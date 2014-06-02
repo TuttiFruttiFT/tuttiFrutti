@@ -3,6 +3,7 @@ package models;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
+import org.mongodb.morphia.annotations.Property;
 
 /**
  * @author rfanego
@@ -16,11 +17,13 @@ public class Jugador {
 	
 	private String mail;
 	
+	@Property("facebook_id")
 	private String facebook;
 	
+	@Property("twitter_id")
 	private String twitter;
 	
-	private Integer saldoRus;
+	private Integer saldo;
 	
 	private String clave;
 
@@ -64,12 +67,12 @@ public class Jugador {
 		this.twitter = twitter;
 	}
 
-	public Integer getSaldoRus() {
-		return saldoRus;
+	public Integer getSaldo() {
+		return saldo;
 	}
 
-	public void setSaldoRus(Integer saldoRus) {
-		this.saldoRus = saldoRus;
+	public void setSaldo(Integer saldo) {
+		this.saldo = saldo;
 	}
 
 	public String getClave() {

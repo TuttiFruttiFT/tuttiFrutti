@@ -8,15 +8,13 @@ GET     /                           			controllers.Application.index()
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               			controllers.Assets.at(path="/public", file)
 
-POST	/jugador/registro						controllers.Jugadores.registrar()
+POST	/jugador								controllers.Jugadores.registrar()
 
-GET		/jugador/validacion						controllers.Jugadores.validar(mail,clave,facebookId,twitterId)
+GET		/jugador								controllers.Jugadores.validar(mail,clave,facebookId,twitterId)
 
-PUT		/jugador/perfil							controllers.Jugadores.editarPerfil()	
+PUT		/jugador								controllers.Jugadores.editarPerfil()	
 
 GET		/jugador/sincronizacion/:idJugador		controllers.Jugadores.sincronizar(idJugador)
-
-GET		/partida/activas/:idJugador				controllers.Partidas.obtenerPartidasActivas(idJugador)
 
 GET		/partida/:idPartida						controllers.Partidas.obtenerPartida(idPartida)
 
