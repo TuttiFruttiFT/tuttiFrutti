@@ -1,0 +1,28 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET     /                           			controllers.Application.index()
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               			controllers.Assets.at(path="/public", file)
+
+POST	/jugador/registro						controllers.Jugadores.registrar()
+
+GET		/jugador/validacion						controllers.Jugadores.validar(mail,clave,facebookId,twitterId)
+
+PUT		/jugador/perfil							controllers.Jugadores.editarPerfil()	
+
+GET		/jugador/sincronizacion/:idJugador		controllers.Jugadores.sincronizar(idJugador)
+
+GET		/partida/activas/:idJugador				controllers.Partidas.obtenerPartidasActivas(idJugador)
+
+GET		/partida/:idPartida						controllers.Partidas.obtenerPartida(idPartida)
+
+POST	/partida/publica						controllers.Partidas.nuevaPartidaPublica()
+
+POST	/partida/privada						controllers.Partidas.nuevaPartidaPrivada()
+
+POST	/partida/turno							controllers.Partidas.jugarTurno()
+
