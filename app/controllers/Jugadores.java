@@ -4,6 +4,7 @@ import java.net.UnknownHostException;
 
 import models.Jugador;
 
+import org.apache.commons.lang3.StringUtils;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
 
@@ -50,17 +51,43 @@ public class Jugadores extends Controller {
     }
 	
 	public static Result validar(String mail,String clave,String facebookId,String twitterId) {
+		if(StringUtils.isNotEmpty(mail) && StringUtils.isNotEmpty(clave)){
+			//TODO Buscar y validar en Mongo
+			return ok();
+		}else if(StringUtils.isNotEmpty(facebookId)){
+			//TODO Buscar y validar en Mongo
+			return ok();
+		}else if(StringUtils.isNotEmpty(twitterId)){
+			//TODO Buscar y validar en Mongo
+			return ok();
+		}
 		
-        return ok();
-    }
-	
-	public static Result sincronizar(String idJugador) {
-		
-        return ok();
+        return badRequest();
     }
 	
 	public static Result editarPerfil() {
 		
+		return ok();
+	}
+	
+	public static Result sincronizar(String idJugador) {
+		//TODO Buscar 
         return ok();
     }
+	
+	
+	public static Result obtenerPartidas(String idJugador){
+		
+		return ok();
+	}
+	
+	public static Result invitarJugadores(){
+		
+		return ok();
+	}
+	
+	public static Result agregarAmigo(){
+		
+		return ok();
+	}
 }

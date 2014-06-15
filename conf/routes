@@ -16,6 +16,12 @@ PUT		/jugador								controllers.Jugadores.editarPerfil()
 
 GET		/jugador/sincronizacion/:idJugador		controllers.Jugadores.sincronizar(idJugador)
 
+GET		/jugador/partidas/:idJugador			controllers.Jugadores.obtenerPartidas(idJugador)
+
+POST	/jugador/invitacion						controllers.Jugadores.invitarJugadores()
+
+POST	/jugador/invitacion						controllers.Jugadores.agregarAmigo()
+
 GET		/partida/:idPartida						controllers.Partidas.obtenerPartida(idPartida)
 
 POST	/partida/publica						controllers.Partidas.nuevaPartidaPublica()
@@ -24,3 +30,18 @@ POST	/partida/privada						controllers.Partidas.nuevaPartidaPrivada()
 
 POST	/partida/turno							controllers.Partidas.jugarTurno()
 
+POST	/rus/compra								controllers.Rus.comprar()
+
+GET		/rus/packs								controllers.Rus.obtenerPacks()
+
+PUT		/palabra/sugerencia						controllers.Palabra.sugerir()
+
+PUT		/palabra/validacion						controllers.Palabra.validar()
+
+GET		/palabra/lista							controllers.Palabra.palabrasAValidar()
+
+GET		/busqueda/jugador/:palabraABuscar		controllers.Busqueda.buscarJugadores(palabraABuscar)
+
+GET		/busqueda/jugador/otros					controllers.Busqueda.buscarOtros()
+
+GET		/categoria/lista						controllers.Categoria.categoriasDisponibles()
