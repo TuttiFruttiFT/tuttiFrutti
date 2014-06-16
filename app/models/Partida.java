@@ -76,4 +76,19 @@ public class Partida {
 		// TODO implementar
 		return null;
 	}
+
+	public static Partida buscarPartida(Integer cantJugadores, String idioma) {
+		// TODO implementar
+		return null;
+	}
+
+	public static Partida crear(Integer cantJugadores, String idioma) {
+		// TODO implementar
+		return null;
+	}
+
+	public void agregarJugador(String idJugador) {
+		// TODO implementar
+		
+	}
 }
