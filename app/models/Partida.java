@@ -12,6 +12,7 @@ import org.mongodb.morphia.annotations.Embedded;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Property;
+import org.mongodb.morphia.annotations.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -51,17 +52,28 @@ public class Partida {
 	@Property("fecha_inicio")
 	private Date fechaInicio;
 	
+	@Property("power_ups_activados")
+	private Boolean powerUpsActivados;
+	
 	@Embedded
 	private List<Categoria> categorias;
 	
 	@Embedded
 	private List<Jugador> jugadores;
 	
-	@Embedded
+	@Transient
 	private List<PowerUp> powerUps;
+	
+	@Transient
+	private Ronda ultimaRonda;
 
 	public static List<PartidaActiva> obtenerPartidasActivas(String idJugador) {
 		// TODO implementar, partidas de idJugador que no estén en PARTIDA_FINALIZADA
+		return null;
+	}
+
+	public static Partida obtenerPartida(String idPartida) {
+		// TODO implementar
 		return null;
 	}
 }

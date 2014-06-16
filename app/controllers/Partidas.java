@@ -1,5 +1,8 @@
 package controllers;
 
+import models.Partida;
+import models.PowerUp;
+import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 
@@ -7,14 +10,14 @@ import play.mvc.Result;
  * @author rfanego
  */
 public class Partidas extends Controller {
-	public static Result obtenerPartidasActivas(String idJugador) {
-		
-        return ok();
-    }
-	
 	public static Result obtenerPartida(String idPartida) {
+		/*
+		 * TODO Obtener la partida, la última ronda y cargar los powerUps
+		 */
+		Partida partida = Partida.obtenerPartida(idPartida);
 		
-        return ok();
+		PowerUp.generar(partida);
+        return ok(Json.toJson(partida));
     }
 	
 	public static Result nuevaPartidaPublica() {
