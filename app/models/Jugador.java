@@ -1,14 +1,31 @@
 package models;
 
+import java.net.UnknownHostException;
+import java.util.Date;
+import java.util.List;
+
+import lombok.Getter;
+import lombok.Setter;
+
 import org.bson.types.ObjectId;
+import org.mongodb.morphia.Datastore;
+import org.mongodb.morphia.Morphia;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Property;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.mongodb.Mongo;
 
 /**
  * @author rfanego
  */
 @Entity
+@Getter @Setter
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Jugador {
 	@Id 
 	private ObjectId id;
@@ -26,60 +43,87 @@ public class Jugador {
 	private Integer saldo;
 	
 	private String clave;
+	
+	@Property("partidas_ganadas")
+	private Integer partidasGanadas;
+	
+	@Property("partidas_perdidas")
+	private Integer partidasPerdidas;
+	
+	@Property("mejor_ganadas")
+	private Integer mejorPuntaje;
+	
+	private String imagen;
 
-	public ObjectId getId() {
-		return id;
+	private List<String> amigos;
+	
+	@Property("fecha_ultimo_juego")
+	private Date fechaUltimoJuego;
+	
+	public static Jugador getJugador(String idJugador){
+		//TODO implementar
+		return null;
+	}
+	
+	public static Jugador validacionMail(String mail,String clave){
+		//TODO implementar
+		return null;
+	}
+	
+	public static Jugador validacionFacebook(String facebookId){
+		//TODO implementar
+		return null;
+	}
+	
+	public static Jugador validacionTwitter(String twitterId){
+		//TODO implementar
+		return null;
 	}
 
-	public void setId(ObjectId id) {
-		this.id = id;
+	public static Jugador registrarMail(String mail, String clave) {
+		// TODO implementar
+		String dbName = new String("tutti");
+		Mongo mongo = null;
+		try {
+			mongo = new Mongo( "localhost", 27017 );
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
+		Morphia morphia = new Morphia();
+		Datastore datastore = morphia.createDatastore(mongo, dbName); 
+		
+		morphia.mapPackage("models");
+		
+		Jugador jugador = new Jugador();
+		jugador.setNickname(mail);
+		jugador.setClave(clave);
+		
+		datastore.save(jugador);
+		
+		return null;
 	}
 
-	public String getNickname() {
-		return nickname;
+	public static Jugador registrarFacebook(String facebookId) {
+		// TODO implementar
+		return null;		
 	}
 
-	public void setNickname(String nickname) {
-		this.nickname = nickname;
+	public static Jugador registrarTwitter(String twitterId) {
+		// TODO implementar
+		return null;
 	}
 
-	public String getMail() {
-		return mail;
+	public static boolean editarPerfil(JsonNode json) {
+		// TODO implementar
+		return false;
 	}
 
-	public void setMail(String mail) {
-		this.mail = mail;
+	public static void agregarAmigo(String idJugador, String idAmigo) {
+		// TODO implementar
+		
 	}
-
-	public String getFacebook() {
-		return facebook;
-	}
-
-	public void setFacebook(String facebook) {
-		this.facebook = facebook;
-	}
-
-	public String getTwitter() {
-		return twitter;
-	}
-
-	public void setTwitter(String twitter) {
-		this.twitter = twitter;
-	}
-
-	public Integer getSaldo() {
-		return saldo;
-	}
-
-	public void setSaldo(Integer saldo) {
-		this.saldo = saldo;
-	}
-
-	public String getClave() {
-		return clave;
-	}
-
-	public void setClave(String clave) {
-		this.clave = clave;
+	
+	public static void powerUp(String idJugador, String idPowerUp) {
+		//TODO implementar
 	}
 }

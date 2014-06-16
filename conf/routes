@@ -12,7 +12,9 @@ POST	/jugador								controllers.Jugadores.registrar()
 
 GET		/jugador								controllers.Jugadores.validar(mail,clave,facebookId,twitterId)
 
-PUT		/jugador								controllers.Jugadores.editarPerfil()	
+PUT		/jugador								controllers.Jugadores.editarPerfil()
+
+GET		/jugador/:idJugador						controllers.Jugadores.obtenerJugador(idJugador)
 
 GET		/jugador/sincronizacion/:idJugador		controllers.Jugadores.sincronizar(idJugador)
 
@@ -21,6 +23,8 @@ GET		/jugador/partidas/:idJugador			controllers.Jugadores.obtenerPartidas(idJuga
 POST	/jugador/invitacion						controllers.Jugadores.invitarJugadores()
 
 POST	/jugador/invitacion						controllers.Jugadores.agregarAmigo()
+
+POST	/jugador/:idJugador/powerup/:idPowerUp	controllers.Jugadores.powerUp(idJugador,idPowerUp)
 
 GET		/partida/:idPartida						controllers.Partidas.obtenerPartida(idPartida)
 

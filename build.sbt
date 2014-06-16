@@ -19,6 +19,6 @@ libraryDependencies += "org.mongodb.morphia" % "morphia" % "0.107"
 
 libraryDependencies += "org.jongo" % "jongo" % "1.0"
 
-libraryDependencies += "org.projectlombok" % "lombok" % "1.12.6"
+libraryDependencies += "org.projectlombok" % "lombok" % "1.14.2"
 
 libraryDependencies += "org.elasticsearch" % "elasticsearch" % "1.1.1"
