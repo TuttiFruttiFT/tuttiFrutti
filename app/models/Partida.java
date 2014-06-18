@@ -14,6 +14,8 @@ import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Property;
 import org.mongodb.morphia.annotations.Transient;
 
+import utils.ElasticUtil;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -34,17 +36,7 @@ public class Partida {
 	
 	private String nombre;
 	
-	@Property("tiempo_ronda")
-	private Integer tiempoRonda;
-	
-	@Property("cant_rondas")
-	private Integer cantRondas;
-	
-	@Property("duracion_maxima")
-	private Integer duracionMaxima;
-	
-	@Property("tiempo_espera_ronda")
-	private Integer tiempoEsperaRonda;
+	private ConfiguracionPartida configuracion;
 	
 	@Property("jugador_ganador")
 	private Jugador jugadorGanador;
@@ -88,6 +80,38 @@ public class Partida {
 	}
 
 	public void agregarJugador(String idJugador) {
+		// TODO implementar
+		
+	}
+
+	public static Partida crear(String idJugador, ConfiguracionPartida configuracion, List<String> jugadores) {
+		// TODO implementar
+		
+		return null;
+	}
+
+	public Resultado jugar(String idJugador, List<CategoriaTurno> categoriasTurno) {
+		for(CategoriaTurno categoriaTurno : categoriasTurno){
+			ElasticUtil.validar(categoriaTurno);
+			this.calcularPuntaje(categoriaTurno);
+		}
+		
+		this.crearTurno(idJugador,categoriasTurno);
+		
+		return calcularResultado();
+	}
+
+	private Resultado calcularResultado() {
+		// TODO implementar
+		return null;
+	}
+
+	private void crearTurno(String idJugador, List<CategoriaTurno> categoriasTurno) {
+		// TODO implementar
+		
+	}
+
+	private void calcularPuntaje(CategoriaTurno categoriaTurno) {
 		// TODO implementar
 		
 	}

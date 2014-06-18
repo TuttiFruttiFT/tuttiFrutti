@@ -1,12 +1,19 @@
 package controllers;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import java.util.ArrayList;
+import java.util.List;
 
+import models.CategoriaTurno;
+import models.ConfiguracionPartida;
 import models.Partida;
 import models.PowerUp;
+import models.Resultado;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
+import utils.PushUtil;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * @author rfanego
@@ -38,12 +45,39 @@ public class Partidas extends Controller {
 	public static Result nuevaPartidaPrivada() {
 		JsonNode json = request().body().asJson();
 		String idJugador = json.get("id_jugador").asText();
-		JsonNode configuracion = json.get("configuracion");
-        return ok();
+		JsonNode jsonConfiguracion = json.get("configuracion");
+		JsonNode jsonJugadores = json.get("jugadores");
+		
+		ConfiguracionPartida configuracion = Json.fromJson(jsonConfiguracion, ConfiguracionPartida.class);
+		List<String> jugadores = new ArrayList<String>();
+		
+		for(JsonNode jsonJugador : jsonJugadores){
+			jugadores.add(jsonJugador.asText());
+		}
+		
+		Partida partida = Partida.crear(idJugador, configuracion,jugadores);
+		
+		PushUtil.partida(jugadores,partida);
+		
+        return ok(Json.toJson(partida));
     }
 	
 	public static Result jugarTurno() {
+		JsonNode json = request().body().asJson();
+		String idJugador = json.get("id_jugador").asText();
+		String idPartida = json.get("id_partida").asText();
+		JsonNode jsonCategoriasTurno = json.get("categorias_turno");
 		
-        return ok();
+		List<CategoriaTurno> categoriasTurno = new ArrayList<CategoriaTurno>();
+		
+		for(JsonNode jsonCategoriaTurno : jsonCategoriasTurno){
+			categoriasTurno.add(Json.fromJson(jsonCategoriaTurno, CategoriaTurno.class));
+		}
+		
+		Partida partida = Partida.obtenerPartida(idPartida);
+		
+		Resultado resultado = partida.jugar(idJugador,categoriasTurno);
+		
+        return ok(Json.toJson(resultado));
     }
 }
