@@ -126,4 +126,9 @@ public class Jugador {
 	public static void powerUp(String idJugador, String idPowerUp) {
 		//TODO implementar
 	}
+
+	public static void compra(String idJugador, Pack pack) {
+		// TODO implementar
+		
+	}
 }

@@ -27,7 +27,7 @@ public class Partidas extends Controller {
         return ok(Json.toJson(partida));
     }
 	
-	public static Result nuevaPartidaPublica() {
+	public static Result nuevaPartidaPublica(){
 		JsonNode json = request().body().asJson();
 		String idJugador = json.get("id_jugador").asText();
 		Integer cantJugadores = json.get("cant_jugadores").asInt();
@@ -42,7 +42,7 @@ public class Partidas extends Controller {
         return ok(Json.toJson(partida));
     }
 	
-	public static Result nuevaPartidaPrivada() {
+	public static Result nuevaPartidaPrivada(){
 		JsonNode json = request().body().asJson();
 		String idJugador = json.get("id_jugador").asText();
 		JsonNode jsonConfiguracion = json.get("configuracion");
@@ -62,7 +62,7 @@ public class Partidas extends Controller {
         return ok(Json.toJson(partida));
     }
 	
-	public static Result jugarTurno() {
+	public static Result jugarTurno(){
 		JsonNode json = request().body().asJson();
 		String idJugador = json.get("id_jugador").asText();
 		String idPartida = json.get("id_partida").asText();
@@ -80,4 +80,12 @@ public class Partidas extends Controller {
 		
         return ok(Json.toJson(resultado));
     }
+	
+	public static Result resultadoTurno(String idPartida,Integer numeroTurno){
+		return ok(Json.toJson(Resultado.resultadoTurno(idPartida,numeroTurno)));
+	}
+	
+	public static Result resultadoPartida(String idPartida){
+		return ok(Json.toJson(Resultado.resultadoPartida(idPartida)));
+	}
 }

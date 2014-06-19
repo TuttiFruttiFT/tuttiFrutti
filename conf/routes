@@ -22,7 +22,7 @@ GET		/jugador/partidas/:idJugador			controllers.Jugadores.obtenerPartidas(idJuga
 
 POST	/jugador/invitacion						controllers.Jugadores.invitarJugadores()
 
-POST	/jugador/invitacion						controllers.Jugadores.agregarAmigo()
+POST	/jugador/amistad						controllers.Jugadores.agregarAmigo()
 
 POST	/jugador/:idJugador/powerup/:idPowerUp	controllers.Jugadores.powerUp(idJugador,idPowerUp)
 
@@ -33,6 +33,10 @@ POST	/partida/publica						controllers.Partidas.nuevaPartidaPublica()
 POST	/partida/privada						controllers.Partidas.nuevaPartidaPrivada()
 
 POST	/partida/turno							controllers.Partidas.jugarTurno()
+
+GET		/partida/:idPartida/turno/:numeroTurno/resultado	controllers.Partidas.resultadoTurno(idPartida,numeroTurno)
+
+GET		/partida/resultado/:idPartida			controllers.Partidas.resultadoPartida(idPartida)
 
 POST	/rus/compra								controllers.Rus.comprar()
 
