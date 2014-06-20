@@ -14,5 +14,4 @@ public class Resultado {
 		// TODO implementar
 		return null;
 	}
-
 }

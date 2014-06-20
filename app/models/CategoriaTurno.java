@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * @author rfanego
  */
 @Entity
-@Getter @Setter
+//@Getter @Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CategoriaTurno {

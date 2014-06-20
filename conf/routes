@@ -42,14 +42,14 @@ POST	/rus/compra								controllers.Rus.comprar()
 
 GET		/rus/packs								controllers.Rus.obtenerPacks()
 
-PUT		/palabra/sugerencia						controllers.Palabra.sugerir()
+PUT		/palabra/sugerencia						controllers.Sugerencias.sugerir()
 
-PUT		/palabra/validacion						controllers.Palabra.validar()
+PUT		/palabra/juicio							controllers.Sugerencias.juzgar()
 
-GET		/palabra/lista							controllers.Palabra.palabrasAValidar()
+GET		/palabra/:idJugador						controllers.Sugerencias.palabraAValidar(idJugador)
 
 GET		/busqueda/jugador/:palabraABuscar		controllers.Busqueda.buscarJugadores(palabraABuscar)
 
-GET		/busqueda/jugador/otros					controllers.Busqueda.buscarOtros()
+GET		/busqueda/jugador/otros/:idJugador		controllers.Busqueda.buscarOtros(idJugador)
 
 GET		/categoria/lista						controllers.Categoria.categoriasDisponibles()

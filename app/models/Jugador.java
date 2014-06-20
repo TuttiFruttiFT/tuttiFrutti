@@ -23,7 +23,7 @@ import com.mongodb.Mongo;
  * @author rfanego
  */
 @Entity
-@Getter @Setter
+//@Getter @Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Jugador {
@@ -95,8 +95,8 @@ public class Jugador {
 		morphia.mapPackage("models");
 		
 		Jugador jugador = new Jugador();
-		jugador.setNickname(mail);
-		jugador.setClave(clave);
+//		jugador.setNickname(mail);
+//		jugador.setClave(clave);
 		
 		datastore.save(jugador);
 		
@@ -130,5 +130,15 @@ public class Jugador {
 	public static void compra(String idJugador, Pack pack) {
 		// TODO implementar
 		
+	}
+
+	public static Jugador obtenerJugadores(String palabraABuscar) {
+		// TODO implementar
+		return null;
+	}
+
+	public static Jugador obtenerOtrosJugadores(String idJugador) {
+		// TODO implementar
+		return null;
 	}
 }
