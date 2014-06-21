@@ -30,14 +30,17 @@ public class Jugadores extends Controller {
 			String facebookId = json.get("facebookId").asText();
 			String twitterId = json.get("twitterId").asText();
 
+			Jugador jugador = null;
+			
 			if(StringUtils.isNotEmpty(mail) && StringUtils.isNotEmpty(clave)){
-				Jugador jugador = Jugador.registrarMail(mail,clave);
-				return ok(Json.toJson(jugador));
+				jugador = Jugador.registrarMail(mail,clave);
 			}else if(StringUtils.isNotEmpty(facebookId)){
-				Jugador jugador = Jugador.registrarFacebook(facebookId);
-				return ok(Json.toJson(jugador));
+				jugador = Jugador.registrarFacebook(facebookId);
 			}else if(StringUtils.isNotEmpty(twitterId)){
-				Jugador jugador = Jugador.registrarTwitter(twitterId);
+				jugador = Jugador.registrarTwitter(twitterId);
+			}
+			
+			if(jugador != null){
 				return ok(Json.toJson(jugador));
 			}
 
@@ -54,7 +57,7 @@ public class Jugadores extends Controller {
 		}else if(StringUtils.isNotEmpty(twitterId)){
 			jugador = Jugador.validacionTwitter(twitterId);
 		}else{
-			return badRequest();			
+			return badRequest();
 		}
 		
 		if(jugador !=  null){
@@ -75,7 +78,7 @@ public class Jugadores extends Controller {
 	}
 	
 	public static Result obtenerJugador(String idJugador) {
-		Jugador jugador = Jugador.getJugador(idJugador);
+		Jugador jugador = Jugador.obtenerJugador(idJugador);
 		
 		if(jugador != null){
 			return ok(Json.toJson(jugador));
@@ -91,7 +94,7 @@ public class Jugadores extends Controller {
 		 * Obtener de cada partida, la letra de la última ronda y la cantidad de rondas que faltan
 		 * Compaginar respuesta
 		 */
-		Jugador jugador = Jugador.getJugador(idJugador);
+		Jugador jugador = Jugador.obtenerJugador(idJugador);
 		if(jugador == null){
 			return badRequest();
 		}

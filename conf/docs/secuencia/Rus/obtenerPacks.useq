@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence-diagram version="1.1.4" icons="true">  
+  <object id="1" language="java" name="controllers.Rus" project="tuttiFrutti" 
+    file="/tuttiFrutti/app/controllers/Rus.java" binary="false" label="rus" type="class" autoSize="true">    
+    <position height="-1" width="-1" x="123" y="0"/>    
+    <execution id="2">      
+      <position height="57" width="50" x="5" y="104"/>    
+    </execution>    
+    <execution id="5">      
+      <position height="76" width="50" x="5" y="193"/>    
+    </execution>    
+    <execution id="7">      
+      <position height="19" width="50" x="5" y="231"/>    
+    </execution>  
+  </object>  
+  <object id="8" language="java" name="models.Pack" project="tuttiFrutti" file="/tuttiFrutti/app/models/Pack.java" 
+    binary="false" label="pack" type="class" autoSize="true">    
+    <position height="-1" width="-1" x="127" y="0"/>    
+    <execution id="4">      
+      <position height="19" width="52" x="59" y="123"/>    
+    </execution>  
+  </object>  
+  <message id="3" operation="packs():java.util.List&lt;Pack&gt;">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="4"/>  
+  </message>  
+  <message id="6" operation="ok(com.fasterxml.jackson.databind.JsonNode):play.mvc.Results.Status">    
+    <end type="SOURCE" refId="5"/>    
+    <end type="TARGET" refId="7"/>  
+  </message>
+</sequence-diagram>

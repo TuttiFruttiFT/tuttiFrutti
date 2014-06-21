@@ -60,7 +60,7 @@ public class Jugador {
 	@Property("fecha_ultimo_juego")
 	private Date fechaUltimoJuego;
 	
-	public static Jugador getJugador(String idJugador){
+	public static Jugador obtenerJugador(String idJugador){
 		//TODO implementar
 		return null;
 	}

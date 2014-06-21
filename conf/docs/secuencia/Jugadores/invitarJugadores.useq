@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence-diagram version="1.1.4" icons="true">  
+  <object id="1" language="java" name="controllers.Jugadores" project="tuttiFrutti" 
+    file="/tuttiFrutti/app/controllers/Jugadores.java" binary="false" label="jugadores" type="class" autoSize="true">    
+    <position height="-1" width="-1" x="33" y="0"/>    
+    <execution id="2">      
+      <position height="57" width="84" x="5" y="121"/>    
+    </execution>    
+    <execution id="5">      
+      <position height="76" width="84" x="5" y="241"/>    
+    </execution>    
+    <execution id="7">      
+      <position height="19" width="84" x="5" y="279"/>    
+    </execution>  
+  </object>  
+  <object id="8" language="java" name="utils.FacebookUtil" project="tuttiFrutti" 
+    file="/tuttiFrutti/app/utils/FacebookUtil.java" binary="false" label="facebookUtil" type="class" autoSize="true">    
+    <position height="-1" width="-1" x="180" y="0"/>    
+    <execution id="4">      
+      <position height="19" width="98" x="93" y="140"/>    
+    </execution>  
+  </object>  
+  <message id="3" operation="enviarInvitaciones(java.lang.String,java.util.List&lt;java.lang.String&gt;):void">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="4"/>  
+  </message>  
+  <message id="6" operation="ok():play.mvc.Results.Status">    
+    <end type="SOURCE" refId="5"/>    
+    <end type="TARGET" refId="7"/>  
+  </message>
+</sequence-diagram>
