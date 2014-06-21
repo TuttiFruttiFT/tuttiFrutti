@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence-diagram version="1.1.4" icons="true" automaticImage="PNG">  
+  <object id="1" language="java" name="controllers.Partidas" project="tuttiFrutti" 
+    file="/tuttiFrutti/app/controllers/Partidas.java" binary="false" label="partidas" type="class" autoSize="true">    
+    <position height="-1" width="-1" x="90" y="0"/>    
+    <execution id="2">      
+      <position height="57" width="71" x="5" y="104"/>    
+    </execution>    
+    <execution id="5">      
+      <position height="76" width="71" x="5" y="205"/>    
+    </execution>    
+    <execution id="7">      
+      <position height="19" width="71" x="5" y="243"/>    
+    </execution>    
+    <execution id="8">      
+      <position height="76" width="71" x="5" y="339"/>    
+    </execution>    
+    <execution id="10">      
+      <position height="19" width="71" x="5" y="377"/>    
+    </execution>  
+  </object>  
+  <object id="11" language="java" name="models.Resultado" project="tuttiFrutti" 
+    file="/tuttiFrutti/app/models/Resultado.java" binary="false" label="resultado" type="class" autoSize="true">    
+    <position height="-1" width="-1" x="137" y="0"/>    
+    <execution id="4">      
+      <position height="19" width="81" x="80" y="123"/>    
+    </execution>  
+  </object>  
+  <message id="3" operation="resultadoTurno(java.lang.String,java.lang.Integer):models.Resultado">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="4"/>  
+  </message>  
+  <message id="6" operation="ok(com.fasterxml.jackson.databind.JsonNode):play.mvc.Results.Status">    
+    <end type="SOURCE" refId="5"/>    
+    <end type="TARGET" refId="7"/>  
+  </message>  
+  <message id="9" operation="notFound():play.mvc.Results.Status">    
+    <end type="SOURCE" refId="8"/>    
+    <end type="TARGET" refId="10"/>  
+  </message>
+</sequence-diagram>

@@ -90,8 +90,8 @@ public class Partida {
 		return null;
 	}
 
-	public Resultado jugar(String idJugador, List<CategoriaTurno> categoriasTurno) {
-		for(CategoriaTurno categoriaTurno : categoriasTurno){
+	public Resultado jugar(String idJugador, List<Dupla> categoriasTurno) {
+		for(Dupla categoriaTurno : categoriasTurno){
 			ElasticUtil.validar(categoriaTurno);
 			this.calcularPuntaje(categoriaTurno);
 		}
@@ -106,12 +106,12 @@ public class Partida {
 		return null;
 	}
 
-	private void crearTurno(String idJugador, List<CategoriaTurno> categoriasTurno) {
+	private void crearTurno(String idJugador, List<Dupla> categoriasTurno) {
 		// TODO implementar
 		
 	}
 
-	private void calcularPuntaje(CategoriaTurno categoriaTurno) {
+	private void calcularPuntaje(Dupla categoriaTurno) {
 		// TODO implementar
 		
 	}

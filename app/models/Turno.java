@@ -25,5 +25,5 @@ public class Turno {
 	private Integer puntaje;
 	
 	@Embedded
-	private List<CategoriaTurno> categoriasTurno;
+	private List<Dupla> duplas;
 }

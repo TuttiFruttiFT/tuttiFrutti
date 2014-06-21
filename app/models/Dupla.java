@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import org.mongodb.morphia.annotations.Entity;
+import org.mongodb.morphia.annotations.Property;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -15,12 +16,14 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 //@Getter @Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CategoriaTurno {
+public class Dupla {
 	private Categoria categoria;
 	
-	private String palabra_ingresada;
+	@Property("palabra_ingresada")
+	private String palabraIngresada;
 	
-	private String palabra_final;
+	@Property("palabra_final")
+	private String palabraFinal;
 	
 	private Double tiempoRelativo;
 	

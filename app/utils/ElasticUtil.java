@@ -1,13 +1,13 @@
 package utils;
 
-import models.CategoriaTurno;
+import models.Dupla;
 
 /**
  * @author rfanego
  */
 public class ElasticUtil {
 
-	public static void validar(CategoriaTurno categoriaTurno) {
+	public static void validar(Dupla categoriaTurno) {
 		// TODO implementar
 		
 	}

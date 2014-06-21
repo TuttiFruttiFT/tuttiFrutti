@@ -3,7 +3,7 @@ package controllers;
 import java.util.ArrayList;
 import java.util.List;
 
-import models.CategoriaTurno;
+import models.Dupla;
 import models.ConfiguracionPartida;
 import models.Partida;
 import models.PowerUp;
@@ -68,10 +68,10 @@ public class Partidas extends Controller {
 		String idPartida = json.get("id_partida").asText();
 		JsonNode jsonCategoriasTurno = json.get("categorias_turno");
 		
-		List<CategoriaTurno> categoriasTurno = new ArrayList<CategoriaTurno>();
+		List<Dupla> categoriasTurno = new ArrayList<Dupla>();
 		
 		for(JsonNode jsonCategoriaTurno : jsonCategoriasTurno){
-			categoriasTurno.add(Json.fromJson(jsonCategoriaTurno, CategoriaTurno.class));
+			categoriasTurno.add(Json.fromJson(jsonCategoriaTurno, Dupla.class));
 		}
 		
 		Partida partida = Partida.obtenerPartida(idPartida);
@@ -82,10 +82,22 @@ public class Partidas extends Controller {
     }
 	
 	public static Result resultadoTurno(String idPartida,Integer numeroTurno){
-		return ok(Json.toJson(Resultado.resultadoTurno(idPartida,numeroTurno)));
+		Resultado resultadoTurno = Resultado.resultadoTurno(idPartida,numeroTurno);
+		
+		if(resultadoTurno != null){
+			return ok(Json.toJson(resultadoTurno));
+		}
+		
+		return notFound();
 	}
 	
 	public static Result resultadoPartida(String idPartida){
-		return ok(Json.toJson(Resultado.resultadoPartida(idPartida)));
+		Resultado resultadoPartida = Resultado.resultadoPartida(idPartida);
+		
+		if(resultadoPartida != null){
+			return ok(Json.toJson(resultadoPartida));
+		}
+		
+		return notFound();
 	}
 }

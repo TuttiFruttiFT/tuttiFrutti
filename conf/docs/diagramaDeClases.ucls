@@ -19,8 +19,8 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="3" language="java" name="models.CategoriaTurno" project="tuttiFrutti" 
-    file="/tuttiFrutti/app/models/CategoriaTurno.java" binary="false" corner="BOTTOM_RIGHT">    
+  <class id="3" language="java" name="models.Dupla" project="tuttiFrutti" file="/tuttiFrutti/app/models/Dupla.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="460" y="598"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
@@ -100,8 +100,8 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="12" language="java" name="models.ResultadoTurno" project="tuttiFrutti" 
-    file="/tuttiFrutti/app/models/ResultadoTurno.java" binary="false" corner="BOTTOM_RIGHT">    
+  <class id="12" language="java" name="models.ResultadoRonda" project="tuttiFrutti" 
+    file="/tuttiFrutti/app/models/ResultadoRonda.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="988" y="662"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
@@ -109,8 +109,8 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="13" language="java" name="models.ResultadoPartido" project="tuttiFrutti" 
-    file="/tuttiFrutti/app/models/ResultadoPartido.java" binary="false" corner="BOTTOM_RIGHT">    
+  <class id="13" language="java" name="models.ResultadoPartida" project="tuttiFrutti" 
+    file="/tuttiFrutti/app/models/ResultadoPartida.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="1159" y="661"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
