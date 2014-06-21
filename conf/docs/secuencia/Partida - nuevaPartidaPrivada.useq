@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence-diagram version="1.1.4" icons="true">  
+  <object id="1" language="java" name="controllers.Partidas" project="tuttiFrutti" 
+    file="/tuttiFrutti/app/controllers/Partidas.java" binary="false" label="partidas" type="class" autoSize="true">    
+    <position height="-1" width="-1" x="173" y="0"/>    
+    <execution id="2">      
+      <position height="57" width="71" x="5" y="101"/>    
+    </execution>    
+    <execution id="5">      
+      <position height="57" width="71" x="5" y="211"/>    
+    </execution>    
+    <execution id="8">      
+      <position height="76" width="71" x="5" y="291"/>    
+    </execution>    
+    <execution id="10">      
+      <position height="19" width="71" x="5" y="329"/>    
+    </execution>  
+  </object>  
+  <object id="11" language="java" name="models.Partida" project="tuttiFrutti" 
+    file="/tuttiFrutti/app/models/Partida.java" binary="false" label="partida" type="class" autoSize="true">    
+    <position height="-1" width="-1" x="157" y="0"/>    
+    <execution id="4">      
+      <position height="19" width="64" x="80" y="120"/>    
+    </execution>  
+  </object>  
+  <object id="12" language="java" name="utils.PushUtil" project="tuttiFrutti" 
+    file="/tuttiFrutti/app/utils/PushUtil.java" binary="false" label="pushUtil" type="class" autoSize="true">    
+    <position height="-1" width="-1" x="181" y="0"/>    
+    <execution id="7">      
+      <position height="19" width="71" x="148" y="230"/>    
+    </execution>  
+  </object>  
+  <message id="3" 
+    operation="crear(java.lang.String,models.ConfiguracionPartida,java.util.List&lt;java.lang.String&gt;):models.Partida">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="4"/>  
+  </message>  
+  <message id="6" operation="partida(java.util.List&lt;java.lang.String&gt;,models.Partida):void">    
+    <end type="SOURCE" refId="5"/>    
+    <end type="TARGET" refId="7"/>  
+  </message>  
+  <message id="9" operation="ok(com.fasterxml.jackson.databind.JsonNode):play.mvc.Results.Status">    
+    <end type="SOURCE" refId="8"/>    
+    <end type="TARGET" refId="10"/>  
+  </message>
+</sequence-diagram>
