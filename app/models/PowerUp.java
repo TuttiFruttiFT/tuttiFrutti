@@ -1,42 +1,51 @@
 package models;
 
-import java.util.Map;
+import java.util.List;
+
+import lombok.Getter;
+import lombok.Setter;
 
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Transient;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * @author rfanego
  */
 @Entity
+@Getter @Setter
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class PowerUp {
 	@Id 
 	private ObjectId id;
 	
-	private String nombre;
+	private String name;
 	
 	@Transient
-    private Map<String,String> categorias;
+    private List<Dupla> duplas;
 
-	public static void generar(Partida partida) {		
+	public static void generar(Match partida) {		
 		PowerUp.generarAutoCompletarPalabra(partida);
 		PowerUp.generarSugerirPalabra(partida);
 		PowerUp.generarPalabrasOponente(partida);
 	}
 
-	private static void generarPalabrasOponente(Partida partida) {
+	private static void generarPalabrasOponente(Match partida) {
 		// TODO implementar
 		
 	}
 
-	private static void generarSugerirPalabra(Partida partida) {
+	private static void generarSugerirPalabra(Match partida) {
 		// TODO implementar
 		
 	}
 
-	private static void generarAutoCompletarPalabra(Partida partida) {
+	private static void generarAutoCompletarPalabra(Match partida) {
 		// TODO implementar
 		
 	}

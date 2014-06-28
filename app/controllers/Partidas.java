@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import models.Dupla;
-import models.ConfiguracionPartida;
-import models.Partida;
+import models.Match;
+import models.MatchConfig;
 import models.PowerUp;
-import models.Resultado;
+import models.ResultModel;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class Partidas extends Controller {
 	public static Result obtenerPartida(String idPartida) {
 		//TODO Obtener la partida, la última ronda y cargar los powerUps
-		Partida partida = Partida.obtenerPartida(idPartida);
+		Match partida = Match.obtenerPartida(idPartida);
 		
 		PowerUp.generar(partida);
         return ok(Json.toJson(partida));
@@ -33,9 +33,9 @@ public class Partidas extends Controller {
 		Integer cantJugadores = json.get("cant_jugadores").asInt();
 		String idioma = json.get("idioma").asText();
 		
-		Partida partida = Partida.buscarPartida(cantJugadores,idioma);
+		Match partida = Match.buscarPartida(cantJugadores,idioma);
 		if(partida == null){
-			partida = Partida.crear(cantJugadores,idioma);
+			partida = Match.crear(cantJugadores,idioma);
 		}
 		partida.agregarJugador(idJugador);
 		PowerUp.generar(partida);
@@ -48,14 +48,14 @@ public class Partidas extends Controller {
 		JsonNode jsonConfiguracion = json.get("configuracion");
 		JsonNode jsonJugadores = json.get("jugadores");
 		
-		ConfiguracionPartida configuracion = Json.fromJson(jsonConfiguracion, ConfiguracionPartida.class);
+		MatchConfig configuracion = Json.fromJson(jsonConfiguracion, MatchConfig.class);
 		List<String> jugadores = new ArrayList<String>();
 		
 		for(JsonNode jsonJugador : jsonJugadores){
 			jugadores.add(jsonJugador.asText());
 		}
 		
-		Partida partida = Partida.crear(idJugador, configuracion,jugadores);
+		Match partida = Match.crear(idJugador, configuracion,jugadores);
 		
 		PushUtil.partida(jugadores,partida);
 		
@@ -74,15 +74,15 @@ public class Partidas extends Controller {
 			categoriasTurno.add(Json.fromJson(jsonCategoriaTurno, Dupla.class));
 		}
 		
-		Partida partida = Partida.obtenerPartida(idPartida);
+		Match partida = Match.obtenerPartida(idPartida);
 		
-		Resultado resultado = partida.jugar(idJugador,categoriasTurno);
+		ResultModel resultado = partida.jugar(idJugador,categoriasTurno);
 		
         return ok(Json.toJson(resultado));
     }
 	
 	public static Result resultadoTurno(String idPartida,Integer numeroTurno){
-		Resultado resultadoTurno = Resultado.resultadoTurno(idPartida,numeroTurno);
+		ResultModel resultadoTurno = ResultModel.resultadoTurno(idPartida,numeroTurno);
 		
 		if(resultadoTurno != null){
 			return ok(Json.toJson(resultadoTurno));
@@ -92,7 +92,7 @@ public class Partidas extends Controller {
 	}
 	
 	public static Result resultadoPartida(String idPartida){
-		Resultado resultadoPartida = Resultado.resultadoPartida(idPartida);
+		ResultModel resultadoPartida = ResultModel.resultadoPartida(idPartida);
 		
 		if(resultadoPartida != null){
 			return ok(Json.toJson(resultadoPartida));

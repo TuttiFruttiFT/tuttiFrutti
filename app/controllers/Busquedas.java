@@ -1,6 +1,6 @@
 package controllers;
 
-import models.Jugador;
+import models.Player;
 import play.mvc.Controller;
 import play.mvc.Result;
 
@@ -9,7 +9,7 @@ import play.mvc.Result;
  */
 public class Busquedas extends Controller {
 	public static Result buscarJugadores(String palabraABuscar) {
-		Jugador jugadores = Jugador.obtenerJugadores(palabraABuscar);
+		Player jugadores = Player.obtenerJugadores(palabraABuscar);
 		
 		//TODO ver como crear un json desde una lista
 		
@@ -17,7 +17,7 @@ public class Busquedas extends Controller {
     }
 	
 	public static Result buscarOtros(String idJugador) {
-		Jugador jugadores = Jugador.obtenerOtrosJugadores(idJugador);
+		Player jugadores = Player.obtenerOtrosJugadores(idJugador);
 		
 		//TODO ver como crear un json desde una lista
 		

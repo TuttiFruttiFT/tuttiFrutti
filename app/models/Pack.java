@@ -17,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * @author rfanego
  */
 @Entity
-//@Getter @Setter
+@Getter @Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Pack {
@@ -25,17 +25,17 @@ public class Pack {
 	@Id 
 	private ObjectId id;
 	
-	private String nombre;
+	private String name;
 	
-	private String descripcion;
+	private String desc;
 	
 	@Property("cantidad_actual")
-	private Integer cantidadActual;
+	private Integer currentAmount;
 	
 	@Property("cantidad_default")
-	private Integer cantidadDefault;
+	private Integer defaultAmount;
 	
-	private Double precio;
+	private Double price;
 
 	public static List<Pack> packs() {
 		// TODO implementar

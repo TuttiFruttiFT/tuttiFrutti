@@ -2,7 +2,7 @@ package controllers;
 
 import java.util.List;
 
-import models.Categoria;
+import models.Category;
 import play.mvc.Controller;
 import play.mvc.Result;
 
@@ -11,7 +11,7 @@ import play.mvc.Result;
  */
 public class Categorias extends Controller {
 	public static Result categoriasDisponibles() {
-		List<Categoria> categorias = Categoria.categorias();
+		List<Category> categorias = Category.categorias();
 		
 		//TODO ver como crear un json desde una lista
 		

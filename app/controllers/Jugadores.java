@@ -3,8 +3,8 @@ package controllers;
 import java.util.ArrayList;
 import java.util.List;
 
-import models.Jugador;
-import models.Partida;
+import models.Player;
+import models.Match;
 import models.views.PartidaActiva;
 
 import org.apache.commons.lang3.StringUtils;
@@ -30,14 +30,14 @@ public class Jugadores extends Controller {
 			String facebookId = json.get("facebookId").asText();
 			String twitterId = json.get("twitterId").asText();
 
-			Jugador jugador = null;
+			Player jugador = null;
 			
 			if(StringUtils.isNotEmpty(mail) && StringUtils.isNotEmpty(clave)){
-				jugador = Jugador.registrarMail(mail,clave);
+				jugador = Player.registrarMail(mail,clave);
 			}else if(StringUtils.isNotEmpty(facebookId)){
-				jugador = Jugador.registrarFacebook(facebookId);
+				jugador = Player.registrarFacebook(facebookId);
 			}else if(StringUtils.isNotEmpty(twitterId)){
-				jugador = Jugador.registrarTwitter(twitterId);
+				jugador = Player.registrarTwitter(twitterId);
 			}
 			
 			if(jugador != null){
@@ -49,13 +49,13 @@ public class Jugadores extends Controller {
     }
 	
 	public static Result validar(String mail,String clave,String facebookId,String twitterId) {
-		Jugador jugador = null;
+		Player jugador = null;
 		if(StringUtils.isNotEmpty(mail) && StringUtils.isNotEmpty(clave)){
-			jugador = Jugador.validacionMail(mail, clave);
+			jugador = Player.validacionMail(mail, clave);
 		}else if(StringUtils.isNotEmpty(facebookId)){
-			jugador = Jugador.validacionFacebook(facebookId);
+			jugador = Player.validacionFacebook(facebookId);
 		}else if(StringUtils.isNotEmpty(twitterId)){
-			jugador = Jugador.validacionTwitter(twitterId);
+			jugador = Player.validacionTwitter(twitterId);
 		}else{
 			return badRequest();
 		}
@@ -70,7 +70,7 @@ public class Jugadores extends Controller {
 	public static Result editarPerfil() {
 		JsonNode json = request().body().asJson();
 		
-		if(Jugador.editarPerfil(json)){
+		if(Player.editarPerfil(json)){
 			return ok();
 		}
 		
@@ -78,7 +78,7 @@ public class Jugadores extends Controller {
 	}
 	
 	public static Result obtenerJugador(String idJugador) {
-		Jugador jugador = Jugador.obtenerJugador(idJugador);
+		Player jugador = Player.obtenerJugador(idJugador);
 		
 		if(jugador != null){
 			return ok(Json.toJson(jugador));
@@ -94,12 +94,12 @@ public class Jugadores extends Controller {
 		 * Obtener de cada partida, la letra de la última ronda y la cantidad de rondas que faltan
 		 * Compaginar respuesta
 		 */
-		Jugador jugador = Jugador.obtenerJugador(idJugador);
+		Player jugador = Player.obtenerJugador(idJugador);
 		if(jugador == null){
 			return badRequest();
 		}
 		
-		List<PartidaActiva> partidasActivas = Partida.obtenerPartidasActivas(idJugador);
+		List<PartidaActiva> partidasActivas = Match.obtenerPartidasActivas(idJugador);
 
 		//TODO ver como crear un json desde una lista
 		
@@ -108,7 +108,7 @@ public class Jugadores extends Controller {
 	
 	
 	public static Result obtenerPartidas(String idJugador){
-		List<PartidaActiva> partidasActivas = Partida.obtenerPartidasActivas(idJugador);
+		List<PartidaActiva> partidasActivas = Match.obtenerPartidasActivas(idJugador);
 
 		//TODO ver como crear un json desde una lista
 		
@@ -132,13 +132,13 @@ public class Jugadores extends Controller {
 		String idJugador = json.get("id_jugador").asText();
 		String idAmigo = json.get("id_amigo").asText();
 		
-		Jugador.agregarAmigo(idJugador,idAmigo);
+		Player.agregarAmigo(idJugador,idAmigo);
 		
 		return ok();
 	}
 	
 	public static Result powerUp(String idJugador,String idPowerUp){
-		Jugador.powerUp(idJugador, idPowerUp);
+		Player.powerUp(idJugador, idPowerUp);
 		return ok();
 	}
 }

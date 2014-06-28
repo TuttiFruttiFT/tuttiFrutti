@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import models.Jugador;
+import models.Player;
 import models.Pack;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -23,7 +23,7 @@ public class Rus extends Controller {
 		
 		GoogleUtil.compra(idJugador,pack);
 		
-		Jugador.compra(idJugador,pack);
+		Player.compra(idJugador,pack);
 		
 		return ok();
 	}

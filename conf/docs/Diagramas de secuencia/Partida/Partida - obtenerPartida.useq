@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence-diagram version="1.1.4" icons="true" automaticImage="PNG">  
+  <object id="1" language="java" name="controllers.Partidas" project="tuttiFrutti" 
+    file="/tuttiFrutti/app/controllers/Partidas.java" binary="false" label="partidas" type="class" autoSize="true">    
+    <position height="-1" width="-1" x="64" y="0"/>    
+    <execution id="2">      
+      <position height="57" width="71" x="5" y="109"/>    
+    </execution>    
+    <execution id="5">      
+      <position height="57" width="71" x="5" y="209"/>    
+    </execution>    
+    <execution id="8">      
+      <position height="76" width="71" x="5" y="498"/>    
+    </execution>    
+    <execution id="10">      
+      <position height="19" width="71" x="5" y="536"/>    
+    </execution>  
+  </object>  
+  <object id="11" language="java" name="models.Match" project="tuttiFrutti" file="/tuttiFrutti/app/models/Match.java" 
+    binary="false" label="partida" type="class" autoSize="true">    
+    <position height="-1" width="-1" x="217" y="0"/>    
+    <execution id="4">      
+      <position height="19" width="64" x="80" y="128"/>    
+    </execution>  
+  </object>  
+  <object id="12" language="java" name="models.PowerUp" project="tuttiFrutti" 
+    file="/tuttiFrutti/app/models/PowerUp.java" binary="false" label="powerUp" type="class" autoSize="true">    
+    <position height="-1" width="-1" x="231" y="0"/>    
+    <execution id="7">      
+      <position height="19" width="75" x="148" y="228"/>    
+    </execution>    
+    <execution id="13">      
+      <position height="76" width="75" x="148" y="277"/>    
+    </execution>    
+    <execution id="15">      
+      <position height="19" width="75" x="148" y="315"/>    
+    </execution>    
+    <execution id="16">      
+      <position height="76" width="75" x="148" y="360"/>    
+    </execution>    
+    <execution id="18">      
+      <position height="19" width="75" x="148" y="398"/>    
+    </execution>    
+    <execution id="19">      
+      <position height="76" width="75" x="148" y="449"/>    
+    </execution>    
+    <execution id="21">      
+      <position height="19" width="75" x="148" y="487"/>    
+    </execution>  
+  </object>  
+  <message id="3" operation="obtenerPartida(java.lang.String):models.Partida">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="4"/>  
+  </message>  
+  <message id="6" operation="generar(models.Partida):void">    
+    <end type="SOURCE" refId="5"/>    
+    <end type="TARGET" refId="7"/>  
+  </message>  
+  <message id="9" operation="ok(com.fasterxml.jackson.databind.JsonNode):play.mvc.Results.Status">    
+    <end type="SOURCE" refId="8"/>    
+    <end type="TARGET" refId="10"/>  
+  </message>  
+  <message id="14" operation="generarPalabrasOponente(models.Partida):void">    
+    <end type="SOURCE" refId="13"/>    
+    <end type="TARGET" refId="15"/>  
+  </message>  
+  <message id="17" operation="generarAutoCompletarPalabra(models.Partida):void">    
+    <end type="SOURCE" refId="16"/>    
+    <end type="TARGET" refId="18"/>  
+  </message>  
+  <message id="20" operation="generarSugerirPalabra(models.Partida):void">    
+    <end type="SOURCE" refId="19"/>    
+    <end type="TARGET" refId="21"/>  
+  </message>
+</sequence-diagram>

@@ -1,6 +1,8 @@
 package controllers;
 
-import models.Sugerencia;
+import java.util.List;
+
+import models.Suggestion;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -15,7 +17,7 @@ public class Sugerencias extends Controller {
 			String categoria = sugerencia.get("categoria").asText();
 			String palabra = sugerencia.get("palabra").asText();
 			
-			Sugerencia.agregar(categoria,palabra);
+			Suggestion.agregar(categoria,palabra);
 		}
 		
         return ok();
@@ -26,14 +28,18 @@ public class Sugerencias extends Controller {
 		
 		String categoria = json.get("categoria").asText();
 		String palabra = json.get("palabra").asText();
+		Boolean valid = json.get("valid").asBoolean();
 		
-		Sugerencia.juzgar(categoria,palabra);
+		Suggestion.juzgar(categoria,palabra, valid);
 		
         return ok();
     }
 	
 	public static Result palabraAValidar(String idJugador) {		
-		Sugerencia sugerencia = Sugerencia.obtenerPalabra(idJugador);
-        return ok(Json.toJson(sugerencia));
+		List<Suggestion> sugerencias = Suggestion.obtenerPalabra(idJugador);
+		
+		//TODO ver como crear un json desde una lista
+		
+        return ok(Json.toJson(sugerencias));
     }
 }

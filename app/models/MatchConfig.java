@@ -16,18 +16,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @Getter @Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Dupla {
-	private Category category;
+public class MatchConfig {
 	
-	@Property("written_word")
-	private String writtenWord;
+	private Integer round;
 	
-	@Property("final_word")
-	private String finalWord;
+	@Property("match_type")
+	private String matchType;
 	
-	private Double time;
-	
-	private String state;
-	
-	private Integer score;
+	@Property("power_ups_enabled")
+	private boolean powerUpsEnabled;
 }
