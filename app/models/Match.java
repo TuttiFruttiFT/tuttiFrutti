@@ -5,7 +5,7 @@ import java.util.List;
 
 import lombok.Getter;
 import lombok.Setter;
-import models.views.PartidaActiva;
+import models.views.ActiveMatch;
 
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Embedded;
@@ -62,7 +62,7 @@ public class Match {
 	@Transient
 	private Round lastRonda;
 
-	public static List<PartidaActiva> activeMatches(String idJugador) {
+	public static List<ActiveMatch> activeMatches(String idJugador) {
 		// TODO implementar, partidas de idJugador que no estén en PARTIDA_FINALIZADA
 		return null;
 	}

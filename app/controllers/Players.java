@@ -5,7 +5,7 @@ import java.util.List;
 
 import models.Player;
 import models.Match;
-import models.views.PartidaActiva;
+import models.views.ActiveMatch;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -99,7 +99,7 @@ public class Players extends Controller {
 			return badRequest();
 		}
 		
-		List<PartidaActiva> activeMatches = Match.activeMatches(playerId);
+		List<ActiveMatch> activeMatches = Match.activeMatches(playerId);
 
 		//TODO ver como crear un json desde una lista
 		
@@ -108,7 +108,7 @@ public class Players extends Controller {
 	
 	
 	public static Result activeMatches(String idJugador){
-		List<PartidaActiva> activeMatches = Match.activeMatches(idJugador);
+		List<ActiveMatch> activeMatches = Match.activeMatches(idJugador);
 
 		//TODO ver como crear un json desde una lista
 		
