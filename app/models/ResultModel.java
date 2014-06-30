@@ -10,7 +10,7 @@ public class ResultModel {
 		return null;
 	}
 
-	public static ResultModel resultadoPartida(String idPartida) {
+	public static ResultModel matchResult(String idPartida) {
 		// TODO implementar
 		return null;
 	}

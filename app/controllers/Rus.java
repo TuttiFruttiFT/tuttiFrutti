@@ -14,21 +14,21 @@ import utils.GoogleUtil;
  * @author rfanego
  */
 public class Rus extends Controller {
-	public static Result comprar(){
+	public static Result buy(){
 		JsonNode json = request().body().asJson();
-		String idJugador = json.get("id_jugador").asText();
-		String idPack = json.get("id_pack").asText();
+		String playerId = json.get("player_id").asText();
+		String packId = json.get("pack_id").asText();
 		
-		Pack pack = Pack.pack(idPack);
+		Pack pack = Pack.pack(packId);
 		
-		GoogleUtil.compra(idJugador,pack);
+		GoogleUtil.buy(playerId,pack);
 		
-		Player.compra(idJugador,pack);
+		Player.buy(playerId,pack);
 		
 		return ok();
 	}
 
-	public static Result obtenerPacks(){
+	public static Result packs(){
 		
 		List<Pack> packs = Pack.packs();
 		

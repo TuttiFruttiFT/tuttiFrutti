@@ -7,7 +7,7 @@ import models.Pack;
  */
 public class GoogleUtil {
 
-	public static void compra(String idJugador, Pack pack) {
+	public static void buy(String idJugador, Pack pack) {
 		// TODO implementar
 		
 	}

@@ -55,27 +55,27 @@ public class Player {
 	
 	private Date last;
 	
-	public static Player obtenerJugador(String idJugador){
+	public static Player player(String idJugador){
 		//TODO implementar
 		return null;
 	}
 	
-	public static Player validacionMail(String mail,String clave){
+	public static Player validateMail(String mail,String clave){
 		//TODO implementar
 		return null;
 	}
 	
-	public static Player validacionFacebook(String facebookId){
+	public static Player validateFacebook(String facebookId){
 		//TODO implementar
 		return null;
 	}
 	
-	public static Player validacionTwitter(String twitterId){
+	public static Player validateTwitter(String twitterId){
 		//TODO implementar
 		return null;
 	}
 
-	public static Player registrarMail(String mail, String clave) {
+	public static Player registerMail(String mail, String clave) {
 		// TODO implementar
 		
 		Datastore datastore = MongoUtil.getDatastore(); 
@@ -89,12 +89,12 @@ public class Player {
 		return jugador;
 	}
 
-	public static Player registrarFacebook(String facebookId) {
+	public static Player registerFacebook(String facebookId) {
 		// TODO implementar
 		return null;		
 	}
 
-	public static Player registrarTwitter(String twitterId) {
+	public static Player registerTwitter(String twitterId) {
 		// TODO implementar
 		return null;
 	}
@@ -104,7 +104,7 @@ public class Player {
 		return false;
 	}
 
-	public static void agregarAmigo(String idJugador, String idAmigo) {
+	public static void addFriend(String idJugador, String idAmigo) {
 		// TODO implementar
 		
 	}
@@ -113,17 +113,17 @@ public class Player {
 		//TODO implementar
 	}
 
-	public static void compra(String idJugador, Pack pack) {
+	public static void buy(String idJugador, Pack pack) {
 		// TODO implementar
 		
 	}
 
-	public static Player obtenerJugadores(String palabraABuscar) {
+	public static Player getPlayers(String palabraABuscar) {
 		// TODO implementar
 		return null;
 	}
 
-	public static Player obtenerOtrosJugadores(String idJugador) {
+	public static Player getOthersPlayers(String idJugador) {
 		// TODO implementar
 		return null;
 	}

@@ -3,53 +3,53 @@
 # ~~~~
 
 # Home page
-GET     /                           			controllers.Application.index()
+GET     /                           				controllers.Application.index()
 
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file               			controllers.Assets.at(path="/public", file)
+GET     /assets/*file               			    controllers.Assets.at(path="/public", file)
+                                                    
+POST	/player									    controllers.Players.register()
+                                                    
+GET		/player									    controllers.Players.validate(mail,password,facebookId,twitterId)
+                                                    
+PUT		/player									    controllers.Players.editProfile()
+                                                    
+GET		/player/:playerId						    controllers.Players.player(playerId)
+                                                    
+GET		/player/sync/:playerId					    ontrollers.Players.sync(playerId)
+                                                    
+GET		/player/matches/:playerId				    controllers.Players.activeMatches(playerId)
+                                                    
+POST	/player/invitation						    controllers.Players.invitePlayers()
+                                                    
+POST	/player/friend							    controllers.Players.addFriend()
+                                                    
+POST	/player/:playerId/powerup/:idPowerUp	    controllers.Players.powerUp(playerId,idPowerUp)
+                                                    
+GET		/match/:matchId							    controllers.Matches.match(matchId)
 
-POST	/jugador								controllers.Jugadores.registrar()
+POST	/match/public								controllers.Matches.publicMatch()
 
-GET		/jugador								controllers.Jugadores.validar(mail,clave,facebookId,twitterId)
+POST	/match/private								controllers.Matches.privateMatch()
 
-PUT		/jugador								controllers.Jugadores.editarPerfil()
+POST	/match/turn									controllers.Matches.turn()
 
-GET		/jugador/:idJugador						controllers.Jugadores.obtenerJugador(idJugador)
+GET		/match/:matchId/round/:roundNumber/result	controllers.Matches.roundResult(matchId,roundNumber)
 
-GET		/jugador/sincronizacion/:idJugador		controllers.Jugadores.sincronizar(idJugador)
+GET		/match/result/:matchId						controllers.Matches.matchResult(matchId)
 
-GET		/jugador/partidas/:idJugador			controllers.Jugadores.obtenerPartidas(idJugador)
+POST	/rus/purchase								controllers.Rus.buy()
 
-POST	/jugador/invitacion						controllers.Jugadores.invitarJugadores()
+GET		/rus/packs									controllers.Rus.packs()
 
-POST	/jugador/amistad						controllers.Jugadores.agregarAmigo()
+PUT		/word/suggest								controllers.Suggestions.suggest()
 
-POST	/jugador/:idJugador/powerup/:idPowerUp	controllers.Jugadores.powerUp(idJugador,idPowerUp)
+PUT		/word/judgement								controllers.Suggestions.judge()
 
-GET		/partida/:idPartida						controllers.Partidas.obtenerPartida(idPartida)
+GET		/word/:playerId								controllers.Suggestions.getWords(playerId)
 
-POST	/partida/publica						controllers.Partidas.nuevaPartidaPublica()
+GET		/search/player/:searchedTerm				controllers.Searches.searchPlayers(searchedTerm)
 
-POST	/partida/privada						controllers.Partidas.nuevaPartidaPrivada()
+GET		/search/player/others/:playerId				controllers.Searches.searchOthers(playerId)
 
-POST	/partida/turno							controllers.Partidas.jugarTurno()
-
-GET		/partida/:idPartida/turno/:numeroTurno/resultado	controllers.Partidas.resultadoTurno(idPartida,numeroTurno)
-
-GET		/partida/resultado/:idPartida			controllers.Partidas.resultadoPartida(idPartida)
-
-POST	/rus/compra								controllers.Rus.comprar()
-
-GET		/rus/packs								controllers.Rus.obtenerPacks()
-
-PUT		/palabra/sugerencia						controllers.Sugerencias.sugerir()
-
-PUT		/palabra/juicio							controllers.Sugerencias.juzgar()
-
-GET		/palabra/:idJugador						controllers.Sugerencias.palabraAValidar(idJugador)
-
-GET		/busqueda/jugador/:palabraABuscar		controllers.Busqueda.buscarJugadores(palabraABuscar)
-
-GET		/busqueda/jugador/otros/:idJugador		controllers.Busqueda.buscarOtros(idJugador)
-
-GET		/categoria/lista						controllers.Categoria.categoriasDisponibles()
+GET		/category/list								controllers.Categories.availableCategories()

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sequence-diagram version="1.1.4" icons="true" automaticImage="PNG">  
-  <object id="1" language="java" name="controllers.Partidas" project="tuttiFrutti" 
-    file="/tuttiFrutti/app/controllers/Partidas.java" binary="false" label="partidas" type="class" autoSize="true">    
+  <object id="1" language="java" name="controllers.Matches" project="tuttiFrutti" 
+    file="/tuttiFrutti/app/controllers/Matches.java" binary="false" label="partidas" type="class" autoSize="true">    
     <position height="-1" width="-1" x="90" y="0"/>    
     <execution id="2">      
       <position height="57" width="71" x="5" y="104"/>    

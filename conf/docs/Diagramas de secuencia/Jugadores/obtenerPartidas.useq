@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sequence-diagram version="1.1.4" icons="true" automaticImage="PNG">  
-  <object id="1" language="java" name="controllers.Jugadores" project="tuttiFrutti" 
-    file="/tuttiFrutti/app/controllers/Jugadores.java" binary="false" label="jugadores" type="class" autoSize="true">    
+  <object id="1" language="java" name="controllers.Players" project="tuttiFrutti" 
+    file="/tuttiFrutti/app/controllers/Players.java" binary="false" label="jugadores" type="class" autoSize="true">    
     <position height="-1" width="-1" x="69" y="0"/>    
     <execution id="2">      
       <position height="57" width="84" x="5" y="117"/>    

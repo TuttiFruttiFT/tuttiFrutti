@@ -32,7 +32,7 @@ public class Category {
 	
 	private String image;
 
-	public static List<Category> categorias() {
+	public static List<Category> categories() {
 		// TODO implementar
 		return null;
 	}

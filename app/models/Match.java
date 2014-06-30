@@ -62,22 +62,22 @@ public class Match {
 	@Transient
 	private Round lastRonda;
 
-	public static List<PartidaActiva> obtenerPartidasActivas(String idJugador) {
+	public static List<PartidaActiva> activeMatches(String idJugador) {
 		// TODO implementar, partidas de idJugador que no estén en PARTIDA_FINALIZADA
 		return null;
 	}
 
-	public static Match obtenerPartida(String idPartida) {
+	public static Match match(String idPartida) {
 		// TODO implementar
 		return null;
 	}
 
-	public static Match buscarPartida(Integer cantJugadores, String idioma) {
+	public static Match findMatch(Integer cantJugadores, String idioma) {
 		// TODO implementar
 		return null;
 	}
 
-	public static Match crear(Integer cantJugadores, String idioma) {
+	public static Match create(Integer cantJugadores, String idioma) {
 		// TODO implementar
 		return null;
 	}
@@ -87,13 +87,13 @@ public class Match {
 		
 	}
 
-	public static Match crear(String idJugador, MatchConfig configuracion, List<String> jugadores) {
+	public static Match create(String idJugador, MatchConfig configuracion, List<String> jugadores) {
 		// TODO implementar
 		
 		return null;
 	}
 
-	public ResultModel jugar(String idJugador, List<Dupla> categoriasTurno) {
+	public ResultModel play(String idJugador, List<Dupla> categoriasTurno) {
 		for(Dupla categoriaTurno : categoriasTurno){
 			ElasticUtil.validar(categoriaTurno);
 			this.calcularPuntaje(categoriaTurno);

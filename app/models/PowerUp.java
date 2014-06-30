@@ -29,7 +29,7 @@ public class PowerUp {
 	@Transient
     private List<Dupla> duplas;
 
-	public static void generar(Match partida) {		
+	public static void generate(Match partida) {		
 		PowerUp.generarAutoCompletarPalabra(partida);
 		PowerUp.generarSugerirPalabra(partida);
 		PowerUp.generarPalabrasOponente(partida);

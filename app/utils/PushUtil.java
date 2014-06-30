@@ -9,7 +9,7 @@ import models.Match;
  */
 public class PushUtil {
 
-	public static void partida(List<String> jugadores, Match partida) {
+	public static void match(List<String> jugadores, Match partida) {
 		// TODO implementar
 		
 	}

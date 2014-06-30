@@ -127,8 +127,8 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="15" language="java" name="controllers.Jugadores" project="tuttiFrutti" 
-    file="/tuttiFrutti/app/controllers/Jugadores.java" binary="false" corner="BOTTOM_RIGHT">    
+  <class id="15" language="java" name="controllers.Players" project="tuttiFrutti" 
+    file="/tuttiFrutti/app/controllers/Players.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="357" y="-31"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
@@ -145,8 +145,8 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="17" language="java" name="controllers.Partidas" project="tuttiFrutti" 
-    file="/tuttiFrutti/app/controllers/Partidas.java" binary="false" corner="BOTTOM_RIGHT">    
+  <class id="17" language="java" name="controllers.Matches" project="tuttiFrutti" 
+    file="/tuttiFrutti/app/controllers/Matches.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="757" y="632"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      

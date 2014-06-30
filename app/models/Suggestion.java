@@ -36,16 +36,16 @@ public class Suggestion {
 	@Property("negative_votes")
 	private Integer negativeVotes;
 	
-	public static void agregar(String categoria, String palabra) {
+	public static void add(String categoria, String palabra) {
 		// TODO implementar
 	}
 
-	public static void juzgar(String categoria, String palabra, boolean valid) {
+	public static void judge(String categoria, String palabra, boolean valid) {
 		// TODO implementar
 		
 	}
 
-	public static List<Suggestion> obtenerPalabra(String idJugador) {
+	public static List<Suggestion> getSuggestions(String idJugador) {
 		/* TODO 
 		 * implementar, consultar primero en un Cache (Redis o EhCache) si el jugador
 		 * ya consultó esa palabra, y guardar en cache cuando la devolvemos
