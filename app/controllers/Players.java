@@ -88,7 +88,7 @@ public class Players extends Controller {
     }
 	
 	public static Result sync(String playerId) {
-		/* TODO
+		/* TODO implementar
 		 * Buscar jugador
 		 * Buscar partidas con idJugador en estado distinto a PARTIDA_FINALIZADA
 		 * Obtener de cada partida, la letra de la última ronda y la cantidad de rondas que faltan

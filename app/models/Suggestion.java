@@ -46,7 +46,7 @@ public class Suggestion {
 	}
 
 	public static List<Suggestion> getSuggestions(String idJugador) {
-		/* TODO 
+		/* TODO implementar
 		 * implementar, consultar primero en un Cache (Redis o EhCache) si el jugador
 		 * ya consultó esa palabra, y guardar en cache cuando la devolvemos
 		 */

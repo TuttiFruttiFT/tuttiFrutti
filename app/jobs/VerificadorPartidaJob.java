@@ -4,7 +4,7 @@ public class VerificadorPartidaJob implements Runnable{
 
 	@Override
 	public void run() {
-		/* TODO
+		/* TODO implementar
 		 * Job que verifica las partidas:
 		 * .-Si a un/os jugador/es se les agotó el tiempo de una ronda, entonces
 		 *   se calcula el resultado del turno.
