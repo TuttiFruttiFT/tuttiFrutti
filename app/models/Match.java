@@ -118,4 +118,14 @@ public class Match {
 		// TODO implementar
 		
 	}
+
+	public void rejected() {
+		// TODO implementar
+		
+	}
+
+	public void playerReject(String playerId) {
+		// TODO implementar
+		
+	}
 }

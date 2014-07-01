@@ -6,6 +6,7 @@ import java.util.List;
 import models.Dupla;
 import models.Match;
 import models.MatchConfig;
+import models.Player;
 import models.PowerUp;
 import models.ResultModel;
 import play.libs.Json;
@@ -61,6 +62,26 @@ public class Matches extends Controller {
 		
         return ok(Json.toJson(match));
     }
+	
+	public static Result rejectedMatch(){
+		JsonNode json = request().body().asJson();
+		String playerId = json.get("player_id").asText();
+		String matchId = json.get("match_id").asText();
+		
+		Match match = Match.match(matchId);
+		match.playerReject(playerId);
+		
+		List<Player> players = match.getPlayers();
+		
+		if(players.size() == 1){
+			match.rejected();
+			PushUtil.rejected(players,match);
+		}else{
+			PushUtil.rejectedByPlayer(players,playerId,match);
+		}
+		
+		return ok();
+	}
 	
 	public static Result turn(){
 		JsonNode json = request().body().asJson();
