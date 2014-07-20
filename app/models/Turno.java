@@ -25,5 +25,6 @@ public class Turno {
 	private Integer puntaje;
 	
 	@Embedded
+	@Property("categorias_turno")
 	private List<CategoriaTurno> categoriasTurno;
 }

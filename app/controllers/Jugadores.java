@@ -63,4 +63,24 @@ public class Jugadores extends Controller {
 		
         return ok();
     }
+	
+	public static Result invitar() {
+		
+        return ok();
+    }
+	
+	public static Result agregarAmigo() {
+		
+        return ok();
+    }
+	
+	public static Result comprarRus() {
+		
+        return ok();
+    }
+	
+	public static Result packs() {
+		
+        return ok();
+    }
 }
