@@ -8,7 +8,7 @@ import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
-import org.mongodb.morphia.annotations.Transient;
+import org.mongodb.morphia.annotations.Property;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -20,34 +20,31 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @Getter @Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class PowerUp {
+public class Pack {
+	
 	@Id 
 	private ObjectId id;
 	
 	private String name;
 	
-	@Transient
-    private List<Dupla> duplas;
-
-	public static void generate(Match partida) {		
-		PowerUp.generarAutoCompletarPalabra(partida);
-		PowerUp.generarSugerirPalabra(partida);
-		PowerUp.generarPalabrasOponente(partida);
-	}
-
-	private static void generarPalabrasOponente(Match partida) {
-		// TODO implementar
-		
-	}
-
-	private static void generarSugerirPalabra(Match partida) {
-		// TODO implementar
-		
-	}
-
-	private static void generarAutoCompletarPalabra(Match partida) {
-		// TODO implementar
-		
-	}
+	private String desc;
 	
+	@Property("cantidad_actual")
+	private Integer currentAmount;
+	
+	@Property("cantidad_default")
+	private Integer defaultAmount;
+	
+	private Double price;
+
+	public static List<Pack> packs() {
+		// TODO implementar
+		return null;
+	}
+
+	public static Pack pack(String idPack) {
+		// TODO implementar
+		return null;
+	}
+
 }

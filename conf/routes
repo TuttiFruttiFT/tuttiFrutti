@@ -2,36 +2,51 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-# Home page
-GET     /                           			controllers.Application.index()
-
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file               			controllers.Assets.at(path="/public", file)
+GET     /assets/*file               			    controllers.Assets.at(path="/public", file)
+                                                    
+POST	/player									    controllers.Players.register()
+                                                    
+GET		/player									    controllers.Players.validate(mail,password,facebookId,twitterId)
+                                                    
+PUT		/player									    controllers.Players.editProfile()
+                                                    
+GET		/player/:playerId						    controllers.Players.player(playerId)
+                                                    
+GET		/player/sync/:playerId					    controllers.Players.sync(playerId)
+                                                    
+GET		/player/matches/:playerId				    controllers.Players.activeMatches(playerId)
+                                                    
+POST	/player/invitation						    controllers.Players.invitePlayers()
+                                                    
+POST	/player/friend							    controllers.Players.addFriend()
+                                                    
+POST	/player/:playerId/powerup/:idPowerUp	    controllers.Players.powerUp(playerId,idPowerUp)
 
-POST	/jugador								controllers.Jugadores.registrar()
+GET		/match/:matchId							    controllers.Matches.getMatch(matchId)
 
-GET		/jugador								controllers.Jugadores.validar(mail,clave,facebookId,twitterId)
+POST	/match/public								controllers.Matches.publicMatch()
 
-PUT		/jugador								controllers.Jugadores.editarPerfil()	
+POST	/match/private								controllers.Matches.privateMatch()
 
-GET		/jugador/sincronizacion/:idJugador		controllers.Jugadores.sincronizar(idJugador)
+POST	/match/turn									controllers.Matches.turn()
 
-POST	/jugador/invitacion						controllers.Jugadores.invitar()
+GET		/match/:matchId/round/:roundNumber/result	controllers.Matches.roundResult(matchId,roundNumber:Int)
 
-PUT		/jugador/amistad						controllers.Jugadores.agregarAmigo()
+GET		/match/result/:matchId						controllers.Matches.matchResult(matchId)
 
-POST	/jugador/rus							controllers.Jugadores.comprarRus()
+POST	/rus/purchase								controllers.Rus.buy()
 
-GET		/jugador/rus/packs						controllers.Jugadores.packs()
+GET		/rus/packs									controllers.Rus.packs()
 
-GET		/partida/:idPartida						controllers.Partidas.obtenerPartida(idPartida)
+PUT		/word/suggest								controllers.Suggestions.suggest()
 
-POST	/partida/publica						controllers.Partidas.nuevaPartidaPublica()
+PUT		/word/judgement								controllers.Suggestions.judge()
 
-POST	/partida/privada						controllers.Partidas.nuevaPartidaPrivada()
+GET		/word/:playerId								controllers.Suggestions.getWords(playerId)
 
-POST	/partida/turno							controllers.Partidas.jugarTurno()
+GET		/search/player/:searchedTerm				controllers.Searches.searchPlayers(searchedTerm)
 
-GET		/partida/:idPartida/turno/:numeroTurno/resultado	controllers.Partidas.resultadoTurno(idPartida,numeroTurno)
+GET		/search/player/others/:playerId				controllers.Searches.searchOthers(playerId)
 
-GET		/partida/resultado/:idPartida			controllers.Partidas.resultadoPartida(idPartida)
+GET		/category/list								controllers.Categories.availableCategories()

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence-diagram version="1.1.4" icons="true" automaticImage="PNG">  
+  <object id="1" language="java" name="controllers.Players" project="tuttiFrutti" 
+    file="/tuttiFrutti/app/controllers/Players.java" binary="false" label="jugadores" type="class" autoSize="true">    
+    <position height="-1" width="-1" x="69" y="0"/>    
+    <execution id="2">      
+      <position height="57" width="84" x="5" y="117"/>    
+    </execution>    
+    <execution id="5">      
+      <position height="76" width="84" x="5" y="238"/>    
+    </execution>    
+    <execution id="7">      
+      <position height="19" width="84" x="5" y="276"/>    
+    </execution>  
+  </object>  
+  <object id="8" language="java" name="models.Match" project="tuttiFrutti" file="/tuttiFrutti/app/models/Match.java" 
+    binary="false" label="partida" type="class" autoSize="true">    
+    <position height="-1" width="-1" x="176" y="0"/>    
+    <execution id="4">      
+      <position height="19" width="64" x="93" y="136"/>    
+    </execution>  
+  </object>  
+  <message id="3" operation="obtenerPartidasActivas(java.lang.String):java.util.List&lt;PartidaActiva&gt;">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="4"/>  
+  </message>  
+  <message id="6" operation="ok(com.fasterxml.jackson.databind.JsonNode):play.mvc.Results.Status">    
+    <end type="SOURCE" refId="5"/>    
+    <end type="TARGET" refId="7"/>  
+  </message>
+</sequence-diagram>

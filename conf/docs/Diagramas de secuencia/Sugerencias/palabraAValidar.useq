@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence-diagram version="1.1.4" icons="true" automaticImage="PNG">  
+  <object id="1" language="java" name="controllers.Sugerencias" project="tuttiFrutti" 
+    file="/tuttiFrutti/app/controllers/Sugerencias.java" binary="false" label="sugerencias" type="class" autoSize="true">    
+    <position height="-1" width="-1" x="169" y="0"/>    
+    <execution id="2">      
+      <position height="57" width="95" x="5" y="110"/>    
+    </execution>    
+    <execution id="5">      
+      <position height="76" width="95" x="5" y="220"/>    
+    </execution>    
+    <execution id="7">      
+      <position height="19" width="95" x="5" y="258"/>    
+    </execution>  
+  </object>  
+  <object id="8" language="java" name="models.Suggestion" project="tuttiFrutti" 
+    file="/tuttiFrutti/app/models/Suggestion.java" binary="false" label="sugerencia" type="class" autoSize="true">    
+    <position height="-1" width="-1" x="286" y="0"/>    
+    <execution id="4">      
+      <position height="19" width="88" x="104" y="129"/>    
+    </execution>  
+  </object>  
+  <message id="3" operation="obtenerPalabra(java.lang.String):models.Sugerencia">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="4"/>  
+  </message>  
+  <message id="6" operation="ok(com.fasterxml.jackson.databind.JsonNode):play.mvc.Results.Status">    
+    <end type="SOURCE" refId="5"/>    
+    <end type="TARGET" refId="7"/>  
+  </message>
+</sequence-diagram>
