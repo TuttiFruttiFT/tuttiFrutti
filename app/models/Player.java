@@ -78,15 +78,15 @@ public class Player {
 	public static Player registerMail(String mail, String clave) {
 		// TODO implementar
 		
-		Datastore datastore = MongoUtil.getDatastore(); 
+		Datastore datastore = MongoUtil.getDatastore();
 		
-		Player jugador = new Player();
-		jugador.setNickname(mail);
-		jugador.setPassword(clave);
+		Player player = new Player();
+		player.setNickname(mail);
+		player.setPassword(clave);
 		
-		datastore.save(jugador);
+		datastore.save(player);
 		
-		return jugador;
+		return player;
 	}
 
 	public static Player registerFacebook(String facebookId) {

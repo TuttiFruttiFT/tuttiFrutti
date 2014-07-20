@@ -5,7 +5,9 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
+import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
+import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Property;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -23,6 +25,9 @@ public class Suggestion {
 	public static final String SUGGESTED = "SUGGESTED";
 	public static final String APPROVED = "APPROVED";
 	public static final String REJECTED = "REJECTED";
+	
+	@Id 
+	private ObjectId id;
 	
 	private String category;
 	

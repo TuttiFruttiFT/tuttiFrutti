@@ -1,13 +1,11 @@
 package models;
 
-import java.util.List;
-
 import lombok.Getter;
 import lombok.Setter;
 
 import org.bson.types.ObjectId;
-import org.mongodb.morphia.Key;
 import org.mongodb.morphia.annotations.Entity;
+import org.mongodb.morphia.annotations.Id;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -20,6 +18,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PlayerResult {
+	@Id 
+	private ObjectId id;
+	
 	private Player player;
 	private Integer score;
 }

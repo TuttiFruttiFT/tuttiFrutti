@@ -9,6 +9,7 @@ import models.views.ActiveMatch;
 
 import org.apache.commons.lang3.StringUtils;
 
+import play.Logger;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -23,13 +24,15 @@ public class Players extends Controller {
 	public static Result register() {
 		JsonNode json = request().body().asJson();
 		if(json == null){
-			return badRequest();
+			return badRequest("Expecting json data");
 		}else{
 			String mail = json.get("mail").asText();
 			String password = json.get("password").asText();
 			String facebookId = json.get("facebook_id").asText();
 			String twitterId = json.get("twitter_id").asText();
 
+			Logger.debug(String.format("mail: %s password: %s facebook_id: %s twitter_id: %s", mail,password,facebookId,twitterId));
+			
 			Player player = null;
 			
 			if(StringUtils.isNotEmpty(mail) && StringUtils.isNotEmpty(password)){
