@@ -20,4 +20,9 @@ public class Global extends GlobalSettings {
 			throw new IllegalStateException("application context could not be initialized properly");
 		}
 	}
+	
+	@Override
+	public <C> C getControllerInstance(Class<C> clazz) {
+		return ctx.getBean(clazz);
+	}
 }
