@@ -44,11 +44,8 @@ public class Match {
 	@Property("winner_id")
 	private String winnerId;
 	
-	@Property("fecha_inicio")
+	@Property("start_date")
 	private Date startDate;
-	
-	@Property("power_ups_activados")
-	private Boolean powerUpsActivados;
 	
 	@Embedded
 	private List<Category> categories;
@@ -60,7 +57,7 @@ public class Match {
 	private List<PowerUp> powerUps;
 	
 	@Transient
-	private Round lastRonda;
+	private Round lastRound;
 
 	public static List<ActiveMatch> activeMatches(String idJugador) {
 		// TODO implementar, partidas de idJugador que no estén en PARTIDA_FINALIZADA

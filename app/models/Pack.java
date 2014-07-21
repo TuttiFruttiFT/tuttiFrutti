@@ -29,10 +29,10 @@ public class Pack {
 	
 	private String desc;
 	
-	@Property("cantidad_actual")
+	@Property("current_amount")
 	private Integer currentAmount;
 	
-	@Property("cantidad_default")
+	@Property("default_amount")
 	private Integer defaultAmount;
 	
 	private Double price;

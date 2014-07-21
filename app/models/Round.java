@@ -30,7 +30,7 @@ public class Round {
 	
 	private Integer number;
 	
-	private String letra;
+	private String letter;
 	
 	@Property("end_time")
 	private Integer endTime;
