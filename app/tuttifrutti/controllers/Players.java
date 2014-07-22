@@ -24,6 +24,9 @@ public class Players extends Controller {
 	@Autowired
 	private Player playerService;
 	
+	@Autowired
+	private Match matchService;
+	
 	public Result register() {
 		JsonNode json = request().body().asJson();
 		if(json == null){
@@ -103,7 +106,7 @@ public class Players extends Controller {
 			return badRequest();
 		}
 		
-		List<ActiveMatch> activeMatches = Match.activeMatches(playerId);
+		List<ActiveMatch> activeMatches = matchService.activeMatches(playerId);
 
 		//TODO ver como crear un json desde una lista
 		
@@ -112,7 +115,7 @@ public class Players extends Controller {
 	
 	
 	public Result activeMatches(String idJugador){
-		List<ActiveMatch> activeMatches = Match.activeMatches(idJugador);
+		List<ActiveMatch> activeMatches = matchService.activeMatches(idJugador);
 
 		//TODO ver como crear un json desde una lista
 		

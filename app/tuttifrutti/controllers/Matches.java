@@ -3,6 +3,8 @@ package tuttifrutti.controllers;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -21,30 +23,33 @@ import com.fasterxml.jackson.databind.JsonNode;
  */
 @org.springframework.stereotype.Controller
 public class Matches extends Controller {
-	public static Result getMatch(String matchId) {
+	@Autowired
+	private Match matchService;
+	
+	public Result getMatch(String matchId) {
 		//TODO Obtener la partida, la última ronda y cargar los powerUps
-		Match match = Match.match(matchId);
+		Match match = matchService.match(matchId);
 		
 		PowerUp.generate(match);
         return ok(Json.toJson(match));
     }
 	
-	public static Result publicMatch(){
+	public Result publicMatch(){
 		JsonNode json = request().body().asJson();
 		String playerId = json.get("player_id").asText();
 		Integer players = json.get("players").asInt();
 		String language = json.get("language").asText();
 		
-		Match partida = Match.findMatch(players,language);
-		if(partida == null){
-			partida = Match.create(players,language);
+		Match match = matchService.findMatch(players,language);
+		if(match == null){
+			match = matchService.create(players,language);
 		}
-		partida.agregarJugador(playerId);
-		PowerUp.generate(partida);
-        return ok(Json.toJson(partida));
+		match.addPlayer(playerId);
+		PowerUp.generate(match);
+        return ok(Json.toJson(match));
     }
 	
-	public static Result privateMatch(){
+	public Result privateMatch(){
 		JsonNode json = request().body().asJson();
 		String playerId = json.get("player_id").asText();
 		JsonNode jsonConfig = json.get("config");
@@ -57,19 +62,19 @@ public class Matches extends Controller {
 			players.add(jsonPlayer.asText());
 		}
 		
-		Match match = Match.create(playerId, config,players);
+		Match match = matchService.create(playerId, config,players);
 		
 		PushUtil.match(players,match);
 		
         return ok(Json.toJson(match));
     }
 	
-	public static Result rejectedMatch(){
+	public Result rejectedMatch(){
 		JsonNode json = request().body().asJson();
 		String playerId = json.get("player_id").asText();
 		String matchId = json.get("match_id").asText();
 		
-		Match match = Match.match(matchId);
+		Match match = matchService.match(matchId);
 		match.playerReject(playerId);
 		
 		List<Player> players = match.getPlayers();
@@ -84,7 +89,7 @@ public class Matches extends Controller {
 		return ok();
 	}
 	
-	public static Result turn(){
+	public Result turn(){
 		JsonNode json = request().body().asJson();
 		String playerId = json.get("player_id").asText();
 		String matchId = json.get("match_id").asText();
@@ -96,14 +101,14 @@ public class Matches extends Controller {
 			duplas.add(Json.fromJson(jsonDupla, Dupla.class));
 		}
 		
-		Match match = Match.match(matchId);
+		Match match = matchService.match(matchId);
 		
 		ResultModel result = match.play(playerId,duplas);
 		
         return ok(Json.toJson(result));
     }
 	
-	public static Result roundResult(String matchId,Integer roundNumber){
+	public Result roundResult(String matchId,Integer roundNumber){
 		ResultModel resultadoTurno = ResultModel.resultadoTurno(matchId,roundNumber);
 		
 		if(resultadoTurno != null){
@@ -113,7 +118,7 @@ public class Matches extends Controller {
 		return notFound();
 	}
 	
-	public static Result matchResult(String matchId){
+	public Result matchResult(String matchId){
 		ResultModel matchResult = ResultModel.matchResult(matchId);
 		
 		if(matchResult != null){

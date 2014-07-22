@@ -7,14 +7,19 @@ import lombok.Getter;
 import lombok.Setter;
 
 import org.bson.types.ObjectId;
+import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.annotations.Embedded;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Property;
 import org.mongodb.morphia.annotations.Transient;
+import org.mongodb.morphia.query.Query;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import tuttifrutti.models.views.ActiveMatch;
 import tuttifrutti.utils.ElasticUtil;
+import tuttifrutti.utils.MongoUtil;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -23,6 +28,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @Getter @Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Component
 public class Match {
 	public static final String TO_BE_APPROVED = "TO_BE_APPROVED";
 	public static final String PLAYER_TURN = "PLAYER_TURN";
@@ -39,6 +45,7 @@ public class Match {
 	
 	private String name;
 	
+	@Embedded
 	private MatchConfig config;
 	
 	@Property("winner_id")
@@ -58,33 +65,39 @@ public class Match {
 	
 	@Transient
 	private Round lastRound;
+	
+	@Autowired
+	private MongoUtil mongoUtil;
 
-	public static List<ActiveMatch> activeMatches(String idJugador) {
+	public List<ActiveMatch> activeMatches(String idJugador) {
 		// TODO implementar, partidas de idJugador que no estén en PARTIDA_FINALIZADA
 		return null;
 	}
 
-	public static Match match(String idPartida) {
+	public Match match(String idPartida) {
 		// TODO implementar
 		return null;
 	}
 
-	public static Match findMatch(Integer cantJugadores, String idioma) {
+	public Match findMatch(Integer numberOfPlayers, String language) {
 		// TODO implementar
+		Datastore datastore = mongoUtil.getDatastore();
+		Query<Match> query = datastore.find(Match.class,"config.players =",numberOfPlayers);
+		query.and(query.criteria("config.language").equal(language));
 		return null;
 	}
 
-	public static Match create(Integer cantJugadores, String idioma) {
+	public Match create(Integer cantJugadores, String idioma) {
 		
 		return null;
 	}
 
-	public void agregarJugador(String idJugador) {
+	public void addPlayer(String idJugador) {
 		// TODO implementar
 		
 	}
 
-	public static Match create(String idJugador, MatchConfig configuracion, List<String> jugadores) {
+	public Match create(String idJugador, MatchConfig configuracion, List<String> jugadores) {
 		// TODO implementar
 		
 		return null;

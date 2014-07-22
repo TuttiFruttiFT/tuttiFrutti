@@ -20,17 +20,17 @@ POST	/player/friend							    @tuttifrutti.controllers.Players.addFriend()
                                                     
 POST	/player/:playerId/powerup/:idPowerUp	    @tuttifrutti.controllers.Players.powerUp(playerId,idPowerUp)
 
-GET		/match/:matchId							    tuttifrutti.controllers.Matches.getMatch(matchId)
+GET		/match/:matchId							    @tuttifrutti.controllers.Matches.getMatch(matchId)
 
-POST	/match/public								tuttifrutti.controllers.Matches.publicMatch()
+POST	/match/public								@tuttifrutti.controllers.Matches.publicMatch()
 
-POST	/match/private								tuttifrutti.controllers.Matches.privateMatch()
+POST	/match/private								@tuttifrutti.controllers.Matches.privateMatch()
 
-POST	/match/turn									tuttifrutti.controllers.Matches.turn()
+POST	/match/turn									@tuttifrutti.controllers.Matches.turn()
 
-GET		/match/:matchId/round/:roundNumber/result	tuttifrutti.controllers.Matches.roundResult(matchId,roundNumber:Int)
+GET		/match/:matchId/round/:roundNumber/result	@tuttifrutti.controllers.Matches.roundResult(matchId,roundNumber:Int)
 
-GET		/match/result/:matchId						tuttifrutti.controllers.Matches.matchResult(matchId)
+GET		/match/result/:matchId						@tuttifrutti.controllers.Matches.matchResult(matchId)
 
 POST	/rus/purchase								@tuttifrutti.controllers.Rus.buy()
 
