@@ -20,6 +20,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Category {
+	public static final int DEFAULT_CATEGORIES_NUMBER = 6;
+	public static final int MINIMUM_CATEGORIES_NUMBER = 4;
+	public static final int MAXIMUM_CATEGORIES_NUMBER = 12;
+	
 	@Id 
 	private ObjectId id;
 	
@@ -32,6 +36,11 @@ public class Category {
 	private String image;
 
 	public static List<Category> categories() {
+		// TODO implementar
+		return null;
+	}
+
+	public static List<Category> getPublicMatchCategories() {
 		// TODO implementar
 		return null;
 	}

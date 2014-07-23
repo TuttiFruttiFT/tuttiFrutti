@@ -38,14 +38,16 @@ public class Matches extends Controller {
 		JsonNode json = request().body().asJson();
 		String playerId = json.get("player_id").asText();
 		Integer players = json.get("players").asInt();
+		String matchType = json.get("match_type").asText();
 		String language = json.get("language").asText();
 		
-		Match match = matchService.findMatch(players,language);
+		Match match = matchService.findMatch(players,language, matchType);
 		if(match == null){
-			match = matchService.create(players,language);
+			match = matchService.create(players,language, matchType);
 		}
 		match.addPlayer(playerId);
 		PowerUp.generate(match);
+		//TODO hay que setear el round desde Round
         return ok(Json.toJson(match));
     }
 	

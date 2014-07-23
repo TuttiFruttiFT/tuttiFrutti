@@ -8,6 +8,7 @@ import org.mongodb.morphia.annotations.Property;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author rfanego
@@ -18,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MatchConfig {
 	
-	private Integer round;
+	private Integer rounds;
 	
 	@Property("match_type")
 	private String matchType;
@@ -26,7 +27,8 @@ public class MatchConfig {
 	@Property("power_ups_enabled")
 	private boolean powerUpsEnabled;
 	
-	private Integer players;
+	@JsonProperty(value="players")
+	private Integer numberOfPlayers;
 	
 	private String language;
 }

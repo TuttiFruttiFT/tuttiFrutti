@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import org.bson.types.ObjectId;
+import org.joda.time.DateTime;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.annotations.Embedded;
 import org.mongodb.morphia.annotations.Entity;
@@ -67,6 +68,7 @@ public class Match {
 	private Round lastRound;
 	
 	@Autowired
+	@Transient
 	private MongoUtil mongoUtil;
 
 	public List<ActiveMatch> activeMatches(String idJugador) {
@@ -79,17 +81,32 @@ public class Match {
 		return null;
 	}
 
-	public Match findMatch(Integer numberOfPlayers, String language) {
-		// TODO implementar
+	public Match findMatch(Integer numberOfPlayers, String language, String matchType) {
 		Datastore datastore = mongoUtil.getDatastore();
 		Query<Match> query = datastore.find(Match.class,"config.players =",numberOfPlayers);
-		query.and(query.criteria("config.language").equal(language));
-		return null;
+		query.and(query.criteria("config.language").equal(language),
+				query.criteria("type").equal(matchType));
+		
+		return query.get();
 	}
 
-	public Match create(Integer cantJugadores, String idioma) {
-		
-		return null;
+	public Match create(Integer numberOfPlayers, String language, String matchType) {
+		Datastore datastore = mongoUtil.getDatastore();
+		Match match = new Match();
+		MatchConfig matchConfig = new MatchConfig();
+		matchConfig.setLanguage(language);
+		matchConfig.setMatchType(matchType);
+		matchConfig.setNumberOfPlayers(numberOfPlayers);
+		matchConfig.setPowerUpsEnabled(true);
+		matchConfig.setRounds(25);
+		match.setConfig(matchConfig);
+		match.setType(matchType);
+		match.setName(null); //TODO ver qué poner de nombre
+		match.setState(TO_BE_APPROVED);
+		match.setStartDate(DateTime.now().toDate()); //TODO guardamos así o parseamos?
+		match.setCategories(Category.getPublicMatchCategories());
+		datastore.save(match);
+		return match;
 	}
 
 	public void addPlayer(String idJugador) {
