@@ -28,3 +28,5 @@ libraryDependencies += "org.springframework" % "spring-context" % "3.2.8.RELEASE
 libraryDependencies += "org.springframework" % "spring-aop" % "3.2.8.RELEASE"
 
 libraryDependencies += "org.springframework" % "spring-expression" % "3.2.1.RELEASE"
+
+libraryDependencies += "de.flapdoodle.embed" % "de.flapdoodle.embed.mongo" % "1.46.0"
