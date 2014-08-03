@@ -20,7 +20,6 @@ import org.springframework.stereotype.Component;
 
 import tuttifrutti.models.views.ActiveMatch;
 import tuttifrutti.utils.ElasticUtil;
-import tuttifrutti.utils.MongoUtil;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -69,7 +68,7 @@ public class Match {
 	
 	@Autowired
 	@Transient
-	private MongoUtil mongoUtil;
+	private Datastore mongoDatastore;
 
 	public List<ActiveMatch> activeMatches(String idJugador) {
 		// TODO implementar, partidas de idJugador que no estén en PARTIDA_FINALIZADA
@@ -82,8 +81,7 @@ public class Match {
 	}
 
 	public Match findMatch(Integer numberOfPlayers, String language, String matchType) {
-		Datastore datastore = mongoUtil.getDatastore();
-		Query<Match> query = datastore.find(Match.class,"config.players =",numberOfPlayers);
+		Query<Match> query = mongoDatastore.find(Match.class, "config.players =", numberOfPlayers);
 		query.and(query.criteria("config.language").equal(language),
 				query.criteria("type").equal(matchType));
 		
@@ -91,7 +89,6 @@ public class Match {
 	}
 
 	public Match create(Integer numberOfPlayers, String language, String matchType) {
-		Datastore datastore = mongoUtil.getDatastore();
 		Match match = new Match();
 		MatchConfig matchConfig = new MatchConfig();
 		matchConfig.setLanguage(language);
@@ -105,7 +102,7 @@ public class Match {
 		match.setState(TO_BE_APPROVED);
 		match.setStartDate(DateTime.now().toDate()); //TODO guardamos así o parseamos?
 		match.setCategories(Category.getPublicMatchCategories());
-		datastore.save(match);
+		mongoDatastore.save(match);
 		return match;
 	}
 

@@ -14,8 +14,6 @@ import org.mongodb.morphia.annotations.Property;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import tuttifrutti.utils.MongoUtil;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -59,7 +57,7 @@ public class Player {
 	private Date last;
 	
 	@Autowired
-	private MongoUtil mongoUtil;
+	private Datastore mongoDatastore;
 	
 	public Player player(String idJugador){
 		//TODO implementar
@@ -83,14 +81,11 @@ public class Player {
 
 	public Player registerMail(String mail, String clave) {
 		// TODO implementar
-		
-		Datastore datastore = mongoUtil.getDatastore();
-		
 		Player player = new Player();
 		player.setNickname(mail);
 		player.setPassword(clave);
 		
-		datastore.save(player);
+		mongoDatastore.save(player);
 		
 		return player;
 	}
