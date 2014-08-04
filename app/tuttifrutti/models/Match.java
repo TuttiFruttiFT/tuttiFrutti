@@ -39,8 +39,6 @@ public class Match {
 	@Id 
 	private ObjectId id;
 	
-	private String type;
-	
 	private String state;
 	
 	private String name;
@@ -97,7 +95,6 @@ public class Match {
 		matchConfig.setPowerUpsEnabled(true);
 		matchConfig.setRounds(25);
 		match.setConfig(matchConfig);
-		match.setType(matchType);
 		match.setName(null); //TODO ver qué poner de nombre
 		match.setState(TO_BE_APPROVED);
 		match.setStartDate(DateTime.now().toDate()); //TODO guardamos así o parseamos?

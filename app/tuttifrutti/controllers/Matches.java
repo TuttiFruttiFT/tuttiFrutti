@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import play.libs.Json;
+import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
 import tuttifrutti.models.Dupla;
@@ -34,6 +35,7 @@ public class Matches extends Controller {
         return ok(Json.toJson(match));
     }
 	
+	@BodyParser.Of(BodyParser.Json.class)
 	public Result publicMatch(){
 		JsonNode json = request().body().asJson();
 		String playerId = json.get("player_id").asText();
@@ -51,6 +53,7 @@ public class Matches extends Controller {
         return ok(Json.toJson(match));
     }
 	
+	@BodyParser.Of(BodyParser.Json.class)
 	public Result privateMatch(){
 		JsonNode json = request().body().asJson();
 		String playerId = json.get("player_id").asText();
@@ -71,6 +74,7 @@ public class Matches extends Controller {
         return ok(Json.toJson(match));
     }
 	
+	@BodyParser.Of(BodyParser.Json.class)
 	public Result rejectedMatch(){
 		JsonNode json = request().body().asJson();
 		String playerId = json.get("player_id").asText();
@@ -91,6 +95,7 @@ public class Matches extends Controller {
 		return ok();
 	}
 	
+	@BodyParser.Of(BodyParser.Json.class)
 	public Result turn(){
 		JsonNode json = request().body().asJson();
 		String playerId = json.get("player_id").asText();
