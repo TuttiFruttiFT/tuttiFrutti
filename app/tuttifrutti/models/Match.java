@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 import tuttifrutti.models.views.ActiveMatch;
 import tuttifrutti.utils.ElasticUtil;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -50,6 +51,8 @@ public class Match {
 	private String winnerId;
 	
 	@Property("start_date")
+	// @JsonProperty(value = "start_date")
+	@JsonIgnore
 	private Date startDate;
 	
 	@Embedded
@@ -64,8 +67,8 @@ public class Match {
 	@Transient
 	private Round lastRound;
 	
-	@Autowired
 	@Transient
+	@Autowired
 	private Datastore mongoDatastore;
 
 	public List<ActiveMatch> activeMatches(String idJugador) {
@@ -78,20 +81,27 @@ public class Match {
 		return null;
 	}
 
-	public Match findMatch(Integer numberOfPlayers, String language, String matchType) {
-		Query<Match> query = mongoDatastore.find(Match.class, "config.players =", numberOfPlayers);
-		query.and(query.criteria("config.language").equal(language),
-				query.criteria("type").equal(matchType));
+	public Match findPublicMatch(String playerId, MatchConfig config) {
+		return findMatch(playerId, config, MatchConfig.PUBLIC_TYPE);
+	}
+
+	public Match findMatch(String playerId, MatchConfig config, String type) {
+		Query<Match> query = mongoDatastore.find(Match.class, "config.number_of_players =", config.getNumberOfPlayers());
+		// TODO agregar a la query que el player no esté entre los players de la partida que se está buscando
+		query.and(query.criteria("config.language").equal(config.getLanguage()), 
+				  query.criteria("config.type").equal(type),
+				  query.criteria("config.mode").equal(config.getMode()));
 		
 		return query.get();
 	}
 
-	public Match create(Integer numberOfPlayers, String language, String matchType) {
+	public Match createPublic(MatchConfig matchConfig) {
+		return create(matchConfig, MatchConfig.PUBLIC_TYPE);
+	}
+
+	public Match create(MatchConfig matchConfig, String type) {
 		Match match = new Match();
-		MatchConfig matchConfig = new MatchConfig();
-		matchConfig.setLanguage(language);
-		matchConfig.setMatchType(matchType);
-		matchConfig.setNumberOfPlayers(numberOfPlayers);
+		matchConfig.setType(type);
 		matchConfig.setPowerUpsEnabled(true);
 		matchConfig.setRounds(25);
 		match.setConfig(matchConfig);

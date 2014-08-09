@@ -39,13 +39,14 @@ public class Matches extends Controller {
 	public Result publicMatch(){
 		JsonNode json = request().body().asJson();
 		String playerId = json.get("player_id").asText();
-		Integer players = json.get("players").asInt();
-		String matchType = json.get("match_type").asText();
-		String language = json.get("language").asText();
-		
-		Match match = matchService.findMatch(players,language, matchType);
+		JsonNode jsonConfig = json.get("config");
+
+		MatchConfig config = Json.fromJson(jsonConfig, MatchConfig.class);
+
+		Match match = matchService.findPublicMatch(playerId, config);
+		System.out.println("MATCH: " + (match == null));
 		if(match == null){
-			match = matchService.create(players,language, matchType);
+			match = matchService.createPublic(config);
 		}
 		match.addPlayer(playerId);
 		PowerUp.generate(match);

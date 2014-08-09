@@ -15,6 +15,7 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.mongodb.morphia.Datastore;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Profile;
@@ -29,6 +30,7 @@ import com.typesafe.config.ConfigFactory;
  */
 @Configuration
 @Profile("PROD")
+@ComponentScan({ "tuttifrutti" })
 public class SpringConfigurationForProd extends SpringConfigurationFor {
 
 	@Override
@@ -59,6 +61,8 @@ public class SpringConfigurationForProd extends SpringConfigurationFor {
 	}
 
 	@Override
+	@Lazy
+	@Bean(name = "mongoClient")
 	public MongoClient mongoClient() {
 		MongoClient mongoClient = null;
 		try {
@@ -70,6 +74,8 @@ public class SpringConfigurationForProd extends SpringConfigurationFor {
 	}
 
 	@Override
+	@Lazy
+	@Bean(name = "mongoDatastore")
 	public Datastore mongoDatastore() {
 		return super.mongoDatastore();
 	}

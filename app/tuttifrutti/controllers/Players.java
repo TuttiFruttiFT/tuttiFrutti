@@ -113,7 +113,6 @@ public class Players extends Controller {
         return ok();
     }
 	
-	
 	public Result activeMatches(String idJugador){
 		List<ActiveMatch> activeMatches = matchService.activeMatches(idJugador);
 

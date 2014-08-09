@@ -3,6 +3,7 @@ package tuttifrutti.spring;
 import org.elasticsearch.client.Client;
 import org.mongodb.morphia.Datastore;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Profile;
@@ -18,6 +19,7 @@ import com.mongodb.MongoClient;
  */
 @Configuration
 @Profile({ "DEV", "TEST" })
+@ComponentScan({ "tuttifrutti" })
 public class SpringConfigurationForDevAndTest extends SpringConfigurationFor {
 
 	@Override
@@ -46,21 +48,21 @@ public class SpringConfigurationForDevAndTest extends SpringConfigurationFor {
 
 	@Override
 	@Lazy
-	@Bean
+	@Bean(name = "mongoDatastore")
 	public Datastore mongoDatastore() {
 		return super.mongoDatastore();
 	}
 
 	@Override
 	@Lazy
-	@Bean
+	@Bean(name = "mongoClient")
 	public MongoClient mongoClient() {
 		return embeddedMongoServer().getClient();
 	}
 
 	@Lazy
 	@Bean
-	private MongoEmbeddedServer embeddedMongoServer() {
+	public MongoEmbeddedServer embeddedMongoServer() {
 		MongoEmbeddedServer mongoServer = new MongoEmbeddedServer();
 
 		return mongoServer;

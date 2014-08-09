@@ -1,13 +1,12 @@
 package tuttiFrutti.models;
 
-import org.junit.Test;
 
 /**
  * @author rfanego
  */
-public class Match {
+public class MatchTest {
 
-	@Test
+	// @Test
 	public void test() {
 
 	}

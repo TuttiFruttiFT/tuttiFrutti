@@ -4,23 +4,27 @@ import static lombok.AccessLevel.PRIVATE;
 import static tuttifrutti.spring.RuntimeEnvironment.currentRuntimeEnvironment;
 import lombok.NoArgsConstructor;
 
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import tuttifrutti.spring.CommonSpringConfiguration;
+import tuttifrutti.spring.SpringConfigurationForDevAndTest;
+import tuttifrutti.spring.SpringConfigurationForProd;
 
 /**
  * @author rfanego
  */
 @NoArgsConstructor(access = PRIVATE)
 public class SpringApplicationContext {
-	private static ConfigurableApplicationContext ctx;
+	private static AnnotationConfigApplicationContext ctx;
 
 	public static void initialize() {
 		try {
-			ctx = new AnnotationConfigApplicationContext(CommonSpringConfiguration.class);
+			ctx = new AnnotationConfigApplicationContext();
 			ctx.getEnvironment().setActiveProfiles(currentRuntimeEnvironment().name());
+			ctx.register(CommonSpringConfiguration.class);
+			ctx.register(SpringConfigurationForDevAndTest.class, SpringConfigurationForProd.class);
 			ctx.refresh();
+			// ctx.start();
 			if (ctx == null) {
 				throw new IllegalStateException("application context could not be initialized properly");
 			}

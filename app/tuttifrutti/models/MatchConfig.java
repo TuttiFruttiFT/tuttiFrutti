@@ -19,15 +19,26 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MatchConfig {
 	
+	public static final String QUICK_MODE = "Q";
+
+	public static final String NORMAL_MODE = "N";
+	
+	public static final String PUBLIC_TYPE = "PUBLIC";
+
+	public static final String PRIVATE_TYPE = "PRIVATE";
+
 	private Integer rounds;
 	
-	@Property("match_type")
-	private String matchType;
+	private String type;
+
+	private String mode;
 	
 	@Property("power_ups_enabled")
+	@JsonProperty(value = "powerups_enabled")
 	private boolean powerUpsEnabled;
 	
-	@JsonProperty(value="players")
+	@Property("number_of_players")
+	@JsonProperty(value = "number_of_players")
 	private Integer numberOfPlayers;
 	
 	private String language;

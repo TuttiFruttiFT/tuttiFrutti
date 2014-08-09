@@ -14,6 +14,7 @@ import org.mongodb.morphia.annotations.Property;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -54,6 +55,7 @@ public class Player {
 
 	private List<String> friends;
 	
+	@JsonIgnore
 	private Date last;
 	
 	@Autowired
