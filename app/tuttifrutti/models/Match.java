@@ -19,11 +19,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import tuttifrutti.models.views.ActiveMatch;
+import tuttifrutti.serializers.ObjectIdSerializer;
 import tuttifrutti.utils.ElasticUtil;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.deser.std.DateDeserializers.DateDeserializer;
+import com.fasterxml.jackson.databind.ser.std.DateSerializer;
 
 @Entity
 @Getter @Setter
@@ -38,6 +43,7 @@ public class Match {
 	public static final String REJECTED = "REJECTED";
 	
 	@Id 
+	@JsonSerialize(using = ObjectIdSerializer.class)
 	private ObjectId id;
 	
 	private String state;
@@ -51,8 +57,9 @@ public class Match {
 	private String winnerId;
 	
 	@Property("start_date")
-	// @JsonProperty(value = "start_date")
-	@JsonIgnore
+	@JsonProperty(value = "start_date")
+	@JsonSerialize(using = DateSerializer.class)
+	@JsonDeserialize(using = DateDeserializer.class)
 	private Date startDate;
 	
 	@Embedded
@@ -87,10 +94,10 @@ public class Match {
 
 	public Match findMatch(String playerId, MatchConfig config, String type) {
 		Query<Match> query = mongoDatastore.find(Match.class, "config.number_of_players =", config.getNumberOfPlayers());
-		// TODO agregar a la query que el player no esté entre los players de la partida que se está buscando
 		query.and(query.criteria("config.language").equal(config.getLanguage()), 
 				  query.criteria("config.type").equal(type),
-				  query.criteria("config.mode").equal(config.getMode()));
+				  query.criteria("config.mode").equal(config.getMode()),
+				  query.criteria("players.id").notEqual(new ObjectId(playerId)));
 		
 		return query.get();
 	}
@@ -107,7 +114,7 @@ public class Match {
 		match.setConfig(matchConfig);
 		match.setName(null); //TODO ver qué poner de nombre
 		match.setState(TO_BE_APPROVED);
-		match.setStartDate(DateTime.now().toDate()); //TODO guardamos así o parseamos?
+		match.setStartDate(DateTime.now().toDate());
 		match.setCategories(Category.getPublicMatchCategories());
 		mongoDatastore.save(match);
 		return match;

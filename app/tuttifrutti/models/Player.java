@@ -14,10 +14,15 @@ import org.mongodb.morphia.annotations.Property;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import tuttifrutti.serializers.ObjectIdSerializer;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.deser.std.DateDeserializers.DateDeserializer;
+import com.fasterxml.jackson.databind.ser.std.DateSerializer;
 
 /**
  * @author rfanego
@@ -29,6 +34,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 @Component
 public class Player {
 	@Id 
+	@JsonSerialize(using = ObjectIdSerializer.class)
 	private ObjectId id;
 	
 	private String nickname;
@@ -55,7 +61,8 @@ public class Player {
 
 	private List<String> friends;
 	
-	@JsonIgnore
+	@JsonSerialize(using = DateSerializer.class)
+	@JsonDeserialize(using = DateDeserializer.class)
 	private Date last;
 	
 	@Autowired

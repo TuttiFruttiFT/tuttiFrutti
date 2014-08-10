@@ -44,7 +44,6 @@ public class Matches extends Controller {
 		MatchConfig config = Json.fromJson(jsonConfig, MatchConfig.class);
 
 		Match match = matchService.findPublicMatch(playerId, config);
-		System.out.println("MATCH: " + (match == null));
 		if(match == null){
 			match = matchService.createPublic(config);
 		}
