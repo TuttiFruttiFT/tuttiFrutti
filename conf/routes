@@ -46,4 +46,4 @@ GET		/search/player/:searchedTerm				@tuttifrutti.controllers.Searches.searchPla
 
 GET		/search/player/others/:playerId				@tuttifrutti.controllers.Searches.searchOthers(playerId)
 
-GET		/category/list								tuttifrutti.controllers.Categories.availableCategories()
+GET		/category/list/:language					@tuttifrutti.controllers.Categories.availableCategories(language)

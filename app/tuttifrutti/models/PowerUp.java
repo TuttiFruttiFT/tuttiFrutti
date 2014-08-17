@@ -10,8 +10,11 @@ import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Transient;
 
+import tuttifrutti.serializers.ObjectIdSerializer;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * @author rfanego
@@ -21,7 +24,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PowerUp {
-	@Id 
+	@Id
+	@JsonSerialize(using = ObjectIdSerializer.class)
 	private ObjectId id;
 	
 	private String name;

@@ -2,6 +2,7 @@ package tuttifrutti.controllers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -15,6 +16,7 @@ import tuttifrutti.models.MatchConfig;
 import tuttifrutti.models.Player;
 import tuttifrutti.models.PowerUp;
 import tuttifrutti.models.ResultModel;
+import tuttifrutti.models.Round;
 import tuttifrutti.utils.PushUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -26,6 +28,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class Matches extends Controller {
 	@Autowired
 	private Match matchService;
+	
+	@Autowired
+	private Round roundService;
 	
 	public Result getMatch(String matchId) {
 		//TODO Obtener la partida, la última ronda y cargar los powerUps
@@ -49,7 +54,7 @@ public class Matches extends Controller {
 		}
 		match.addPlayer(playerId);
 		PowerUp.generate(match);
-		//TODO hay que setear el round desde Round
+		roundService.create(match);
         return ok(Json.toJson(match));
     }
 	
@@ -61,7 +66,7 @@ public class Matches extends Controller {
 		JsonNode jsonPlayers = json.get("players");
 		
 		MatchConfig config = Json.fromJson(jsonConfig, MatchConfig.class);
-		List<String> players = new ArrayList<String>();
+		List<String> players = new ArrayList<>();
 		
 		for(JsonNode jsonPlayer : jsonPlayers){
 			players.add(jsonPlayer.asText());
@@ -83,7 +88,7 @@ public class Matches extends Controller {
 		Match match = matchService.match(matchId);
 		match.playerReject(playerId);
 		
-		List<Player> players = match.getPlayers();
+		List<Player> players = match.getPlayers().stream().map(result -> result.getPlayer()).collect(Collectors.toList());
 		
 		if(players.size() == 1){
 			match.rejected();
@@ -102,7 +107,7 @@ public class Matches extends Controller {
 		String matchId = json.get("match_id").asText();
 		JsonNode jsonDuplas = json.get("duplas");
 		
-		List<Dupla> duplas = new ArrayList<Dupla>();
+		List<Dupla> duplas = new ArrayList<>();
 		
 		for(JsonNode jsonDupla : jsonDuplas){
 			duplas.add(Json.fromJson(jsonDupla, Dupla.class));
@@ -116,7 +121,7 @@ public class Matches extends Controller {
     }
 	
 	public Result roundResult(String matchId,Integer roundNumber){
-		ResultModel resultadoTurno = ResultModel.resultadoTurno(matchId,roundNumber);
+		ResultModel resultadoTurno = ResultModel.turnResult(matchId,roundNumber);
 		
 		if(resultadoTurno != null){
 			return ok(Json.toJson(resultadoTurno));

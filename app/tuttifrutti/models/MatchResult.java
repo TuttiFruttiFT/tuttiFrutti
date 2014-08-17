@@ -9,8 +9,11 @@ import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 
+import tuttifrutti.serializers.ObjectIdSerializer;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * @author rfanego
@@ -20,7 +23,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MatchResult extends ResultModel {
-	@Id 
+	@Id
+	@JsonSerialize(using = ObjectIdSerializer.class)
 	private ObjectId id;
 	
 	private String winner;

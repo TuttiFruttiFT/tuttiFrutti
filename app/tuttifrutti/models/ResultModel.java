@@ -5,7 +5,7 @@ package tuttifrutti.models;
  */
 public class ResultModel {
 
-	public static ResultModel resultadoTurno(String idPartida, Integer numeroTurno) {
+	public static ResultModel turnResult(String idPartida, Integer numeroTurno) {
 		// TODO implementar
 		return null;
 	}

@@ -32,3 +32,5 @@ libraryDependencies += "org.springframework" % "spring-expression" % "3.2.10.REL
 libraryDependencies += "org.springframework" % "spring-test" % "3.2.10.RELEASE"
 
 libraryDependencies += "de.flapdoodle.embed" % "de.flapdoodle.embed.mongo" % "1.46.0"
+
+libraryDependencies += "org.apache.commons" % "commons-collections4" % "4.0"

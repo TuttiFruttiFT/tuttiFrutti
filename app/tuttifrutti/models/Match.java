@@ -1,5 +1,7 @@
 package tuttifrutti.models;
 
+import static tuttifrutti.models.MatchConfig.PUBLIC_TYPE;
+
 import java.util.Date;
 import java.util.List;
 
@@ -66,17 +68,20 @@ public class Match {
 	private List<Category> categories;
 	
 	@Embedded
-	private List<Player> players;
+	private List<PlayerResult> players;
 	
 	@Transient
 	private List<PowerUp> powerUps;
 	
-	@Transient
+//	@Transient
 	private Round lastRound;
 	
 	@Transient
 	@Autowired
 	private Datastore mongoDatastore;
+	
+	@Autowired
+	private Category categoryService;
 
 	public List<ActiveMatch> activeMatches(String idJugador) {
 		// TODO implementar, partidas de idJugador que no estén en PARTIDA_FINALIZADA
@@ -89,33 +94,35 @@ public class Match {
 	}
 
 	public Match findPublicMatch(String playerId, MatchConfig config) {
-		return findMatch(playerId, config, MatchConfig.PUBLIC_TYPE);
+		return findMatch(playerId, config, PUBLIC_TYPE);
 	}
 
 	public Match findMatch(String playerId, MatchConfig config, String type) {
 		Query<Match> query = mongoDatastore.find(Match.class, "config.number_of_players =", config.getNumberOfPlayers());
+		Player player = new Player();
+		player.setId(new ObjectId(playerId));
 		query.and(query.criteria("config.language").equal(config.getLanguage()), 
 				  query.criteria("config.type").equal(type),
 				  query.criteria("config.mode").equal(config.getMode()),
-				  query.criteria("players.id").notEqual(new ObjectId(playerId)));
+				  query.criteria("players").not().hasThisElement(player));
 		
 		return query.get();
 	}
 
 	public Match createPublic(MatchConfig matchConfig) {
-		return create(matchConfig, MatchConfig.PUBLIC_TYPE);
+		return create(matchConfig, PUBLIC_TYPE);
 	}
 
-	public Match create(MatchConfig matchConfig, String type) {
+	public Match create(MatchConfig config, String type) {
 		Match match = new Match();
-		matchConfig.setType(type);
-		matchConfig.setPowerUpsEnabled(true);
-		matchConfig.setRounds(25);
-		match.setConfig(matchConfig);
+		config.setType(type);
+		config.setPowerUpsEnabled(true);
+		config.setRounds(25);
+		match.setConfig(config);
 		match.setName(null); //TODO ver qué poner de nombre
 		match.setState(TO_BE_APPROVED);
 		match.setStartDate(DateTime.now().toDate());
-		match.setCategories(Category.getPublicMatchCategories());
+		match.setCategories(categoryService.getPublicMatchCategories(config.getLanguage()));
 		mongoDatastore.save(match);
 		return match;
 	}
@@ -131,13 +138,13 @@ public class Match {
 		return null;
 	}
 
-	public ResultModel play(String idJugador, List<Dupla> categoriasTurno) {
-		for(Dupla categoriaTurno : categoriasTurno){
-			ElasticUtil.validar(categoriaTurno);
-			this.calcularPuntaje(categoriaTurno);
+	public ResultModel play(String idJugador, List<Dupla> duplas) {
+		for(Dupla dupla : duplas){
+			ElasticUtil.validar(dupla);
+			this.calcularPuntaje(dupla);
 		}
 		
-		this.crearTurno(idJugador,categoriasTurno);
+		this.crearTurno(idJugador,duplas);
 		
 		return calcularResultado();
 	}
