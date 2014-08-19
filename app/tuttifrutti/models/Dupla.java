@@ -36,7 +36,11 @@ public class Dupla {
 	
 	private Double time;
 	
-	private String state;
+	private DuplaState state;
 	
 	private Integer score;
+}
+
+enum DuplaState{
+	PRECISE,CORRECTED,WRONG
 }

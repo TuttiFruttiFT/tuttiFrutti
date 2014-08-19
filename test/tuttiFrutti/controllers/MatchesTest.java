@@ -42,6 +42,10 @@ public class MatchesTest {
 			Category categoryService = SpringApplicationContext.getBeanNamed("category", Category.class);
 			String language = "ES";
 			
+			Round lastRound = new Round();
+			lastRound.setNumber(1);
+			lastRound.setLetter(Letter.A);
+			
 			Player player = savePlayer(dataStore, "SARASA", "sarasas@sarasa.com");
 			Player player2 = savePlayer(dataStore, "SARASA2", "sarasas2@sarasa.com");
 
@@ -58,6 +62,7 @@ public class MatchesTest {
 			match.setStartDate(DateTime.now().toDate());
 			match.setCategories(categoryService.getPublicMatchCategories(language));
 			match.setPlayers(Arrays.asList(playerResult2));
+			match.setLastRound(lastRound);
 			dataStore.save(match);
 			
 			String playerId = player.getId().toString();
@@ -69,23 +74,13 @@ public class MatchesTest {
 			assertThat(r.getStatus()).isEqualTo(OK);
 
 			JsonNode jsonNode = r.asJson();
+			System.out.println(jsonNode.toString());
 			Match resultMatch = Json.fromJson(jsonNode, Match.class);
 			
 			assertThat(resultMatch).isNotNull();
 			assertThat(resultMatch.getId().toString()).isEqualTo(match.getId().toString());
-			assertThat(resultMatch.getState()).isEqualTo(TO_BE_APPROVED);
-			assertThat(resultMatch.getConfig()).isNotNull();
-			assertThat(resultMatch.getConfig().getType()).isEqualTo(PUBLIC_TYPE);
-			assertThat(resultMatch.getConfig().getMode()).isEqualTo(NORMAL_MODE);
-			assertThat(resultMatch.getConfig().getLanguage()).isEqualTo(language);
-			assertThat(resultMatch.getConfig().getNumberOfPlayers()).isEqualTo(3);
-			assertThat(resultMatch.getCategories().size()).isEqualTo(DEFAULT_CATEGORIES_NUMBER);
-			Round round = resultMatch.getLastRound();
-			assertThat(round).isNotNull();
-			assertThat(round.getNumber()).isEqualTo(1);
-			Letter letter = round.getLetter();
-			assertThat(letter).isNotNull();
-			System.out.println("Letra: " + letter.getLetter());
+			Letter letter = commonMatchAssertions(language, resultMatch);
+			assertThat(letter).isEqualTo(Letter.A);
 		});
 	}
 
@@ -109,23 +104,27 @@ public class MatchesTest {
 
 			JsonNode jsonNode = r.asJson();
 			Match resultMatch = Json.fromJson(jsonNode, Match.class);
-
+			
 			assertThat(resultMatch).isNotNull();
 			assertThat(resultMatch.getId()).isNotNull();
-			assertThat(resultMatch.getState()).isEqualTo(TO_BE_APPROVED);
-			assertThat(resultMatch.getConfig()).isNotNull();
-			assertThat(resultMatch.getConfig().getType()).isEqualTo(MatchConfig.PUBLIC_TYPE);
-			assertThat(resultMatch.getConfig().getMode()).isEqualTo(MatchConfig.NORMAL_MODE);
-			assertThat(resultMatch.getConfig().getLanguage()).isEqualTo(language);
-			assertThat(resultMatch.getConfig().getNumberOfPlayers()).isEqualTo(3);
-			assertThat(resultMatch.getCategories().size()).isEqualTo(DEFAULT_CATEGORIES_NUMBER);
-			Round round = resultMatch.getLastRound();
-			assertThat(round).isNotNull();
-			assertThat(round.getNumber()).isEqualTo(1);
-			Letter letter = round.getLetter();
-			assertThat(letter).isNotNull();
-			System.out.println("Letra: " + letter.getLetter());
+			commonMatchAssertions(language, resultMatch);
 		});
+	}
+	
+	private Letter commonMatchAssertions(String language, Match resultMatch) {
+		assertThat(resultMatch.getState()).isEqualTo(TO_BE_APPROVED);
+		assertThat(resultMatch.getConfig()).isNotNull();
+		assertThat(resultMatch.getConfig().getType()).isEqualTo(PUBLIC_TYPE);
+		assertThat(resultMatch.getConfig().getMode()).isEqualTo(NORMAL_MODE);
+		assertThat(resultMatch.getConfig().getLanguage()).isEqualTo(language);
+		assertThat(resultMatch.getConfig().getNumberOfPlayers()).isEqualTo(3);
+		assertThat(resultMatch.getCategories().size()).isEqualTo(DEFAULT_CATEGORIES_NUMBER);
+		Round round = resultMatch.getLastRound();
+		assertThat(round).isNotNull();
+		assertThat(round.getNumber()).isEqualTo(1);
+		Letter letter = round.getLetter();
+		assertThat(letter).isNotNull();
+		return letter;
 	}
 	
 	private PlayerResult savePlayerResult(Datastore datastore, Player player, int score) {
@@ -158,6 +157,7 @@ public class MatchesTest {
 	
 	private void saveCategories(Datastore datastore, String language) {
 		Category categoryNombres = new Category();
+		categoryNombres.setId("nombres");
 		categoryNombres.setImage("nombres_img");
 		categoryNombres.setLanguage(language);
 		categoryNombres.setName("Nombres");

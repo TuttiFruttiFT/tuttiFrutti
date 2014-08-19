@@ -7,11 +7,11 @@ import lombok.Setter;
 
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.Datastore;
-import org.mongodb.morphia.Key;
 import org.mongodb.morphia.annotations.Embedded;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Property;
+import org.mongodb.morphia.annotations.Reference;
 import org.mongodb.morphia.annotations.Transient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -36,7 +36,8 @@ public class Round {
 	@JsonSerialize(using = ObjectIdSerializer.class)
 	private ObjectId id;
 	
-	private Key<Match> match;
+	@Reference
+	private Match match;
 	
 	private Integer number;
 	
@@ -58,7 +59,6 @@ public class Round {
 
 	public void create(Match match) {
 		Round round = new Round();
-		round.setMatch(mongoDatastore.getKey(match));
 		round.setNumber(getRoundNumber(match));
 		round.setLetter(getLetter(match));
 		match.setLastRound(round);

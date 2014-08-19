@@ -73,7 +73,6 @@ public class Match {
 	@Transient
 	private List<PowerUp> powerUps;
 	
-//	@Transient
 	private Round lastRound;
 	
 	@Transient
@@ -82,15 +81,20 @@ public class Match {
 	
 	@Autowired
 	private Category categoryService;
+	
+	@Autowired
+	private Round roundService;
+	
+	@Autowired
+	private ElasticUtil elasticUtil;
 
 	public List<ActiveMatch> activeMatches(String idJugador) {
 		// TODO implementar, partidas de idJugador que no estén en PARTIDA_FINALIZADA
 		return null;
 	}
 
-	public Match match(String idPartida) {
-		// TODO implementar
-		return null;
+	public Match match(String matchId) {
+		return mongoDatastore.get(Match.class,matchId);
 	}
 
 	public Match findPublicMatch(String playerId, MatchConfig config) {
@@ -123,6 +127,7 @@ public class Match {
 		match.setState(TO_BE_APPROVED);
 		match.setStartDate(DateTime.now().toDate());
 		match.setCategories(categoryService.getPublicMatchCategories(config.getLanguage()));
+		roundService.create(match);
 		mongoDatastore.save(match);
 		return match;
 	}
@@ -134,13 +139,12 @@ public class Match {
 
 	public Match create(String idJugador, MatchConfig configuracion, List<String> jugadores) {
 		// TODO implementar
-		
 		return null;
 	}
 
-	public ResultModel play(String idJugador, List<Dupla> duplas) {
+	public ResultModel play(String idJugador, List<Dupla> duplas) {		
+		elasticUtil.validar(duplas);
 		for(Dupla dupla : duplas){
-			ElasticUtil.validar(dupla);
 			this.calcularPuntaje(dupla);
 		}
 		
