@@ -16,6 +16,7 @@ import tuttifrutti.models.MatchConfig;
 import tuttifrutti.models.Player;
 import tuttifrutti.models.PowerUp;
 import tuttifrutti.models.ResultModel;
+import tuttifrutti.utils.JsonUtil;
 import tuttifrutti.utils.PushUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -110,9 +111,8 @@ public class Matches extends Controller {
 		
 		Match match = matchService.match(matchId);
 		
-		ResultModel result = match.play(playerId,duplas);
-		
-        return ok(Json.toJson(result));
+        List<Dupla> wrongDuplas = match.play(playerId,duplas);
+		return ok(Json.toJson(JsonUtil.parseListToJson(wrongDuplas)));
     }
 	
 	public Result roundResult(String matchId,Integer roundNumber){

@@ -74,7 +74,6 @@ public class MatchesTest {
 			assertThat(r.getStatus()).isEqualTo(OK);
 
 			JsonNode jsonNode = r.asJson();
-			System.out.println(jsonNode.toString());
 			Match resultMatch = Json.fromJson(jsonNode, Match.class);
 			
 			assertThat(resultMatch).isNotNull();
@@ -157,76 +156,94 @@ public class MatchesTest {
 	
 	private void saveCategories(Datastore datastore, String language) {
 		Category categoryNombres = new Category();
-		categoryNombres.setId("nombres");
+		categoryNombres.setId("names");
 		categoryNombres.setImage("nombres_img");
 		categoryNombres.setLanguage(language);
 		categoryNombres.setName("Nombres");
 		datastore.save(categoryNombres);
 		
 		Category categoryColores = new Category();
+		categoryColores.setId("colors");
 		categoryColores.setImage("colores_img");
 		categoryColores.setLanguage(language);
 		categoryColores.setName("Colores");
 		datastore.save(categoryColores);
 		
 		Category categoryCosas = new Category();
+		categoryCosas.setId("things");
 		categoryCosas.setImage("cosas_img");
 		categoryCosas.setLanguage(language);
 		categoryCosas.setName("Cosas / Objectos");
 		datastore.save(categoryCosas);
 
-		Category categoryComidad = new Category();
-		categoryComidad.setImage("comidad_img");
-		categoryComidad.setLanguage(language);
-		categoryComidad.setName("Comidas y Bebidas");
-		datastore.save(categoryComidad);
+		Category categoryComidas = new Category();
+		categoryComidas.setId("meals");
+		categoryComidas.setImage("comidas_img");
+		categoryComidas.setLanguage(language);
+		categoryComidas.setName("Comidas y Bebidas");
+		datastore.save(categoryComidas);
 		
 		Category categoryPaises = new Category();
-		categoryPaises.setImage("nombres_img");
+		categoryPaises.setId("countries");
+		categoryPaises.setImage("countries_img");
 		categoryPaises.setLanguage(language);
 		categoryPaises.setName("Paises");
 		datastore.save(categoryPaises);
 		
 		Category categoryAnimales = new Category();
+		categoryAnimales.setId("animals");
 		categoryAnimales.setImage("animales_img");
 		categoryAnimales.setLanguage(language);
 		categoryAnimales.setName("Animales");
 		datastore.save(categoryAnimales);
 		
 		Category categoryDeportes = new Category();
+		categoryDeportes.setId("sports");
 		categoryDeportes.setImage("deportes_img");
 		categoryDeportes.setLanguage(language);
 		categoryDeportes.setName("Deportes");
 		datastore.save(categoryDeportes);
 		
 		Category categoryCiudades = new Category();
+		categoryCiudades.setId("cities");
 		categoryCiudades.setImage("ciudades_img");
 		categoryCiudades.setLanguage(language);
 		categoryCiudades.setName("Ciudades");
 		datastore.save(categoryCiudades);
 		
 		Category categoryRopa = new Category();
+		categoryRopa.setId("clothes");
 		categoryRopa.setImage("ropa_img");
 		categoryRopa.setLanguage(language);
 		categoryRopa.setName("Ropa");
 		datastore.save(categoryRopa);
 		
 		Category categoryInstrumentos = new Category();
+		categoryInstrumentos.setId("instruments");
 		categoryInstrumentos.setImage("instrumentos_img");
 		categoryInstrumentos.setLanguage(language);
 		categoryInstrumentos.setName("Instrumentos");
 		datastore.save(categoryInstrumentos);
 		
 		Category categoryVerbos = new Category();
+		categoryVerbos.setId("verbs");
 		categoryVerbos.setImage("verbos_img");
 		categoryVerbos.setLanguage(language);
 		categoryVerbos.setName("Verbos");
 		datastore.save(categoryVerbos);
 		
 		Category categoryTrabajos = new Category();
+		categoryTrabajos.setId("jobs");
 		categoryTrabajos.setImage("trabajos_img");
 		categoryTrabajos.setLanguage(language);
 		categoryTrabajos.setName("Trabajos");
 		datastore.save(categoryTrabajos);
+		
+		Category categoryBands = new Category();
+		categoryBands.setId("bands");
+		categoryBands.setImage("bands_img");
+		categoryBands.setLanguage(language);
+		categoryBands.setName("Bandas de Música");
+		datastore.save(categoryBands);
 	}
 }

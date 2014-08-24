@@ -2,8 +2,8 @@ import lombok.val;
 import play.Application;
 import play.GlobalSettings;
 import play.Logger;
-import tuttifrutti.utils.ElasticSearchEmbeddedServer;
-import tuttifrutti.utils.MongoEmbeddedServer;
+import tuttifrutti.elastic.ElasticSearchEmbeddedServer;
+import tuttifrutti.mongo.MongoEmbeddedServer;
 import tuttifrutti.utils.SpringApplicationContext;
 
 

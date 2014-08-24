@@ -1,8 +1,9 @@
-package tuttifrutti.utils;
+package tuttifrutti.mongo;
 
 import java.net.UnknownHostException;
 
 import play.Logger;
+import tuttifrutti.utils.ConfigurationAccessor;
 
 import com.mongodb.MongoClient;
 

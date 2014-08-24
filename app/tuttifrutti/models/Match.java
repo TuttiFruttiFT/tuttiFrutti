@@ -20,9 +20,9 @@ import org.mongodb.morphia.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import tuttifrutti.elastic.ElasticUtil;
 import tuttifrutti.models.views.ActiveMatch;
 import tuttifrutti.serializers.ObjectIdSerializer;
-import tuttifrutti.utils.ElasticUtil;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -142,30 +142,27 @@ public class Match {
 		return null;
 	}
 
-	public ResultModel play(String idJugador, List<Dupla> duplas) {		
-		elasticUtil.validar(duplas);
-		for(Dupla dupla : duplas){
-			this.calcularPuntaje(dupla);
-		}
+	public List<Dupla> play(String idJugador, List<Dupla> duplas) {		
+		elasticUtil.validar(duplas,roundService.getLetter());
 		
-		this.crearTurno(idJugador,duplas);
+		this.createTurn(idJugador,duplas);
 		
-		return calcularResultado();
+		calculateResult();
+		
+		return getWrongDuplas(duplas);
 	}
 
-	private ResultModel calcularResultado() {
-		// TODO implementar
+	private List<Dupla> getWrongDuplas(List<Dupla> duplas) {
+		//TODO implementar
 		return null;
 	}
 
-	private void crearTurno(String idJugador, List<Dupla> categoriasTurno) {
-		// TODO implementar
-		
+	private void calculateResult() {
+		// TODO hacer las push a los jugadores en el caso de que sea el último turno
 	}
 
-	private void calcularPuntaje(Dupla categoriaTurno) {
+	private void createTurn(String idJugador, List<Dupla> categoriasTurno) {
 		// TODO implementar
-		
 	}
 
 	public void rejected() {

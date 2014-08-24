@@ -1,31 +1,25 @@
 package tuttifrutti.models;
 
+import static tuttifrutti.models.DuplaState.CORRECTED;
+import static tuttifrutti.models.DuplaState.PERFECT;
+import static tuttifrutti.models.DuplaState.WRONG;
 import lombok.Getter;
 import lombok.Setter;
 
-import org.bson.types.ObjectId;
-import org.mongodb.morphia.annotations.Entity;
-import org.mongodb.morphia.annotations.Id;
+import org.mongodb.morphia.annotations.Embedded;
 import org.mongodb.morphia.annotations.Property;
-
-import tuttifrutti.serializers.ObjectIdSerializer;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * @author rfanego
  */
-@Entity
+@Embedded
 @Getter @Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Dupla {
-	@Id 
-	@JsonSerialize(using = ObjectIdSerializer.class)
-	private ObjectId id;
-	
 	private Category category;
 	
 	@Property("written_word")
@@ -39,8 +33,21 @@ public class Dupla {
 	private DuplaState state;
 	
 	private Integer score;
-}
+	
+	public String getWrittenWord(){
+		return writtenWord.toLowerCase();
+	}
+	
+	public void setFinalWord(String finalWord){
+		this.finalWord = finalWord;
+		if(finalWord.equals(getWrittenWord())){
+			setState(PERFECT);
+		}else{
+			setState(CORRECTED);
+		}
+	}
 
-enum DuplaState{
-	PRECISE,CORRECTED,WRONG
+	public void setWrongState() {
+		setState(WRONG);
+	}
 }

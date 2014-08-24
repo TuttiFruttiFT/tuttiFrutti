@@ -1,4 +1,4 @@
-package tuttifrutti.utils;
+package tuttifrutti.mongo;
 
 import java.net.UnknownHostException;
 

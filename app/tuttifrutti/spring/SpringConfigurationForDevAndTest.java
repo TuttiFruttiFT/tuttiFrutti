@@ -9,8 +9,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Profile;
 
 import play.Logger;
-import tuttifrutti.utils.ElasticSearchEmbeddedServer;
-import tuttifrutti.utils.MongoEmbeddedServer;
+import tuttifrutti.elastic.ElasticSearchEmbeddedServer;
+import tuttifrutti.mongo.MongoEmbeddedServer;
 
 import com.mongodb.MongoClient;
 

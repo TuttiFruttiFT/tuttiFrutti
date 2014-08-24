@@ -13,6 +13,25 @@ libraryDependencies ++= Seq(
   javaWs
 )
 
+
+Keys.fork in run := true
+
+javaOptions in run ++= Seq(
+    "-Xdebug",
+    "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=9998",
+    "-Xms128m",
+    "-Xmx1024m"
+)
+
+Keys.fork in Test := true
+
+javaOptions in Test ++= Seq(
+    "-Xdebug",
+    "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=9998",
+    "-Xms128m",
+    "-Xmx1024m"
+)
+
 libraryDependencies += "org.mongodb" % "mongo-java-driver" % "2.12.2"
 
 libraryDependencies += "org.mongodb.morphia" % "morphia" % "0.108"
