@@ -1,7 +1,10 @@
 package tuttifrutti.models;
 
+import static java.util.stream.Collectors.toList;
+import static tuttifrutti.models.DuplaState.WRONG;
 import static tuttifrutti.models.MatchConfig.PUBLIC_TYPE;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -153,16 +156,24 @@ public class Match {
 	}
 
 	private List<Dupla> getWrongDuplas(List<Dupla> duplas) {
-		//TODO implementar
-		return null;
+		return duplas.stream().filter(dupla -> dupla.getState().equals(WRONG)).collect(toList());
 	}
 
 	private void calculateResult() {
 		// TODO hacer las push a los jugadores en el caso de que sea el último turno
+		List<Turn> turns = roundService.getTurns();
+		List<Dupla> allDuplas = new ArrayList<>();
+		if(turns.size() == players.size()){
+			
+		}
 	}
 
-	private void createTurn(String idJugador, List<Dupla> categoriasTurno) {
-		// TODO implementar
+	private void createTurn(String playerId, List<Dupla> duplas) {
+		Turn turn = new Turn();
+		turn.setDuplas(duplas);
+		turn.setPlayerId(playerId);
+		lastRound.addTurn(turn);
+		mongoDatastore.save(lastRound);
 	}
 
 	public void rejected() {

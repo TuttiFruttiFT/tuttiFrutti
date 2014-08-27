@@ -1,5 +1,6 @@
 package tuttifrutti.models;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Getter;
@@ -79,5 +80,12 @@ public class Round {
 			return 1;
 		}
 		return (round.getNumber() + 1);
+	}
+
+	public void addTurn(Turn turn) {
+		if(turns == null){
+			turns = new ArrayList<>();
+		}
+		turns.add(turn);
 	}
 }

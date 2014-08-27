@@ -74,6 +74,7 @@ public class MatchesTest {
 			assertThat(r.getStatus()).isEqualTo(OK);
 
 			JsonNode jsonNode = r.asJson();
+			System.out.println(jsonNode.toString());
 			Match resultMatch = Json.fromJson(jsonNode, Match.class);
 			
 			assertThat(resultMatch).isNotNull();

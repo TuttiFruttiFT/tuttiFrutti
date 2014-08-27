@@ -19,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @Getter @Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Dupla {
+public class Dupla implements Comparable<Dupla>{
 	private Category category;
 	
 	@Property("written_word")
@@ -49,5 +49,10 @@ public class Dupla {
 
 	public void setWrongState() {
 		setState(WRONG);
+	}
+
+	@Override
+	public int compareTo(Dupla dupla) {
+		return this.category.getId().compareTo(dupla.getCategory().getId());
 	}
 }

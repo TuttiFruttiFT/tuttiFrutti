@@ -26,5 +26,5 @@ public class PlayerResult {
 	private ObjectId id;
 	
 	private Player player;
-	private Integer score;
+	private int score;
 }
