@@ -49,25 +49,28 @@ public class ElasticUtil {
 		
 		for(Dupla dupla : duplas){
 			BoolQueryBuilder boolQueryBuilder = boolQuery();
-			
-			MatchQueryBuilder matchQueryBuilder = matchQuery("value", dupla.getWrittenWord());
-			matchQueryBuilder.fuzziness(AUTO);
-			matchQueryBuilder.prefixLength(1);
-			matchQueryBuilder.maxExpansions(50);
-			matchQueryBuilder.minimumShouldMatch("100%");
-			
-			TermQueryBuilder termQueryBuilder = QueryBuilders.termQuery("letter", letter.getLetter());
-			
-			boolQueryBuilder.must(boolQueryBuilder);
-			boolQueryBuilder.should(termQueryBuilder);
-			boolQueryBuilder.minimumNumberShouldMatch(1);
-			
 			String categoryId = dupla.getCategory().getId();
-			SearchRequestBuilder searchQuery = elasticSearchClient.prepareSearch("categories").setTypes(categoryId).setSize(1);
-			searchQuery.setQuery(matchQueryBuilder);
 			
+			String writtenWord = dupla.getWrittenWord();
+			if(StringUtils.isNotEmpty(writtenWord)){
+				MatchQueryBuilder matchQueryBuilder = matchQuery("value", writtenWord);
+				matchQueryBuilder.fuzziness(AUTO);
+				matchQueryBuilder.prefixLength(1);
+				matchQueryBuilder.maxExpansions(50);
+				matchQueryBuilder.minimumShouldMatch("100%");
+				
+				TermQueryBuilder termQueryBuilder = QueryBuilders.termQuery("letter", letter.getLetter());
+				
+				boolQueryBuilder.must(boolQueryBuilder);
+				boolQueryBuilder.should(termQueryBuilder);
+				boolQueryBuilder.minimumNumberShouldMatch(1);
+				
+				SearchRequestBuilder searchQuery = elasticSearchClient.prepareSearch("categories").setTypes(categoryId).setSize(1);
+				searchQuery.setQuery(matchQueryBuilder);
+				
+				mSearch.add(searchQuery);
+			}
 			mapDuplas.put(categoryId, dupla);
-			mSearch.add(searchQuery);
 		}
 		
 		MultiSearchResponse mResponse = elasticSearchClient.multiSearch(mSearch).actionGet();

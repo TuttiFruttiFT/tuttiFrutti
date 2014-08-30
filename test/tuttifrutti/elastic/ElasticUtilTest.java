@@ -19,6 +19,7 @@ import org.junit.Test;
 import play.Logger;
 import tuttifrutti.models.Category;
 import tuttifrutti.models.Dupla;
+import tuttifrutti.models.DuplaState;
 import tuttifrutti.utils.SpringApplicationContext;
 
 public class ElasticUtilTest {
@@ -35,18 +36,36 @@ public class ElasticUtilTest {
 			Category categoryColors = new Category();
 			categoryColors.setId("colors");
 			
+			Category categoryMeals = new Category();
+			categoryMeals.setId("meals");
+			
+			Category categoryCountries = new Category();
+			categoryCountries.setId("countries");
+			
 			List<Dupla> duplas = new ArrayList<>();
 			Dupla duplaBanda = new Dupla();
 			duplaBanda.setCategory(categoryBands);
 			duplaBanda.setWrittenWord("Rolling Stone");
-			duplaBanda.setTime(11.0);
+			duplaBanda.setTime(11);
 			duplas.add(duplaBanda);
 			
 			Dupla duplaColor = new Dupla();
 			duplaColor.setCategory(categoryColors);
 			duplaColor.setWrittenWord("Gris");
-			duplaColor.setTime(19.0);
+			duplaColor.setTime(19);
 			duplas.add(duplaColor);
+			
+			Dupla duplaVacia = new Dupla();
+			duplaVacia.setCategory(categoryMeals);
+			duplaVacia.setWrittenWord("");
+			duplaVacia.setTime(19);
+			duplas.add(duplaVacia);
+			
+			Dupla duplaNull = new Dupla();
+			duplaNull.setCategory(categoryCountries);
+			duplaNull.setWrittenWord(null);
+			duplaNull.setTime(19);
+			duplas.add(duplaNull);
 			
 			elasticUtil.validar(duplas, R);
 			
@@ -57,11 +76,15 @@ public class ElasticUtilTest {
 					assertThat(dupla.getState()).isEqualTo(CORRECTED);
 				}
 				
-				if(dupla.getCategory().getId().equals("colors")){
+				if(dupla.getCategory().getId().equals("colors") || dupla.getCategory().getId().equals("meals")
+				   || dupla.getCategory().getId().equals("countries")){
 					assertThat(dupla.getFinalWord()).isNull();
 					assertThat(dupla.getState()).isEqualTo(WRONG);
 				}
 			}
+			
+			assertThat(duplas.stream().filter(dupla -> dupla.getState().equals(WRONG)).count()).isEqualTo(3);
+			assertThat(duplas.stream().filter(dupla -> dupla.getState().equals(CORRECTED)).count()).isEqualTo(1);			
 		});
 	}
 

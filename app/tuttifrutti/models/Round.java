@@ -49,7 +49,8 @@ public class Round {
 	@Property("end_time")
 	private Integer endTime;
 	
-	private String winner;
+	@Property("stop_player_id")
+	private String stopPlayerId;
 	
 	@Embedded
 	private List<Turn> turns;

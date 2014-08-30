@@ -28,14 +28,14 @@ public class Dupla implements Comparable<Dupla>{
 	@Property("final_word")
 	private String finalWord;
 	
-	private Double time;
+	private Integer time;
 	
 	private DuplaState state;
 	
 	private Integer score;
 	
 	public String getWrittenWord(){
-		return writtenWord.toLowerCase();
+		return writtenWord != null ? writtenWord.toLowerCase() : writtenWord;
 	}
 	
 	public void setFinalWord(String finalWord){
