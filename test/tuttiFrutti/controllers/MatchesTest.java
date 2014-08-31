@@ -10,7 +10,9 @@ import static tuttifrutti.models.Match.TO_BE_APPROVED;
 import static tuttifrutti.models.MatchConfig.NORMAL_MODE;
 import static tuttifrutti.models.MatchConfig.PUBLIC_TYPE;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.joda.time.DateTime;
 import org.junit.Test;
@@ -19,13 +21,17 @@ import org.mongodb.morphia.Datastore;
 import play.libs.Json;
 import play.libs.ws.WS;
 import play.libs.ws.WSResponse;
+import tuttifrutti.elastic.ElasticSearchAwareTest;
 import tuttifrutti.models.Category;
+import tuttifrutti.models.Dupla;
 import tuttifrutti.models.Letter;
 import tuttifrutti.models.Match;
 import tuttifrutti.models.MatchConfig;
 import tuttifrutti.models.Player;
 import tuttifrutti.models.PlayerResult;
 import tuttifrutti.models.Round;
+import tuttifrutti.models.Turn;
+import tuttifrutti.utils.JsonUtil;
 import tuttifrutti.utils.SpringApplicationContext;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -33,13 +39,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 /**
  * @author rfanego
  */
-public class MatchesTest {
+public class MatchesTest extends ElasticSearchAwareTest {
 
 	@Test
 	public void searchPublicMatchReturnsExistingMatch() {
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
 			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
-			Category categoryService = SpringApplicationContext.getBeanNamed("category", Category.class);
 			String language = "ES";
 			
 			Round lastRound = new Round();
@@ -54,16 +59,8 @@ public class MatchesTest {
 			
 			saveCategories(dataStore, language);
 
-			Match match = new Match();
 			MatchConfig matchConfig = createMatchConfig(language, NORMAL_MODE, PUBLIC_TYPE, 3, true, 25);
-			match.setConfig(matchConfig);
-			match.setName(null); // TODO ver qué poner de nombre
-			match.setState(TO_BE_APPROVED);
-			match.setStartDate(DateTime.now().toDate());
-			match.setCategories(categoryService.getPublicMatchCategories(language));
-			match.setPlayers(Arrays.asList(playerResult2));
-			match.setLastRound(lastRound);
-			dataStore.save(match);
+			Match match = createMatch(dataStore, language, lastRound,Arrays.asList(playerResult2), matchConfig);
 			
 			String playerId = player.getId().toString();
 			WSResponse r = WS.url("http://localhost:9000/match/public").setContentType("application/json")
@@ -74,7 +71,6 @@ public class MatchesTest {
 			assertThat(r.getStatus()).isEqualTo(OK);
 
 			JsonNode jsonNode = r.asJson();
-			System.out.println(jsonNode.toString());
 			Match resultMatch = Json.fromJson(jsonNode, Match.class);
 			
 			assertThat(resultMatch).isNotNull();
@@ -88,7 +84,7 @@ public class MatchesTest {
 	public void searchPublicMatchReturnsCreatedMatch() {
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
 			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
-			Player player = savePlayer(dataStore, null, null);
+			Player player = savePlayer(dataStore, "SARASA", "sarasas@sarasa.com");
 			String language = "ES";
 
 			saveCategories(dataStore, language);
@@ -109,6 +105,76 @@ public class MatchesTest {
 			assertThat(resultMatch.getId()).isNotNull();
 			commonMatchAssertions(language, resultMatch);
 		});
+	}
+	
+	@Test
+	public void turn() {
+		running(testServer(9000, fakeApplication()), (Runnable) () -> {
+			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
+			String language = "ES";
+			
+			Player player = savePlayer(dataStore, "SARASA", "sarasas@sarasa.com");
+			Player player2 = savePlayer(dataStore, "SARASA2", "sarasas2@sarasa.com");
+
+			PlayerResult playerResult1 = savePlayerResult(dataStore, player, 35);
+			PlayerResult playerResult2 = savePlayerResult(dataStore, player2, 40);
+			
+			saveCategories(dataStore, language);
+
+			List<Dupla> duplas = new ArrayList<>();
+			saveDupla(new Category("bands"), duplas, "Rolling Stone", 15);
+			saveDupla(new Category("colors"), duplas, "Gris", 24);
+			saveDupla(new Category("meals"), duplas, "", 35);
+			saveDupla(new Category("countries"), duplas, null, 39);
+			
+			List<Dupla> duplas2 = new ArrayList<>();
+			saveDupla(new Category("bands"), duplas2, "Radiohead", 15);
+			saveDupla(new Category("colors"), duplas2, "Marron", 24);
+			saveDupla(new Category("meals"), duplas2, "Risotto", 35);
+			saveDupla(new Category("countries"), duplas2, "Rumania", 39);
+			
+			Turn turn = new Turn();
+			turn.setPlayerId(player2.getId().toString());
+			turn.setEndTime(45);
+			turn.setScore(0);
+			turn.setDuplas(duplas2);
+			
+			Round lastRound = new Round();
+			lastRound.setNumber(1);
+			lastRound.setLetter(Letter.A);
+			lastRound.addTurn(turn);
+			
+			MatchConfig matchConfig = createMatchConfig(language, NORMAL_MODE, PUBLIC_TYPE, 3, true, 25);
+			Match match = createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig);
+			
+			WSResponse r = WS.url("http://localhost:9000/match/turn").setContentType("application/json")
+					 .post("{\"player_id\" : \"" + player.getId().toString() + "\", \"match_id\":" + match.getId().toString() 
+						   + "\", \"duplas\":" + JsonUtil.parseListToJson(duplas)
+						   + "}")
+					 .get(5000L);
+		});
+	}
+	
+	private void saveDupla(Category categoryBands, List<Dupla> duplas, String writtenWord, Integer time) {
+		Dupla duplaBanda = new Dupla();
+		duplaBanda.setCategory(categoryBands);
+		duplaBanda.setWrittenWord(writtenWord);
+		duplaBanda.setTime(time);
+		duplas.add(duplaBanda);
+	}
+
+	private Match createMatch(Datastore dataStore, String language,Round lastRound, List<PlayerResult> playerResults, MatchConfig matchConfig) {
+		Category categoryService = SpringApplicationContext.getBeanNamed("category", Category.class);
+		Match match = new Match();
+		match.setConfig(matchConfig);
+		match.setName(null); // TODO ver qué poner de nombre
+		match.setState(TO_BE_APPROVED);
+		match.setStartDate(DateTime.now().toDate());
+		match.setCategories(categoryService.getPublicMatchCategories(language));
+		match.setPlayers(playerResults);
+		match.setLastRound(lastRound);
+		dataStore.save(match);
+		return match;
 	}
 	
 	private Letter commonMatchAssertions(String language, Match resultMatch) {

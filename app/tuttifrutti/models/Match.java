@@ -198,6 +198,8 @@ public class Match {
 		for(Turn turn : turns){
 			int turnScore = turn.getDuplas().stream().mapToInt(dupla -> dupla.getScore()).sum();
 			turn.setScore(turnScore);
+			PlayerResult playerResult = players.stream().filter(player -> player.getPlayer().getId().toString().equals(turn.getPlayerId())).findFirst().get();
+			playerResult.setScore(playerResult.getScore() + turnScore);
 		}
 	}
 

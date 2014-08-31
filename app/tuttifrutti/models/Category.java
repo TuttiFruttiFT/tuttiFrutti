@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import org.mongodb.morphia.Datastore;
@@ -23,6 +24,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  */
 @Entity
 @Getter @Setter
+@NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Component
@@ -45,7 +47,11 @@ public class Category {
 	@Transient
 	@Autowired
 	private Datastore mongoDatastore;
-
+	
+	public Category(String id){
+		this.id = id;
+	}
+	
 	public List<Category> categories(String language) {
 		Query<Category> query = mongoDatastore.find(Category.class, "language =", language);
 		return query.asList();
