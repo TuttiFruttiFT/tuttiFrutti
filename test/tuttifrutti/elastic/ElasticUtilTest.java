@@ -27,7 +27,7 @@ public class ElasticUtilTest extends ElasticSearchAwareTest {
 			
 			List<Dupla> duplas = new ArrayList<>();
 			saveDupla(new Category("bands"), duplas, "Rolling Stone", 11);
-			saveDupla(new Category("colors"), duplas, "Gris", 19);
+			saveDupla(new Category("colors"), duplas, "Gris Arena", 19);
 			saveDupla(new Category("meals"), duplas, "", 19);
 			saveDupla(new Category("countries"), duplas, null, 19);
 			

@@ -10,6 +10,7 @@ import static tuttifrutti.models.Category.DEFAULT_CATEGORIES_NUMBER;
 import static tuttifrutti.models.DuplaState.CORRECTED;
 import static tuttifrutti.models.DuplaState.PERFECT;
 import static tuttifrutti.models.DuplaState.WRONG;
+import static tuttifrutti.models.Letter.R;
 import static tuttifrutti.models.Match.TO_BE_APPROVED;
 import static tuttifrutti.models.MatchConfig.NORMAL_MODE;
 import static tuttifrutti.models.MatchConfig.PUBLIC_TYPE;
@@ -17,8 +18,6 @@ import static tuttifrutti.models.MatchConfig.PUBLIC_TYPE;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 import org.joda.time.DateTime;
 import org.junit.Test;
@@ -27,7 +26,6 @@ import org.mongodb.morphia.Datastore;
 import play.libs.Json;
 import play.libs.ws.WS;
 import play.libs.ws.WSResponse;
-import scalaz.syntax.std.ToListOps;
 import tuttifrutti.elastic.ElasticSearchAwareTest;
 import tuttifrutti.models.Category;
 import tuttifrutti.models.Dupla;
@@ -138,7 +136,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			
 			List<Dupla> duplas2 = new ArrayList<>();
 			saveDupla(new Category("bands"), duplas2, "Rolling Stone", 15,CORRECTED);
-			saveDupla(new Category("colors"), duplas2, "Gris", 24,PERFECT);
+			saveDupla(new Category("colors"), duplas2, "Rojo", 24,PERFECT);
 			saveDupla(new Category("meals"), duplas2, "", 35,WRONG);
 			saveDupla(new Category("countries"), duplas2, null, 39,WRONG);
 			
@@ -150,7 +148,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			
 			Round lastRound = new Round();
 			lastRound.setNumber(1);
-			lastRound.setLetter(Letter.A);
+			lastRound.setLetter(R);
 			lastRound.addTurn(turn);
 			
 			MatchConfig matchConfig = createMatchConfig(language, NORMAL_MODE, PUBLIC_TYPE, 3, true, 25);
@@ -162,7 +160,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 						   + "\", \"time\": 41" 
 						   + ", \"duplas\":" + JsonUtil.parseListToJson(duplas)
 						   + "}")
-					 .get(500000L);
+					 .get(5000000L);
 			
 			assertThat(r).isNotNull();
 			assertThat(r.getStatus()).isEqualTo(OK);

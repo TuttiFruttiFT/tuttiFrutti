@@ -179,12 +179,11 @@ public class Match {
 			for(Category category : match.getCategories()){
 				List<Dupla> categoryDuplas = getDuplasByCategory(filteredDuplas, category);
 				
-				List<Dupla> validDuplas = getValidDuplas(categoryDuplas);
-				if(!validDuplas.isEmpty()){
-					if(validDuplas.size() == 1){
-						validDuplas.get(0).setScore(ALONE_SCORE);
+				if(!categoryDuplas.isEmpty()){
+					if(categoryDuplas.size() == 1){
+						categoryDuplas.get(0).setScore(ALONE_SCORE);
 					}else{
-						comparingAndScoring(validDuplas);
+						comparingAndScoring(categoryDuplas);
 					}
 				}
 			}
@@ -236,7 +235,7 @@ public class Match {
 	}
 	
 	private List<Dupla> filterEmptyWrongAndOutOfTimeDuplas(List<Dupla> allDuplas,Integer minTime) {
-		return allDuplas.stream().filter(emptyWrongAndOutOfTime(minTime)).collect(toList());
+		return allDuplas.stream().filter(emptyWrongAndOutOfTime(minTime).negate()).collect(toList());
 	}
 
 	private Predicate<? super Dupla> emptyWrongAndOutOfTime(Integer minTime) {

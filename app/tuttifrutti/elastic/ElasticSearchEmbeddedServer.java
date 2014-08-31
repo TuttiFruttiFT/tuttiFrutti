@@ -81,6 +81,8 @@ public class ElasticSearchEmbeddedServer {
 
 			builder.startObject("value").field("type", "string").field("index", "not_analyzed").endObject();
 			
+//			builder.startObject("letter").field("type", "string").field("index", "not_analyzed").endObject();
+			
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

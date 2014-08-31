@@ -29,6 +29,7 @@ public class ElasticSearchAwareTest {
 		jsonList.add(Pair.of("bandRolling2.json", "bands"));
 		jsonList.add(Pair.of("colorNegro.json", "colors"));
 		jsonList.add(Pair.of("colorMarron.json", "colors"));
+		jsonList.add(Pair.of("colorRojo.json", "colors"));
 		jsonList.add(Pair.of("colorGrisArena.json", "colors"));
 		jsonList.add(Pair.of("mealCaramelo.json", "meals"));
 		jsonList.add(Pair.of("mealMango.json", "meals"));

@@ -19,8 +19,6 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.MatchQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,14 +57,12 @@ public class ElasticUtil {
 				matchQueryBuilder.maxExpansions(50);
 				matchQueryBuilder.minimumShouldMatch("100%");
 				
-				TermQueryBuilder termQueryBuilder = QueryBuilders.termQuery("letter", letter.getLetter());
-				
-				boolQueryBuilder.must(boolQueryBuilder);
-				boolQueryBuilder.should(termQueryBuilder);
+				boolQueryBuilder.must(matchQueryBuilder);
+				boolQueryBuilder.should(matchQuery("letter", letter.getLetter()));
 				boolQueryBuilder.minimumNumberShouldMatch(1);
 				
 				SearchRequestBuilder searchQuery = elasticSearchClient.prepareSearch("categories").setTypes(categoryId).setSize(1);
-				searchQuery.setQuery(matchQueryBuilder);
+				searchQuery.setQuery(boolQueryBuilder);
 				
 				mSearch.add(searchQuery);
 			}
