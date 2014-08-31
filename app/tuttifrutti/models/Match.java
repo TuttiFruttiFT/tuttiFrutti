@@ -1,6 +1,7 @@
 package tuttifrutti.models;
 
 import static java.util.stream.Collectors.toList;
+import static org.springframework.util.StringUtils.isEmpty;
 import static tuttifrutti.models.DuplaState.WRONG;
 import static tuttifrutti.models.MatchConfig.PUBLIC_TYPE;
 
@@ -23,7 +24,6 @@ import org.mongodb.morphia.annotations.Transient;
 import org.mongodb.morphia.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 import tuttifrutti.elastic.ElasticUtil;
 import tuttifrutti.models.views.ActiveMatch;
@@ -88,12 +88,15 @@ public class Match {
 	@Autowired
 	private Datastore mongoDatastore;
 	
+	@Transient
 	@Autowired
 	private Category categoryService;
 	
+	@Transient
 	@Autowired
 	private Round roundService;
 	
+	@Transient
 	@Autowired
 	private ElasticUtil elasticUtil;
 
@@ -103,7 +106,7 @@ public class Match {
 	}
 
 	public Match match(String matchId) {
-		return mongoDatastore.get(Match.class,matchId);
+		return mongoDatastore.get(Match.class,new ObjectId(matchId));
 	}
 
 	public Match findPublicMatch(String playerId, MatchConfig config) {
@@ -151,12 +154,12 @@ public class Match {
 		return null;
 	}
 
-	public List<Dupla> play(String idJugador, List<Dupla> duplas) {		
-		elasticUtil.validar(duplas,roundService.getLetter());
+	public List<Dupla> play(Match match, String idJugador, List<Dupla> duplas, int time) {		
+		elasticUtil.validar(duplas,match.getLastRound().getLetter());
 		
-		this.createTurn(idJugador,duplas);
+		this.createTurn(match,idJugador, duplas, time);
 		
-		calculateResult();
+		calculateResult(match);
 		
 		return getWrongDuplas(duplas);
 	}
@@ -165,14 +168,15 @@ public class Match {
 		return duplas.stream().filter(dupla -> dupla.getState().equals(WRONG)).collect(toList());
 	}
 
-	private void calculateResult() {
-		List<Turn> turns = lastRound.getTurns();
-		if(turns.size() == players.size()){
+	private void calculateResult(Match match) {
+		Round round = match.getLastRound();
+		List<Turn> turns = round.getTurns();
+		if(turns.size() == match.getPlayers().size()){
 			Integer minTime = getMinimumTime(turns); 
 			List<Dupla> allDuplas = flatDuplasFromTurns(turns);
 			scoreEmptyWrongAndOutOfTimeDuplas(allDuplas, minTime);
 			List<Dupla> filteredDuplas = filterEmptyWrongAndOutOfTimeDuplas(allDuplas, minTime);
-			for(Category category : categories){
+			for(Category category : match.getCategories()){
 				List<Dupla> categoryDuplas = getDuplasByCategory(filteredDuplas, category);
 				
 				List<Dupla> validDuplas = getValidDuplas(categoryDuplas);
@@ -187,12 +191,12 @@ public class Match {
 			
 			calculateTurnScores(turns);
 			
-			lastRound.setEndTime(minTime);
-			lastRound.setStopPlayerId(getStopPlayerId(lastRound.getTurns(),minTime));
+			round.setEndTime(minTime);
+			round.setStopPlayer(getStopPlayer(round.getTurns(),minTime, null));
+			mongoDatastore.save(round);
 			// TODO hacer las push a los jugadores
 		}
 	}
-
 
 	private void calculateTurnScores(List<Turn> turns) {
 		for(Turn turn : turns){
@@ -203,12 +207,18 @@ public class Match {
 		}
 	}
 
-	private String getStopPlayerId(List<Turn> turns, Integer minTime) {
-		return turns.stream().filter(turn -> turn.getEndTime() == minTime).findFirst().get().getPlayerId();
+	private StopPlayer getStopPlayer(List<Turn> turns, Integer minTime, Match match) {
+		StopPlayer stopPlayer = new StopPlayer();
+		String playerId = turns.stream().filter(turn -> turn.getEndTime() == minTime).findFirst().get().getPlayerId();
+		PlayerResult playerResult = match.getPlayers().stream().filter(player -> player.getPlayer().getId().toString().equals(playerId))
+									.findFirst().get();
+		stopPlayer.setStopPlayerId(playerId);
+		stopPlayer.setNickname(playerResult.getPlayer().getNickname());
+		return stopPlayer;
 	}
 
 	private Integer getMinimumTime(List<Turn> turns) {
-		return turns.stream().map(turn -> turn.getScore()).min(Integer::compareTo).get();
+		return turns.stream().mapToInt(turn -> turn.getEndTime()).min().getAsInt();
 	}
 
 	private List<Dupla> flatDuplasFromTurns(List<Turn> turns) {
@@ -230,7 +240,7 @@ public class Match {
 	}
 
 	private Predicate<? super Dupla> emptyWrongAndOutOfTime(Integer minTime) {
-		return dupla -> dupla.getState().equals(WRONG) || StringUtils.isEmpty(dupla.getWrittenWord()) || dupla.getTime() > minTime;
+		return dupla -> (dupla.getState().equals(WRONG) || isEmpty(dupla.getWrittenWord()) || dupla.getTime() > minTime);
 	}
 
 	private List<Dupla> getDuplasByCategory(List<Dupla> allDuplas,Category category) {
@@ -260,12 +270,14 @@ public class Match {
 		comparingAndScoring(validDuplas);
 	}
 
-	private void createTurn(String playerId, List<Dupla> duplas) {
+	private void createTurn(Match match, String playerId, List<Dupla> duplas, int time) {
 		Turn turn = new Turn();
 		turn.setDuplas(duplas);
 		turn.setPlayerId(playerId);
-		lastRound.addTurn(turn);
-		mongoDatastore.save(lastRound);
+		turn.setEndTime(time);
+		Round round = match.getLastRound();
+		round.addTurn(turn);
+		mongoDatastore.save(round);
 	}
 
 	public void rejected() {

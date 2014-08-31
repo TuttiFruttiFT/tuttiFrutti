@@ -101,6 +101,7 @@ public class Matches extends Controller {
 		JsonNode json = request().body().asJson();
 		String playerId = json.get("player_id").asText();
 		String matchId = json.get("match_id").asText();
+		int time = json.get("time").asInt();
 		JsonNode jsonDuplas = json.get("duplas");
 		
 		List<Dupla> duplas = new ArrayList<>();
@@ -111,7 +112,7 @@ public class Matches extends Controller {
 		
 		Match match = matchService.match(matchId);
 		
-        List<Dupla> wrongDuplas = match.play(playerId,duplas);
+        List<Dupla> wrongDuplas = matchService.play(match,playerId, duplas, time);
 		return ok(Json.toJson(JsonUtil.parseListToJson(wrongDuplas)));
     }
 	
