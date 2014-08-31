@@ -3,6 +3,8 @@
  */
 package tuttifrutti.models;
 
+import org.mongodb.morphia.annotations.Embedded;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,7 +17,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @Getter @Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-class StopPlayer{
+@Embedded
+public class StopPlayer{
 	private String stopPlayerId;
 	private String nickname;
 }

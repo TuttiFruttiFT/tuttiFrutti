@@ -188,20 +188,21 @@ public class Match {
 				}
 			}
 			
-			calculateTurnScores(turns);
+			calculateTurnScores(turns, match);
 			
 			round.setEndTime(minTime);
-			round.setStopPlayer(getStopPlayer(round.getTurns(),minTime, null));
+			round.setStopPlayer(getStopPlayer(round.getTurns(),minTime, match));
 			mongoDatastore.save(round);
+			mongoDatastore.save(match);
 			// TODO hacer las push a los jugadores
 		}
 	}
 
-	private void calculateTurnScores(List<Turn> turns) {
+	private void calculateTurnScores(List<Turn> turns, Match match) {
 		for(Turn turn : turns){
 			int turnScore = turn.getDuplas().stream().mapToInt(dupla -> dupla.getScore()).sum();
 			turn.setScore(turnScore);
-			PlayerResult playerResult = players.stream().filter(player -> player.getPlayer().getId().toString().equals(turn.getPlayerId())).findFirst().get();
+			PlayerResult playerResult = match.getPlayers().stream().filter(player -> player.getPlayer().getId().toString().equals(turn.getPlayerId())).findFirst().get();
 			playerResult.setScore(playerResult.getScore() + turnScore);
 		}
 	}
@@ -226,10 +227,6 @@ public class Match {
 		return allDuplas;
 	}
 
-	private List<Dupla> getValidDuplas(List<Dupla> categoryDuplas) {
-		return categoryDuplas.stream().filter(dupla -> !dupla.getState().equals(WRONG)).collect(toList());
-	}
-
 	private void scoreEmptyWrongAndOutOfTimeDuplas(List<Dupla> categoryDuplas, Integer minTime) {
 		categoryDuplas.stream().filter(emptyWrongAndOutOfTime(minTime)).forEach(dupla -> dupla.setScore(ZERO_SCORE));
 	}
@@ -248,7 +245,7 @@ public class Match {
 
 	private void comparingAndScoring(List<Dupla> validDuplas) {
 		Dupla dupla = validDuplas.get(0);
-		for(Dupla otherDupla : validDuplas.subList(1, validDuplas.size() - 1)){
+		for(Dupla otherDupla : validDuplas.subList(1, validDuplas.size())){
 			if(dupla.getFinalWord().equals(otherDupla.getFinalWord())){
 				dupla.setScore(DUPLICATE_SCORE);
 				otherDupla.setScore(DUPLICATE_SCORE);
@@ -261,8 +258,9 @@ public class Match {
 		
 		validDuplas.remove(0);
 		if(validDuplas.size() == 1){
-			if(validDuplas.get(0).getScore() == null){
-				dupla.setScore(UNIQUE_SCORE);
+			Dupla remainingDupla = validDuplas.get(0); 
+			if(remainingDupla.getScore() == null){
+				remainingDupla.setScore(UNIQUE_SCORE);
 			}
 			return;
 		}

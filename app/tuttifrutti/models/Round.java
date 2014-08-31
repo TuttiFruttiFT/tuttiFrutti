@@ -49,7 +49,7 @@ public class Round {
 	@Property("end_time")
 	private Integer endTime;
 	
-	@Property("stop_player")
+	@Embedded
 	private StopPlayer stopPlayer;
 	
 	@Embedded

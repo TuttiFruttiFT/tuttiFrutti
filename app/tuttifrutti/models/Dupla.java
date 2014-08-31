@@ -40,10 +40,12 @@ public class Dupla implements Comparable<Dupla>{
 	
 	public void setFinalWord(String finalWord){
 		this.finalWord = finalWord;
-		if(finalWord.equals(getWrittenWord())){
-			setState(PERFECT);
-		}else{
-			setState(CORRECTED);
+		if(finalWord != null){			
+			if(finalWord.equals(getWrittenWord())){
+				setState(PERFECT);
+			}else{
+				setState(CORRECTED);
+			}
 		}
 	}
 

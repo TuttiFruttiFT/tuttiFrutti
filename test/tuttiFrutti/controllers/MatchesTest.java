@@ -135,10 +135,10 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			saveDupla(new Category("countries"), duplas, "Rumania", 39);
 			
 			List<Dupla> duplas2 = new ArrayList<>();
-			saveDupla(new Category("bands"), duplas2, "Rolling Stone", 15,CORRECTED);
-			saveDupla(new Category("colors"), duplas2, "Rojo", 24,PERFECT);
-			saveDupla(new Category("meals"), duplas2, "", 35,WRONG);
-			saveDupla(new Category("countries"), duplas2, null, 39,WRONG);
+			saveDupla(new Category("bands"), duplas2, "Rolling Stone", "rolling stones",15, CORRECTED);
+			saveDupla(new Category("colors"), duplas2, "Rojo", "rojo",24, PERFECT);
+			saveDupla(new Category("meals"), duplas2, "", null,35, WRONG);
+			saveDupla(new Category("countries"), duplas2, null, null,39, WRONG);
 			
 			Turn turn = new Turn();
 			turn.setPlayerId(player2.getId().toString());
@@ -179,13 +179,14 @@ public class MatchesTest extends ElasticSearchAwareTest {
 	}
 
 	private Dupla saveDupla(Category categoryBands, List<Dupla> duplas, String writtenWord, Integer time) {
-		return saveDupla(categoryBands, duplas, writtenWord, time,null);
+		return saveDupla(categoryBands, duplas, writtenWord, null,time, null);
 	}
 	
-	private Dupla saveDupla(Category categoryBands, List<Dupla> duplas, String writtenWord, Integer time,DuplaState state) {
+	private Dupla saveDupla(Category categoryBands, List<Dupla> duplas, String writtenWord, String finalWord,Integer time, DuplaState state) {
 		Dupla dupla = new Dupla();
 		dupla.setCategory(categoryBands);
 		dupla.setWrittenWord(writtenWord);
+		dupla.setFinalWord(finalWord);
 		dupla.setTime(time);
 		dupla.setState(state);
 		duplas.add(dupla);
