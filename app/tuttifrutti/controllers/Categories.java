@@ -22,8 +22,8 @@ public class Categories extends Controller {
 	public Result availableCategories(String language) {
 		List<Category> categories = categoryService.categories(language);
 
-		StringBuilder jsonResult = parseListToJson(categories);
+		String jsonResult = parseListToJson(categories);
 		
-        return ok(Json.parse(jsonResult.toString()));
+        return ok(Json.parse(jsonResult));
     }
 }

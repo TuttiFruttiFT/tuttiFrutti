@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.JsonNode;
  *
  */
 public class JsonUtil {
-	public static <T> StringBuilder parseListToJson(List<T> list) {
+	public static <T> String parseListToJson(List<T> list) {
 		StringBuilder jsonResult = new StringBuilder();
 		String comma = "";
 		for(T object : list){
@@ -24,6 +24,6 @@ public class JsonUtil {
 		}
 		jsonResult.insert(0, "[");
 		jsonResult.append("]");
-		return jsonResult;
+		return jsonResult.toString();
 	}
 }

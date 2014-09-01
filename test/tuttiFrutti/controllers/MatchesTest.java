@@ -166,7 +166,16 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			assertThat(r.getStatus()).isEqualTo(OK);
 
 			JsonNode jsonNode = r.asJson();
-			jsonNode.forEach(json -> System.out.println(json.toString()));
+			JsonNode jsonWrongDupla = jsonNode.get(0);
+			
+			assertThat(jsonWrongDupla.get("category").get("id").asText()).isEqualTo("colors");
+			assertThat(jsonWrongDupla.get("writtenWord").asText()).isEqualTo("marron");
+			assertThat(jsonWrongDupla.get("time").asInt()).isEqualTo(24);
+			assertThat(jsonWrongDupla.get("state").asText()).isEqualTo("WRONG");
+			assertThat(jsonWrongDupla.get("score").asInt()).isEqualTo(0);
+			
+			Match modifiedMatch = dataStore.get(Match.class, match.getId());
+			Round modifiedRound = modifiedMatch.getLastRound();
 		});
 	}
 	
