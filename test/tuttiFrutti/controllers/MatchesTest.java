@@ -47,7 +47,7 @@ import com.fasterxml.jackson.databind.JsonNode;
  */
 public class MatchesTest extends ElasticSearchAwareTest {
 
-//	@Test
+	@Test
 	public void searchPublicMatchReturnsExistingMatch() {
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
 			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
@@ -86,7 +86,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 		});
 	}
 
-//	@Test
+	@Test
 	public void searchPublicMatchReturnsCreatedMatch() {
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
 			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
@@ -176,6 +176,63 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			
 			Match modifiedMatch = dataStore.get(Match.class, match.getId());
 			Round modifiedRound = modifiedMatch.getLastRound();
+			
+			for(PlayerResult playerResult : modifiedMatch.getPlayers()){
+				if(playerResult.getPlayer().getId().toString().equals(player.getId().toString())){
+					assertThat(playerResult.getScore()).isEqualTo(85);
+				}
+				
+				if(playerResult.getPlayer().getId().toString().equals(player2.getId().toString())){
+					assertThat(playerResult.getScore()).isEqualTo(70);
+				}
+			}
+			
+			assertThat(modifiedRound.getEndTime()).isEqualTo(41);
+			for(Turn modifiedTurn : modifiedRound.getTurns()){
+				if(modifiedTurn.getPlayerId().equals(player.getId().toString())){
+					assertThat(modifiedTurn.getEndTime()).isEqualTo(41);
+					assertThat(modifiedTurn.getScore()).isEqualTo(50);
+					for(Dupla modifiedDupla : modifiedTurn.getDuplas()){
+						if(modifiedDupla.getCategory().getId().equals("bands")){
+							assertThat(modifiedDupla.getScore()).isEqualTo(10);
+						}
+						
+						if(modifiedDupla.getCategory().getId().equals("colors")){
+							assertThat(modifiedDupla.getScore()).isEqualTo(0);
+						}
+						
+						if(modifiedDupla.getCategory().getId().equals("meals")){
+							assertThat(modifiedDupla.getScore()).isEqualTo(20);
+						}
+						
+						if(modifiedDupla.getCategory().getId().equals("countries")){
+							assertThat(modifiedDupla.getScore()).isEqualTo(20);
+						}
+					}
+				}
+				
+				if(modifiedTurn.getPlayerId().equals(player2.getId().toString())){
+					assertThat(modifiedTurn.getEndTime()).isEqualTo(45);
+					assertThat(modifiedTurn.getScore()).isEqualTo(30);
+					for(Dupla modifiedDupla : modifiedTurn.getDuplas()){
+						if(modifiedDupla.getCategory().getId().equals("bands")){
+							assertThat(modifiedDupla.getScore()).isEqualTo(10);
+						}
+						
+						if(modifiedDupla.getCategory().getId().equals("colors")){
+							assertThat(modifiedDupla.getScore()).isEqualTo(20);
+						}
+						
+						if(modifiedDupla.getCategory().getId().equals("meals")){
+							assertThat(modifiedDupla.getScore()).isEqualTo(0);
+						}
+						
+						if(modifiedDupla.getCategory().getId().equals("countries")){
+							assertThat(modifiedDupla.getScore()).isEqualTo(0);
+						}
+					}
+				}
+			}
 		});
 	}
 	

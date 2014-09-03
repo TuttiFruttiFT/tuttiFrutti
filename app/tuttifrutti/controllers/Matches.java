@@ -113,6 +113,7 @@ public class Matches extends Controller {
 		Match match = matchService.match(matchId);
 		
         List<Dupla> wrongDuplas = matchService.play(match,playerId, duplas, time);
+        
 		return ok(Json.parse(JsonUtil.parseListToJson(wrongDuplas)));
     }
 	

@@ -3,12 +3,15 @@
  */
 package tuttifrutti.models;
 
+import static java.util.stream.Collectors.toList;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.mongodb.morphia.annotations.Embedded;
@@ -23,7 +26,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  *
  */
 @Embedded
-@Getter 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public enum Letter {
@@ -36,6 +38,7 @@ public enum Letter {
 	private static final int SIZE = VALUES.size();
 	private static final Random RANDOM = new Random();
 	
+	@Getter @Setter
 	private String letter;
 	
 	@Property("previous_letters")
@@ -51,14 +54,13 @@ public enum Letter {
 		return VALUES.get(RANDOM.nextInt(SIZE));
 	}
 
-	public Letter next() {
+	public void next() {
 		this.previousLetters.add(this.letter);
 		List<Letter> availableLetters = getAvailableLetters();
-		return availableLetters.get(RANDOM.nextInt(availableLetters.size()));
+		this.letter = availableLetters.get(RANDOM.nextInt(availableLetters.size())).getLetter();
 	}
 
 	private List<Letter> getAvailableLetters() {
-		//TODO implementar, ver primero funciones lambda
-		return null;
+		return VALUES.stream().filter(letter -> !this.previousLetters.stream().anyMatch(usedLetter -> usedLetter.equals(letter.getLetter()))).collect(toList());
 	}
 }
