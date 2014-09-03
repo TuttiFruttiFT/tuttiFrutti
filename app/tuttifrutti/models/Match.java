@@ -192,7 +192,9 @@ public class Match {
 			
 			round.setEndTime(minTime);
 			round.setStopPlayer(getStopPlayer(round.getTurns(),minTime, match));
+			round.setMatchId(match.getId().toString());
 			mongoDatastore.save(round);
+			roundService.create(match);
 			mongoDatastore.save(match);
 			// TODO hacer las push a los jugadores
 		}

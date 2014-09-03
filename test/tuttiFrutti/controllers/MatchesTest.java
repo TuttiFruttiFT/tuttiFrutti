@@ -117,6 +117,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 	public void turn() {
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
 			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
+			Round roundService = SpringApplicationContext.getBeanNamed("round", Round.class);
 			
 			String language = "ES";
 			
@@ -146,8 +147,10 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			turn.setScore(0);
 			turn.setDuplas(duplas2);
 			
+			int roundNumber = 1;
+			
 			Round lastRound = new Round();
-			lastRound.setNumber(1);
+			lastRound.setNumber(roundNumber);
 			lastRound.setLetter(R);
 			lastRound.addTurn(turn);
 			
@@ -160,7 +163,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 						   + "\", \"time\": 41" 
 						   + ", \"duplas\":" + JsonUtil.parseListToJson(duplas)
 						   + "}")
-					 .get(5000000L);
+					 .get(5000L);
 			
 			assertThat(r).isNotNull();
 			assertThat(r.getStatus()).isEqualTo(OK);
@@ -175,7 +178,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			assertThat(jsonWrongDupla.get("score").asInt()).isEqualTo(0);
 			
 			Match modifiedMatch = dataStore.get(Match.class, match.getId());
-			Round modifiedRound = modifiedMatch.getLastRound();
+			Round modifiedRound = roundService.getRound(match.getId().toString(), roundNumber);
 			
 			for(PlayerResult playerResult : modifiedMatch.getPlayers()){
 				if(playerResult.getPlayer().getId().toString().equals(player.getId().toString())){

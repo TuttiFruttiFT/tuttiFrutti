@@ -12,8 +12,8 @@ import org.mongodb.morphia.annotations.Embedded;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Property;
-import org.mongodb.morphia.annotations.Reference;
 import org.mongodb.morphia.annotations.Transient;
+import org.mongodb.morphia.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -37,8 +37,8 @@ public class Round {
 	@JsonSerialize(using = ObjectIdSerializer.class)
 	private ObjectId id;
 	
-	@Reference
-	private Match match;
+	@Property("match_id")
+	private String matchId;
 	
 	private Integer number;
 	
@@ -90,5 +90,11 @@ public class Round {
 			turns = new ArrayList<>();
 		}
 		turns.add(turn);
+	}
+
+	public Round getRound(String matchId, Integer roundNumber) {
+		Query<Round> query = mongoDatastore.find(Round.class, "match_id =", matchId);
+		query.and(query.criteria("number").equal(roundNumber));
+		return query.get();
 	}
 }

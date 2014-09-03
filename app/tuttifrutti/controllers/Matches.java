@@ -16,6 +16,7 @@ import tuttifrutti.models.MatchConfig;
 import tuttifrutti.models.Player;
 import tuttifrutti.models.PowerUp;
 import tuttifrutti.models.ResultModel;
+import tuttifrutti.models.Round;
 import tuttifrutti.utils.JsonUtil;
 import tuttifrutti.utils.PushUtil;
 
@@ -28,6 +29,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class Matches extends Controller {
 	@Autowired
 	private Match matchService;
+	
+	@Autowired
+	private Round roundService;
 	
 	public Result getMatch(String matchId) {
 		//TODO Obtener la partida y cargar los powerUps
@@ -118,10 +122,10 @@ public class Matches extends Controller {
     }
 	
 	public Result roundResult(String matchId,Integer roundNumber){
-		ResultModel resultadoTurno = ResultModel.turnResult(matchId,roundNumber);
+		Round round = roundService.getRound(matchId,roundNumber);
 		
-		if(resultadoTurno != null){
-			return ok(Json.toJson(resultadoTurno));
+		if(round != null){
+			return ok(Json.toJson(round));
 		}
 		
 		return notFound();
