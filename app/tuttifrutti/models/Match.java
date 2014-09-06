@@ -28,6 +28,7 @@ import org.springframework.stereotype.Component;
 import tuttifrutti.elastic.ElasticUtil;
 import tuttifrutti.models.views.ActiveMatch;
 import tuttifrutti.serializers.ObjectIdSerializer;
+import tuttifrutti.utils.PushUtil;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -99,6 +100,10 @@ public class Match {
 	@Transient
 	@Autowired
 	private ElasticUtil elasticUtil;
+	
+	@Transient
+	@Autowired
+	private PushUtil pushUtil;
 
 	public List<ActiveMatch> activeMatches(String idJugador) {
 		// TODO implementar, partidas de idJugador que no estén en PARTIDA_FINALIZADA
@@ -196,8 +201,12 @@ public class Match {
 			mongoDatastore.save(round);
 			roundService.create(match);
 			mongoDatastore.save(match);
-			// TODO hacer las push a los jugadores
+			pushUtil.roundResult(match.getId().toString(),round.getNumber(),playerIds(match.getPlayers()));
 		}
+	}
+
+	private List<String> playerIds(List<PlayerResult> players) {
+		return players.stream().map(playerResult -> playerResult.getPlayer().getId().toString()).collect(toList());
 	}
 
 	private void calculateTurnScores(List<Turn> turns, Match match) {

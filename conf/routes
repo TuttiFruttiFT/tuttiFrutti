@@ -47,3 +47,5 @@ GET		/search/player/:searchedTerm				@tuttifrutti.controllers.Searches.searchPla
 GET		/search/player/others/:playerId				@tuttifrutti.controllers.Searches.searchOthers(playerId)
 
 GET		/category/list/:language					@tuttifrutti.controllers.Categories.availableCategories(language)
+
+POST	/mock/push/createTargetedMessage			@tuttifrutti.controllers.mock.PushMock.createTargetedMessage()

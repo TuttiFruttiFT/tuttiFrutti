@@ -1,6 +1,12 @@
-name := """tuttiFrutti"""
+import com.github.play2war.plugin._
 
 version := "1.0-SNAPSHOT"
+
+Play2WarPlugin.play2WarSettings
+
+name := """tuttiFrutti"""
+
+Play2WarKeys.servletVersion := "3.0"
 
 lazy val root = (project in file(".")).enablePlugins(PlayJava)
 
