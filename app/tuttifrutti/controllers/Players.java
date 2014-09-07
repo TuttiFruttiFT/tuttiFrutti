@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import play.libs.Json;
+import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
 import tuttifrutti.models.Match;
@@ -27,6 +28,7 @@ public class Players extends Controller {
 	@Autowired
 	private Match matchService;
 	
+	@BodyParser.Of(BodyParser.Json.class)
 	public Result register() {
 		JsonNode json = request().body().asJson();
 		if(json == null){
@@ -74,6 +76,7 @@ public class Players extends Controller {
 		return notFound();
     }
 	
+	@BodyParser.Of(BodyParser.Json.class)
 	public Result editProfile() {
 		JsonNode json = request().body().asJson();
 		
