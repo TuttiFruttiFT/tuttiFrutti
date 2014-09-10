@@ -12,6 +12,7 @@ import play.Logger;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
+import tuttifrutti.models.CategoryElastic;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,7 +28,7 @@ public class CategoryLoader extends Controller {
 	private Client elasticSearchClient;
 	
 	public Result load94secondsCategories(){
-		InputStream inJson = CategoryLoader.class.getResourceAsStream("/conf/categorias/ninetyfour_seconds_es.json");
+		InputStream inJson = CategoryElastic.class.getResourceAsStream("/categorias/ninetyfour_seconds_es.json");
 		try {
 			JsonNode jsonArray = new ObjectMapper().readTree(inJson);
 			
@@ -66,17 +67,17 @@ public class CategoryLoader extends Controller {
 
 	private void indexWord(JsonNode word, String categoryName) {
 		String value = getValue(word);
-		String json = Json.newObject().put("value", value).put("letter", getLetter(value)).put("language", "ES").asText();
+		String json = Json.newObject().put("value", value).put("letter", getLetter(value)).put("language", "ES").toString();
 		elasticSearchClient.prepareIndex(s("elasticsearch.updater.index"), categoryName).setSource(json).execute().actionGet();
 		
 	}
 
 	private String getLetter(String value) {
-		return value.substring(0, 1);
+		return value.substring(1, 2);
 	}
 
 	private String getValue(JsonNode word) {
-		String value = word.get("m").asText();
+		String value = word.get("m").toString();
 		return value.toLowerCase();
 	}
 }
