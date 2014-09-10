@@ -48,4 +48,6 @@ GET		/search/player/others/:playerId				@tuttifrutti.controllers.Searches.search
 
 GET		/category/list/:language					@tuttifrutti.controllers.Categories.availableCategories(language)
 
+POST	/category/loader							@tuttifrutti.controllers.CategoryLoader.load94secondsCategories()
+
 POST	/mock/push/createTargetedMessage			@tuttifrutti.controllers.mock.PushMock.createTargetedMessage()
