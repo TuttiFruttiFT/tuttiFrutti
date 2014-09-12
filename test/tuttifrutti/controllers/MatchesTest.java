@@ -11,9 +11,9 @@ import static tuttifrutti.models.DuplaState.CORRECTED;
 import static tuttifrutti.models.DuplaState.PERFECT;
 import static tuttifrutti.models.DuplaState.WRONG;
 import static tuttifrutti.models.Letter.R;
-import static tuttifrutti.models.Match.TO_BE_APPROVED;
 import static tuttifrutti.models.MatchConfig.NORMAL_MODE;
 import static tuttifrutti.models.MatchConfig.PUBLIC_TYPE;
+import static tuttifrutti.models.MatchState.TO_BE_APPROVED;
 
 import java.util.ArrayList;
 import java.util.Arrays;

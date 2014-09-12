@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.toList;
 import static org.springframework.util.StringUtils.isEmpty;
 import static tuttifrutti.models.DuplaState.WRONG;
 import static tuttifrutti.models.MatchConfig.PUBLIC_TYPE;
+import static tuttifrutti.models.MatchState.TO_BE_APPROVED;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -48,17 +49,12 @@ public class Match {
 	private static final int UNIQUE_SCORE = 10;
 	private static final int DUPLICATE_SCORE = 5;
 	private static final int ZERO_SCORE = 0;
-	public static final String TO_BE_APPROVED = "TO_BE_APPROVED";
-	public static final String PLAYER_TURN = "PLAYER_TURN";
-	public static final String OPPONENT_TURN = "OPPONENT_TURN";
-	public static final String FINISHED = "FINISHED";
-	public static final String REJECTED = "REJECTED";
 	
 	@Id 
 	@JsonSerialize(using = ObjectIdSerializer.class)
 	private ObjectId id;
 	
-	private String state;
+	private MatchState state;
 	
 	private String name;
 	
@@ -96,6 +92,10 @@ public class Match {
 	@Transient
 	@Autowired
 	private Round roundService;
+	
+	@Transient
+	@Autowired
+	private Player playerService;
 	
 	@Transient
 	@Autowired
@@ -144,14 +144,17 @@ public class Match {
 		match.setState(TO_BE_APPROVED);
 		match.setStartDate(DateTime.now().toDate());
 		match.setCategories(categoryService.getPublicMatchCategories(config.getLanguage()));
+		match.setPlayers(new ArrayList<>());
 		roundService.create(match);
 		mongoDatastore.save(match);
 		return match;
 	}
 
-	public void addPlayer(String idJugador) {
-		// TODO implementar
-		
+	public void addPlayer(Match match, String playerId) {
+		PlayerResult playerResult = new PlayerResult();
+		playerResult.setPlayer(playerService.player(playerId));
+		playerResult.setScore(0);
+		match.getPlayers().add(playerResult);
 	}
 
 	public Match create(String idJugador, MatchConfig configuracion, List<String> jugadores) {
@@ -296,5 +299,9 @@ public class Match {
 	public void playerReject(String playerId) {
 		// TODO implementar
 		
+	}
+
+	public boolean readyToStart() {
+		return this.getPlayers().size() == this.config.getNumberOfPlayers();
 	}
 }

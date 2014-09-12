@@ -68,9 +68,8 @@ public class Player {
 	@Autowired
 	private Datastore mongoDatastore;
 	
-	public Player player(String idJugador){
-		//TODO implementar
-		return null;
+	public Player player(String playerId){
+		return mongoDatastore.get(Player.class,new ObjectId(playerId));
 	}
 	
 	public Player validateMail(String mail,String clave){

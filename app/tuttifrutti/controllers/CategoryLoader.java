@@ -5,6 +5,7 @@ import static tuttifrutti.utils.ConfigurationAccessor.s;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.Client;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -68,16 +69,17 @@ public class CategoryLoader extends Controller {
 	private void indexWord(JsonNode word, String categoryName) {
 		String value = getValue(word);
 		String json = Json.newObject().put("value", value).put("letter", getLetter(value)).put("language", "ES").toString();
-		elasticSearchClient.prepareIndex(s("elasticsearch.updater.index"), categoryName).setSource(json).execute().actionGet();
-		
+		IndexResponse response = elasticSearchClient.prepareIndex(s("elasticsearch.updater.index"), categoryName).setSource(json).execute().actionGet();
+		response.getIndex();
 	}
 
 	private String getLetter(String value) {
-		return value.substring(1, 2);
+		return value.substring(0, 1);
 	}
 
 	private String getValue(JsonNode word) {
-		String value = word.get("m").toString();
+		String rawValue = Json.stringify(word.get("m"));
+		String value = rawValue.substring(1, rawValue.length() - 1);
 		return value.toLowerCase();
 	}
 }

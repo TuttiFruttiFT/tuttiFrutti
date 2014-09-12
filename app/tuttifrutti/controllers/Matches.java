@@ -13,6 +13,7 @@ import play.mvc.Result;
 import tuttifrutti.models.Dupla;
 import tuttifrutti.models.Match;
 import tuttifrutti.models.MatchConfig;
+import tuttifrutti.models.MatchState;
 import tuttifrutti.models.Player;
 import tuttifrutti.models.PowerUp;
 import tuttifrutti.models.ResultModel;
@@ -34,7 +35,6 @@ public class Matches extends Controller {
 	private Round roundService;
 	
 	public Result getMatch(String matchId) {
-		//TODO Obtener la partida y cargar los powerUps
 		Match match = matchService.match(matchId);
 		
 		PowerUp.generate(match);
@@ -53,8 +53,14 @@ public class Matches extends Controller {
 		if(match == null){
 			match = matchService.createPublic(config);
 		}
-		match.addPlayer(playerId);
+		matchService.addPlayer(match, playerId);
 		PowerUp.generate(match);
+		if(match.readyToStart()){
+			match.setState(MatchState.PLAYER_TURN);
+			List<String> playerIds = match.getPlayers().stream().map(result -> result.getPlayer().getId().toString())
+					.filter(id -> !id.equals(playerId)).collect(Collectors.toList());
+			PushUtil.match(playerIds,match);
+		}
         return ok(Json.toJson(match));
     }
 	

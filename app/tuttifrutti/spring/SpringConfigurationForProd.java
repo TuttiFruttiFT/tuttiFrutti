@@ -41,19 +41,17 @@ public class SpringConfigurationForProd extends SpringConfigurationFor {
 		try {
 			val elasticSearchHost = s("elasticsearch.host");
 
-			if (!contains(elasticSearchHost, "localhost")) {
-				Settings settings = settingsBuilder().put("cluster.name", s("elasticsearch.cluster.name")).put("client.transport.sniff", true)
-						.build();
+			Settings settings = settingsBuilder().put("cluster.name", s("elasticsearch.cluster.name")).put("client.transport.sniff", true)
+					.build();
 
-				String[] esHosts = elasticSearchHost.split(",");
+			String[] esHosts = elasticSearchHost.split(",");
 
-				transportClient = new TransportClient(settings);
+			transportClient = new TransportClient(settings);
 
-				for (String host : esHosts) {
-					transportClient.addTransportAddress(new InetSocketTransportAddress(host, i("elasticsearch.port")));
-				}
-				Logger.info("ES - Client Started. Hosts: " + esHosts);
+			for (String host : esHosts) {
+				transportClient.addTransportAddress(new InetSocketTransportAddress(host, i("elasticsearch.port")));
 			}
+			Logger.info("ES - Client Started. Hosts: " + esHosts);
 		} catch (Exception e) {
 			Logger.error("Error getting ES client.", e);
 		}

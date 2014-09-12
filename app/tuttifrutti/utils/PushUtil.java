@@ -33,9 +33,10 @@ public class PushUtil {
     private static final Integer ANDROID_DEVICE_TYPE = 3;
     private static final Integer RETRIES_NUMBER = 5;
 
-	public static void match(List<String> jugadores, Match partida) {
-		// TODO implementar
-		
+	public static void match(List<String> playerIds, Match match) {
+		Akka.system().scheduler().scheduleOnce(FiniteDuration.Zero(), () -> {
+			sendMessage(Json.toJson(match).toString(), playerIds);
+		}, Akka.system().dispatcher());
 	}
 
 	public static void rejected(List<Player> players, Match match) {
