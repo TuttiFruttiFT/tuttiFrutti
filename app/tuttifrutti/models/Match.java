@@ -146,7 +146,6 @@ public class Match {
 		match.setCategories(categoryService.getPublicMatchCategories(config.getLanguage()));
 		match.setPlayers(new ArrayList<>());
 		roundService.create(match);
-		mongoDatastore.save(match);
 		return match;
 	}
 

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.mongodb.morphia.Datastore;
+import org.mongodb.morphia.annotations.Transient;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import play.libs.Json;
@@ -34,6 +36,10 @@ public class Matches extends Controller {
 	@Autowired
 	private Round roundService;
 	
+	@Transient
+	@Autowired
+	private Datastore mongoDatastore;
+	
 	public Result getMatch(String matchId) {
 		Match match = matchService.match(matchId);
 		
@@ -61,6 +67,7 @@ public class Matches extends Controller {
 					.filter(id -> !id.equals(playerId)).collect(Collectors.toList());
 			PushUtil.match(playerIds,match);
 		}
+		mongoDatastore.save(match);
         return ok(Json.toJson(match));
     }
 	

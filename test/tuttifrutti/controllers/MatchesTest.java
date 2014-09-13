@@ -72,7 +72,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			WSResponse r = WS.url("http://localhost:9000/match/public").setContentType("application/json")
 							 .post("{\"player_id\" : \"" + playerId + "\", \"config\":" 
 									+ Json.toJson(matchConfig).toString()+ "}")
-							 .get(5000L);
+							 .get(5000000L);
 			assertThat(r).isNotNull();
 			assertThat(r.getStatus()).isEqualTo(OK);
 
@@ -82,11 +82,17 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			assertThat(resultMatch).isNotNull();
 			assertThat(resultMatch.getId().toString()).isEqualTo(match.getId().toString());
 			Letter letter = commonMatchAssertions(language, resultMatch);
+			for(PlayerResult playerResult : resultMatch.getPlayers()){
+				Player playerAux = playerResult.getPlayer();
+				if(playerAux.getNickname().equals("SARASA2")){
+					assertThat(playerResult.getScore()).isEqualTo(10);
+				}
+			}
 			assertThat(letter).isEqualTo(Letter.A);
 		});
 	}
 
-	@Test
+//	@Test
 	public void searchPublicMatchReturnsCreatedMatch() {
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
 			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
@@ -113,7 +119,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 		});
 	}
 	
-	@Test
+//	@Test
 	public void turn() {
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
 			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
@@ -289,6 +295,13 @@ public class MatchesTest extends ElasticSearchAwareTest {
 		assertThat(resultMatch.getConfig().getLanguage()).isEqualTo(language);
 		assertThat(resultMatch.getConfig().getNumberOfPlayers()).isEqualTo(3);
 		assertThat(resultMatch.getCategories().size()).isEqualTo(DEFAULT_CATEGORIES_NUMBER);
+		assertThat(resultMatch.getPlayers()).isNotNull();
+		for(PlayerResult playerResult : resultMatch.getPlayers()){
+			Player player = playerResult.getPlayer();
+			if(player.getNickname().equals("SARASA")){
+				assertThat(playerResult.getScore()).isEqualTo(0);
+			}
+		}
 		Round round = resultMatch.getLastRound();
 		assertThat(round).isNotNull();
 		assertThat(round.getNumber()).isEqualTo(1);
