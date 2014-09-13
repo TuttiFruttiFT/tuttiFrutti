@@ -151,7 +151,11 @@ public class Match {
 
 	public void addPlayer(Match match, String playerId) {
 		PlayerResult playerResult = new PlayerResult();
-		playerResult.setPlayer(playerService.player(playerId));
+		Player player = playerService.player(playerId);
+		if(player == null){
+			throw new RuntimeException("Player " + playerId + " does not exist");
+		}
+		playerResult.setPlayer(player);
 		playerResult.setScore(0);
 		match.getPlayers().add(playerResult);
 	}
@@ -287,7 +291,7 @@ public class Match {
 		turn.setEndTime(time);
 		Round round = match.getLastRound();
 		round.addTurn(turn);
-		mongoDatastore.save(round);
+		mongoDatastore.save(match);
 	}
 
 	public void rejected() {

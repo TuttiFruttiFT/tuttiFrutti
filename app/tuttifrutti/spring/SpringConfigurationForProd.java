@@ -1,6 +1,5 @@
 package tuttifrutti.spring;
 
-import static org.apache.commons.lang3.StringUtils.contains;
 import static org.elasticsearch.common.settings.ImmutableSettings.settingsBuilder;
 import static tuttifrutti.utils.ConfigurationAccessor.i;
 import static tuttifrutti.utils.ConfigurationAccessor.s;
@@ -50,8 +49,8 @@ public class SpringConfigurationForProd extends SpringConfigurationFor {
 
 			for (String host : esHosts) {
 				transportClient.addTransportAddress(new InetSocketTransportAddress(host, i("elasticsearch.port")));
+				Logger.info("ES - Client Started. Hosts: " + host);
 			}
-			Logger.info("ES - Client Started. Hosts: " + esHosts);
 		} catch (Exception e) {
 			Logger.error("Error getting ES client.", e);
 		}

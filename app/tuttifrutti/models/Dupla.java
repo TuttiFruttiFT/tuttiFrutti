@@ -11,6 +11,7 @@ import org.mongodb.morphia.annotations.Property;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author rfanego
@@ -23,9 +24,11 @@ public class Dupla implements Comparable<Dupla>{
 	private Category category;
 	
 	@Property("written_word")
+	@JsonProperty(value = "written_word")
 	private String writtenWord;
 	
 	@Property("final_word")
+	@JsonProperty(value = "final_word")
 	private String finalWord;
 	
 	private Integer time;
