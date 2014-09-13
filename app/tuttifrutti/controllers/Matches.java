@@ -8,6 +8,7 @@ import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.annotations.Transient;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import play.Logger;
 import play.libs.Json;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
@@ -121,11 +122,15 @@ public class Matches extends Controller {
 		int time = json.get("time").asInt();
 		JsonNode jsonDuplas = json.get("duplas");
 		
+		Logger.info("jsonDuplas: " + jsonDuplas.toString());
+		
 		List<Dupla> duplas = new ArrayList<>();
 		
 		for(JsonNode jsonDupla : jsonDuplas){
 			duplas.add(Json.fromJson(jsonDupla, Dupla.class));
 		}
+		
+		Logger.info("Cantidad de duplas: " + duplas.size()); 
 		
 		Match match = matchService.match(matchId);
 		

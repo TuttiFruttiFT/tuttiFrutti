@@ -92,7 +92,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 		});
 	}
 
-//	@Test
+	@Test
 	public void searchPublicMatchReturnsCreatedMatch() {
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
 			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
@@ -119,7 +119,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 		});
 	}
 	
-//	@Test
+	@Test
 	public void turn() {
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
 			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
