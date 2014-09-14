@@ -73,8 +73,7 @@ public class Round {
 			return Letter.random();
 		}
 		Letter roundLetter = round.getLetter();
-		roundLetter.next();
-		return roundLetter;
+		return roundLetter.next();
 	}
 
 	private Integer getRoundNumber(Match match) {

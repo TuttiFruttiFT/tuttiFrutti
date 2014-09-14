@@ -169,7 +169,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 						   + "\", \"time\": 41" 
 						   + ", \"duplas\":" + JsonUtil.parseListToJson(duplas)
 						   + "}")
-					 .get(5000L);
+					 .get(5000000L);
 			
 			assertThat(r).isNotNull();
 			assertThat(r.getStatus()).isEqualTo(OK);
@@ -178,13 +178,17 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			JsonNode jsonWrongDupla = jsonNode.get(0);
 			
 			assertThat(jsonWrongDupla.get("category").get("id").asText()).isEqualTo("colors");
-			assertThat(jsonWrongDupla.get("writtenWord").asText()).isEqualTo("marron");
+			assertThat(jsonWrongDupla.get("written_word").asText()).isEqualTo("marron");
 			assertThat(jsonWrongDupla.get("time").asInt()).isEqualTo(24);
 			assertThat(jsonWrongDupla.get("state").asText()).isEqualTo("WRONG");
 			assertThat(jsonWrongDupla.get("score").asInt()).isEqualTo(0);
 			
 			Match modifiedMatch = dataStore.get(Match.class, match.getId());
 			Round modifiedRound = roundService.getRound(match.getId().toString(), roundNumber);
+			Round newRound = modifiedMatch.getLastRound();
+			
+			assertThat(newRound.getLetter()).isNotEqualTo(modifiedRound.getLetter());
+			assertThat(newRound.getLetter().getPreviousLetters()).contains(R.toString());
 			
 			for(PlayerResult playerResult : modifiedMatch.getPlayers()){
 				if(playerResult.getPlayer().getId().toString().equals(player.getId().toString())){

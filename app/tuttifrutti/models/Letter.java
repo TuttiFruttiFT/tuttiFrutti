@@ -43,6 +43,7 @@ public enum Letter {
 	
 	@Property("previous_letters")
 	@JsonIgnore
+	@Getter @Setter
 	private CircularFifoQueue<String> previousLetters;
 	
 	Letter(String letter){
@@ -54,10 +55,12 @@ public enum Letter {
 		return VALUES.get(RANDOM.nextInt(SIZE));
 	}
 
-	public void next() {
+	public Letter next() {
 		this.previousLetters.add(this.letter);
 		List<Letter> availableLetters = getAvailableLetters();
-		this.letter = availableLetters.get(RANDOM.nextInt(availableLetters.size())).getLetter();
+		Letter newLetter = availableLetters.get(RANDOM.nextInt(availableLetters.size()));
+		newLetter.previousLetters = this.previousLetters;
+		return newLetter;
 	}
 
 	private List<Letter> getAvailableLetters() {

@@ -51,7 +51,6 @@ public class ElasticUtil {
 			
 			String writtenWord = dupla.getWrittenWord();
 			
-			Logger.info("category: " + categoryId + " writtenWord: " + writtenWord);
 			if(StringUtils.isNotEmpty(writtenWord)){
 				MatchQueryBuilder matchQueryBuilder = matchQuery("value", writtenWord);
 				matchQueryBuilder.fuzziness(AUTO);
@@ -63,12 +62,8 @@ public class ElasticUtil {
 				boolQueryBuilder.should(matchQuery("letter", letter.getLetter()));
 				boolQueryBuilder.minimumNumberShouldMatch(1);
 				
-				Logger.info("boolQueryBuilder: " + boolQueryBuilder.toString());
-				
 				SearchRequestBuilder searchQuery = elasticSearchClient.prepareSearch("categories").setTypes(categoryId).setSize(1);
 				searchQuery.setQuery(boolQueryBuilder);
-				
-				Logger.info("searchQuery: " + searchQuery.toString());
 				
 				mSearch.add(searchQuery);
 			}
