@@ -6,7 +6,6 @@ import static play.test.Helpers.running;
 import static play.test.Helpers.testServer;
 import static tuttifrutti.models.DuplaState.CORRECTED;
 import static tuttifrutti.models.DuplaState.WRONG;
-import static tuttifrutti.models.Letter.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +14,8 @@ import org.junit.Test;
 
 import tuttifrutti.models.Category;
 import tuttifrutti.models.Dupla;
+import tuttifrutti.models.Letter;
+import tuttifrutti.models.LetterWrapper;
 import tuttifrutti.utils.SpringApplicationContext;
 
 public class ElasticUtilTest extends ElasticSearchAwareTest {
@@ -31,7 +32,7 @@ public class ElasticUtilTest extends ElasticSearchAwareTest {
 			saveDupla(new Category("meals"), duplas, "", 19);
 			saveDupla(new Category("countries"), duplas, null, 19);
 			
-			elasticUtil.validar(duplas, R);
+			elasticUtil.validar(duplas, new LetterWrapper(Letter.R));
 			
 			for(Dupla dupla : duplas){
 				if(dupla.getCategory().getId().equals("bands")){

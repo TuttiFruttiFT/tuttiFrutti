@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
 
 import play.Logger;
 import tuttifrutti.models.Dupla;
-import tuttifrutti.models.Letter;
+import tuttifrutti.models.LetterWrapper;
 import tuttifrutti.models.ScoreCalculator;
 
 /**
@@ -41,7 +41,7 @@ public class ElasticUtil {
 	@Autowired
 	private ScoreCalculator scoreCalculator;
 
-	public void validar(List<Dupla> duplas, Letter letter) {
+	public void validar(List<Dupla> duplas, LetterWrapper letter) {
 		Map<String,Dupla> mapDuplas = new HashMap<>();
 		MultiSearchRequest mSearch = new MultiSearchRequest();
 		
@@ -59,7 +59,7 @@ public class ElasticUtil {
 				matchQueryBuilder.minimumShouldMatch("100%");
 				
 				boolQueryBuilder.must(matchQueryBuilder);
-				boolQueryBuilder.should(matchQuery("letter", letter.getLetter()));
+				boolQueryBuilder.should(matchQuery("letter", letter.getLetter().toString()));
 				boolQueryBuilder.minimumNumberShouldMatch(1);
 				
 				SearchRequestBuilder searchQuery = elasticSearchClient.prepareSearch("categories").setTypes(categoryId).setSize(1);

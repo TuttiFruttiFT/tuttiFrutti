@@ -17,11 +17,13 @@ import org.mongodb.morphia.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import tuttifrutti.serializers.LetterDeserializer;
 import tuttifrutti.serializers.ObjectIdSerializer;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
@@ -42,9 +44,10 @@ public class Round {
 	
 	private Integer number;
 	
-	@JsonUnwrapped
 	@Embedded
-	private Letter letter;
+	@JsonUnwrapped
+	@JsonDeserialize(using = LetterDeserializer.class)
+	private LetterWrapper letter;
 	
 	@Property("end_time")
 	private Integer endTime;
@@ -67,12 +70,12 @@ public class Round {
 		mongoDatastore.save(match);
 	}
 
-	private Letter getLetter(Match match) {
+	private LetterWrapper getLetter(Match match) {
 		Round round = match.getLastRound();
 		if(round == null){
-			return Letter.random();
+			return LetterWrapper.random();
 		}
-		Letter roundLetter = round.getLetter();
+		LetterWrapper roundLetter = round.getLetter();
 		return roundLetter.next();
 	}
 
