@@ -34,10 +34,10 @@ public class Players extends Controller {
 		if(json == null){
 			return badRequest("Expecting json data");
 		}else{
-			String mail = json.get("mail").asText();
-			String password = json.get("password").asText();
-			String facebookId = json.get("facebook_id").asText();
-			String twitterId = json.get("twitter_id").asText();
+			String mail = json.get("mail") != null ? json.get("mail").asText() : null;
+			String password = json.get("password") != null ? json.get("password").asText(): null;
+			String facebookId = json.get("facebook_id") != null ? json.get("facebook_id").asText() : null;
+			String twitterId = json.get("twitter_id") != null ? json.get("twitter_id").asText() : null;
 
 			Player player = null;
 			
