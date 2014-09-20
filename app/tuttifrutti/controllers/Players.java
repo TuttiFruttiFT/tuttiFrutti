@@ -10,6 +10,7 @@ import play.libs.Json;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
+import tuttifrutti.models.Device;
 import tuttifrutti.models.Match;
 import tuttifrutti.models.Player;
 import tuttifrutti.models.views.ActiveMatch;
@@ -27,6 +28,9 @@ public class Players extends Controller {
 	
 	@Autowired
 	private Match matchService;
+	
+	@Autowired
+	private Device deviceService;
 	
 	@BodyParser.Of(BodyParser.Json.class)
 	public Result register() {
@@ -124,6 +128,7 @@ public class Players extends Controller {
         return ok();
 	}
 	
+	@BodyParser.Of(BodyParser.Json.class)
 	public Result invitePlayers(){
 		JsonNode json = request().body().asJson();
 		String matchId = json.get("player_id").asText();
@@ -136,6 +141,7 @@ public class Players extends Controller {
 		return ok();
 	}
 	
+	@BodyParser.Of(BodyParser.Json.class)
 	public Result addFriend(){
 		JsonNode json = request().body().asJson();
 		String playerId = json.get("player_id").asText();
@@ -149,5 +155,25 @@ public class Players extends Controller {
 	public Result powerUp(String idJugador,String idPowerUp){
 		playerService.powerUp(idJugador, idPowerUp);
 		return ok();
+	}
+	
+	@BodyParser.Of(BodyParser.Json.class)
+	public Result registerDevice(){
+		JsonNode json = request().body().asJson();
+		String pushToken = json.get("push_token").asText();
+		String hardwareId = json.get("hwid").asText();
+		String playerId = json.get("player_id").asText();
+		
+		Device device = deviceService.device(playerId);
+		
+		if(device == null){
+			//register new device and set tag to player
+		}else{
+			if(!pushToken.equals(device.getPushToken())){
+				//Unregister old device and register new device, and save it on mongo
+			}
+		}
+		
+		return null;
 	}
 }

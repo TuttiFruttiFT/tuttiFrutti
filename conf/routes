@@ -20,6 +20,8 @@ POST	/player/friend							    @tuttifrutti.controllers.Players.addFriend()
                                                     
 POST	/player/:playerId/powerup/:idPowerUp	    @tuttifrutti.controllers.Players.powerUp(playerId,idPowerUp)
 
+POST	/player/device								@tuttifrutti.controllers.Players.registerDevice()
+
 GET		/match/:matchId							    @tuttifrutti.controllers.Matches.getMatch(matchId)
 
 POST	/match/public								@tuttifrutti.controllers.Matches.publicMatch()
