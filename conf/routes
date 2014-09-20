@@ -4,13 +4,9 @@
 
 POST	/player									    @tuttifrutti.controllers.Players.register()
                                                     
-GET		/player									    @tuttifrutti.controllers.Players.validate(mail,password,facebookId,twitterId)
-                                                    
 PUT		/player									    @tuttifrutti.controllers.Players.editProfile()
                                                     
 GET		/player/:playerId						    @tuttifrutti.controllers.Players.player(playerId)
-                                                    
-GET		/player/sync/:playerId					    @tuttifrutti.controllers.Players.sync(playerId)
                                                     
 GET		/player/matches/:playerId				    @tuttifrutti.controllers.Players.activeMatches(playerId)
                                                     

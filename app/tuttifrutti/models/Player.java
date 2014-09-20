@@ -11,6 +11,7 @@ import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Property;
+import org.mongodb.morphia.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -72,9 +73,9 @@ public class Player {
 		return mongoDatastore.get(Player.class,new ObjectId(playerId));
 	}
 	
-	public Player validateMail(String mail,String clave){
+	public Boolean validateMail(String mail,String clave){
 		//TODO implementar
-		return null;
+		return true;
 	}
 	
 	public Player validateFacebook(String facebookId){
@@ -135,5 +136,10 @@ public class Player {
 	public Player getOthersPlayers(String idJugador) {
 		// TODO implementar
 		return null;
+	}
+
+	public Player search(String mail) {
+		Query<Player> query = mongoDatastore.find(Player.class, "mail =", mail);
+		return query.get();
 	}
 }

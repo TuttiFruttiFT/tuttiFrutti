@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.toList;
 import static org.springframework.util.StringUtils.isEmpty;
 import static tuttifrutti.models.DuplaState.WRONG;
 import static tuttifrutti.models.MatchConfig.PUBLIC_TYPE;
+import static tuttifrutti.models.MatchState.FINISHED;
 import static tuttifrutti.models.MatchState.TO_BE_APPROVED;
 
 import java.util.ArrayList;
@@ -105,9 +106,20 @@ public class Match {
 	@Autowired
 	private PushUtil pushUtil;
 
-	public List<ActiveMatch> activeMatches(String idJugador) {
-		// TODO implementar, partidas de idJugador que no estén en PARTIDA_FINALIZADA
-		return null;
+	public List<ActiveMatch> activeMatches(String playerId) {
+		// TODO implementar, partidas de idJugador que no estén en FINISHED
+		List<ActiveMatch> activeMatches = new ArrayList<>();
+		Query<Match> query = mongoDatastore.find(Match.class, "state <>", FINISHED.toString());
+		query.and(query.criteria("players.player.id").equal(new ObjectId(playerId)));
+		for(Match match : query.asList()){
+			ActiveMatch activeMatch = new ActiveMatch();
+			activeMatch.setCurrentRound(match.getLastRound());
+			activeMatch.setMatchId(match.getId().toString());
+			activeMatch.setName(match.getName());
+			activeMatch.setState(match.getState().toString());
+			activeMatches.add(activeMatch);
+		}
+		return activeMatches;
 	}
 
 	public Match match(String matchId) {
@@ -120,12 +132,10 @@ public class Match {
 
 	public Match findMatch(String playerId, MatchConfig config, String type) {
 		Query<Match> query = mongoDatastore.find(Match.class, "config.number_of_players =", config.getNumberOfPlayers());
-		Player player = new Player();
-		player.setId(new ObjectId(playerId));
 		query.and(query.criteria("config.language").equal(config.getLanguage()), 
 				  query.criteria("config.type").equal(type),
 				  query.criteria("config.mode").equal(config.getMode()),
-				  query.criteria("players").not().hasThisElement(player));
+				  query.criteria("players.player.id").notEqual(new ObjectId(playerId)));
 		
 		return query.get();
 	}
@@ -140,7 +150,7 @@ public class Match {
 		config.setPowerUpsEnabled(true);
 		config.setRounds(25);
 		match.setConfig(config);
-		match.setName(null); //TODO ver qué poner de nombre
+		match.setName("Nombre Partida"); //TODO ver qué poner de nombre
 		match.setState(TO_BE_APPROVED);
 		match.setStartDate(DateTime.now().toDate());
 		match.setCategories(categoryService.getPublicMatchCategories(config.getLanguage()));

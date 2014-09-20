@@ -1,9 +1,12 @@
 package tuttifrutti.controllers;
 
+import static tuttifrutti.utils.PushUtil.setTag;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.mongodb.morphia.Datastore;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import play.libs.Json;
@@ -15,6 +18,8 @@ import tuttifrutti.models.Match;
 import tuttifrutti.models.Player;
 import tuttifrutti.models.views.ActiveMatch;
 import tuttifrutti.utils.FacebookUtil;
+import tuttifrutti.utils.JsonUtil;
+import tuttifrutti.utils.PushUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -32,6 +37,9 @@ public class Players extends Controller {
 	@Autowired
 	private Device deviceService;
 	
+	@Autowired
+	private Datastore mongoDatastore;
+	
 	@BodyParser.Of(BodyParser.Json.class)
 	public Result register() {
 		JsonNode json = request().body().asJson();
@@ -46,7 +54,14 @@ public class Players extends Controller {
 			Player player = null;
 			
 			if(StringUtils.isNotEmpty(mail) && StringUtils.isNotEmpty(password)){
-				player = playerService.registerMail(mail,password);
+				player = playerService.search(mail);
+				if(player == null){					
+					player = playerService.registerMail(mail,password);
+				}else{
+					if(!playerService.validateMail(mail, password)){
+						return unauthorized();
+					}
+				}
 			}else if(StringUtils.isNotEmpty(facebookId)){
 				player = playerService.registerFacebook(facebookId);
 			}else if(StringUtils.isNotEmpty(twitterId)){
@@ -59,25 +74,6 @@ public class Players extends Controller {
 
 			return badRequest();
 		}
-    }
-	
-	public Result validate(String mail,String password,String facebookId,String twitterId) {
-		Player player = null;
-		if(StringUtils.isNotEmpty(mail) && StringUtils.isNotEmpty(password)){
-			player = playerService.validateMail(mail, password);
-		}else if(StringUtils.isNotEmpty(facebookId)){
-			player = playerService.validateFacebook(facebookId);
-		}else if(StringUtils.isNotEmpty(twitterId)){
-			player = playerService.validateTwitter(twitterId);
-		}else{
-			return badRequest();
-		}
-		
-		if(player !=  null){
-			return ok(Json.toJson(player));
-		}
-		
-		return notFound();
     }
 	
 	@BodyParser.Of(BodyParser.Json.class)
@@ -101,31 +97,10 @@ public class Players extends Controller {
 		return badRequest();
     }
 	
-	public Result sync(String playerId) {
-		/* TODO implementar
-		 * Buscar jugador
-		 * Buscar partidas con idJugador en estado distinto a PARTIDA_FINALIZADA
-		 * Obtener de cada partida, la letra de la última ronda y la cantidad de rondas que faltan
-		 * Compaginar respuesta
-		 */
-		Player jugador = playerService.player(playerId);
-		if(jugador == null){
-			return badRequest();
-		}
-		
+	public Result activeMatches(String playerId){
 		List<ActiveMatch> activeMatches = matchService.activeMatches(playerId);
 
-		//TODO ver como crear un json desde una lista
-		
-        return ok();
-    }
-	
-	public Result activeMatches(String idJugador){
-		List<ActiveMatch> activeMatches = matchService.activeMatches(idJugador);
-
-		//TODO ver como crear un json desde una lista
-		
-        return ok();
+        return ok(Json.parse(JsonUtil.parseListToJson(activeMatches)));
 	}
 	
 	@BodyParser.Of(BodyParser.Json.class)
@@ -167,13 +142,23 @@ public class Players extends Controller {
 		Device device = deviceService.device(playerId);
 		
 		if(device == null){
-			//register new device and set tag to player
+			PushUtil.registerDevice(pushToken, hardwareId, "ES");
+			setTag(hardwareId, playerId);
+			device = new Device();
+			device.setHardwareId(hardwareId);
+			device.setPlayerId(playerId);
+			device.setPushToken(pushToken);
+			mongoDatastore.save(device);
+			return null;
 		}else{
 			if(!pushToken.equals(device.getPushToken())){
-				//Unregister old device and register new device, and save it on mongo
+				PushUtil.unRegisterDevice(hardwareId);
+				PushUtil.registerDevice(pushToken, hardwareId, "ES");
+				device.setPushToken(pushToken);
+				mongoDatastore.save(device);
 			}
 		}
 		
-		return null;
+		return ok();
 	}
 }

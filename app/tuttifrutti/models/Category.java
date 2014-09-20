@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import org.apache.commons.lang3.StringUtils;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
@@ -53,6 +54,9 @@ public class Category {
 	}
 	
 	public List<Category> categories(String language) {
+		if(StringUtils.isEmpty(language)){
+			language = "ES";
+		}
 		Query<Category> query = mongoDatastore.find(Category.class, "language =", language);
 		return query.asList();
 	}

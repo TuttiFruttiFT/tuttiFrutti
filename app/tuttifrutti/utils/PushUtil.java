@@ -1,5 +1,7 @@
 package tuttifrutti.utils;
 
+import static play.libs.F.Promise.promise;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -8,12 +10,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import play.Logger;
-import play.libs.Akka;
 import play.libs.Json;
 import play.libs.ws.WS;
 import play.libs.ws.WSResponse;
 import play.mvc.Http.Status;
-import scala.concurrent.duration.FiniteDuration;
 import tuttifrutti.models.Match;
 import tuttifrutti.models.Player;
 
@@ -34,9 +34,10 @@ public class PushUtil {
     private static final Integer RETRIES_NUMBER = 5;
 
 	public static void match(List<String> playerIds, Match match) {
-		Akka.system().scheduler().scheduleOnce(FiniteDuration.Zero(), () -> {
+		promise(() -> {
 			sendMessage(Json.toJson(match).toString(), playerIds);
-		}, Akka.system().dispatcher());
+			return null;
+		});
 	}
 
 	public static void rejected(List<Player> players, Match match) {
@@ -50,13 +51,14 @@ public class PushUtil {
 	}
 
 	public void roundResult(String matchId, Integer roundNumber,List<String> playerIds) {
-		Akka.system().scheduler().scheduleOnce(FiniteDuration.Zero(), () -> {
+		promise(() -> {
 			ObjectNode json = Json.newObject().put("type", PushType.ROUND_RESULT.toString()).put("match_id", matchId)
 					.put("round_number", roundNumber);
 			for(String playerId : playerIds){
-				sendMessage(json.put("playerId", playerId).toString(), Arrays.asList(playerId));
-			}			
-		}, Akka.system().dispatcher());
+				sendMessage(json.put("player_id", playerId).toString(), Arrays.asList(playerId));
+			}		
+			return null;
+		});
 	}
 	
 	private static void sendMessage(String jsonData,List<String> playerIds){
@@ -97,22 +99,50 @@ public class PushUtil {
 				 .post(registerJson.asText())
 				 .get(5000L);
 		
+		processPushResponse(r, "registering device with hwid " + hardwareId);
+	}
+	
+	public static void setTag(String hardwareId,String playerId){
+		ObjectNode tagJson = Json.newObject().put("player_id", playerId);
+		ObjectNode jsonBody = Json.newObject();
+		jsonBody.put("application", APPLICATION_CODE);
+		jsonBody.put("hwid", hardwareId);
+		jsonBody.put("tags", tagJson);
+		WSResponse r = WS.url(PUSHWOOSH_SERVICE_BASE_URL + "setTags").setContentType("application/json")
+				 .post(jsonBody.asText())
+				 .get(5000L);
+		
+		processPushResponse(r, "set tag for player " + playerId);
+	}
+
+	public static void unRegisterDevice(String hardwareId) {
+		ObjectNode jsonBody = Json.newObject();
+		jsonBody.put("application", APPLICATION_CODE);
+		jsonBody.put("hwid", hardwareId);
+		WSResponse r = WS.url(PUSHWOOSH_SERVICE_BASE_URL + "unregisterDevice").setContentType("application/json")
+				 .post(jsonBody.asText())
+				 .get(5000L);
+		
+		processPushResponse(r, "unregistering device with hwid " + hardwareId);
+	}
+	
+	private static void processPushResponse(WSResponse r, String partialErrorMessage) {
 		if(r.getStatus() == Status.OK){
 			JsonNode response = r.asJson();
 			Integer statusCode = response.get("status_code").asInt();
 			if(statusCode == 210){
 				String statusMessage = response.get("status_message").asText();
-				String errorMessage = "Argument error trying to register device. Status message: " + statusMessage;
+				String errorMessage = "Argument error trying to " + partialErrorMessage + ". Status message: " + statusMessage;
 				Logger.error(errorMessage);
 				throw new RuntimeException(errorMessage);
 			}
 			return;
 		}
-		String errorMessage = "Register Device fail with status " + r.getStatus();
+		String errorMessage = partialErrorMessage + " fail with status " + r.getStatus();
 		Logger.error(errorMessage);
 		throw new RuntimeException(errorMessage);
 	}
-
+	
 	private static String playerPushTags(List<String> playerIds) {
 		List<String> tags = new ArrayList<>();
 		for(String playerId : playerIds){
@@ -120,4 +150,5 @@ public class PushUtil {
 		}
 		return StringUtils.join(tags," + ");
 	}
+
 }

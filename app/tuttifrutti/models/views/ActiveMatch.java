@@ -2,11 +2,11 @@ package tuttifrutti.models.views;
 
 import lombok.Getter;
 import lombok.Setter;
-
-import org.bson.types.ObjectId;
+import tuttifrutti.models.Round;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author rfanego
@@ -16,13 +16,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ActiveMatch {
 
-	private ObjectId id;
+	@JsonProperty(value = "match_id")
+	private String matchId;
 	
 	private String name;
 	
-	private String letter;
-	
-	private Integer rondasFaltantes; //TODO check name in apiary
+	@JsonProperty(value = "current_round")
+	private Round currentRound;
 	
 	private String state;
 }
