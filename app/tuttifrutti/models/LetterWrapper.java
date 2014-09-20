@@ -5,14 +5,13 @@ import static tuttifrutti.models.Letter.values;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.mongodb.morphia.annotations.Embedded;
 import org.mongodb.morphia.annotations.Property;
 
@@ -26,7 +25,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @Embedded
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@NoArgsConstructor
 public class LetterWrapper {
 	private static final int PREVIOUS_LETTERS_SIZE = 5;
 	
@@ -41,11 +39,16 @@ public class LetterWrapper {
 	@Property("previous_letters")
 	@JsonIgnore
 	@Getter @Setter
-	private CircularFifoQueue<String> previousLetters;
+	private LinkedList<String> previousLetters;
+	
+	@SuppressWarnings("unused")
+	private LetterWrapper(){
+		this.previousLetters = new LinkedList<>();
+	}
 	
 	public LetterWrapper(Letter letter){
 		this.letter = letter;
-		this.previousLetters = new CircularFifoQueue<>(PREVIOUS_LETTERS_SIZE);
+		this.previousLetters = new LinkedList<>();
 	}
 	
 	public static LetterWrapper random() {
@@ -53,7 +56,10 @@ public class LetterWrapper {
 	}
 
 	public LetterWrapper next() {
-		this.previousLetters.add(this.letter.toString());
+		this.previousLetters.addFirst(this.letter.toString());
+		if(this.previousLetters.size() > PREVIOUS_LETTERS_SIZE){
+			this.previousLetters.removeLast();
+		}
 		List<Letter> availableLetters = getAvailableLetters();
 		LetterWrapper newLetter = new LetterWrapper(availableLetters.get(RANDOM.nextInt(availableLetters.size())));
 		newLetter.previousLetters = this.previousLetters;
