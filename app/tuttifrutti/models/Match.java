@@ -18,7 +18,6 @@ import java.util.function.Predicate;
 import lombok.Getter;
 import lombok.Setter;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
 import org.mongodb.morphia.Datastore;
