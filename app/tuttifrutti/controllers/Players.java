@@ -1,5 +1,6 @@
 package tuttifrutti.controllers;
 
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static tuttifrutti.utils.PushUtil.setTag;
 
 import java.util.ArrayList;
@@ -53,7 +54,7 @@ public class Players extends Controller {
 
 			Player player = null;
 			
-			if(StringUtils.isNotEmpty(mail) && StringUtils.isNotEmpty(password)){
+			if(isNotEmpty(mail) && isNotEmpty(password)){
 				player = playerService.search(mail);
 				if(player == null){					
 					player = playerService.registerMail(mail,password);

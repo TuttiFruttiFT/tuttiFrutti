@@ -68,10 +68,16 @@ public class TestUtils {
 		return playerResult;
 	}
 
-	public static Player savePlayer(Datastore datastore, String nickname, String mail) {
+	public static Player savePlayer(Datastore datastore, String mail) {
+		return savePlayer(datastore, mail, mail);
+	}
+	
+	public static Player savePlayer(Datastore datastore, String mail, String password) {
 		Player player = new Player();
-		player.setNickname(nickname);
+		String[] splittedMail = mail.split("@");
+		player.setNickname((splittedMail.length > 0) ? splittedMail[0] : mail);
 		player.setMail(mail);
+		player.setPassword(password);
 		datastore.save(player);
 		return player;
 	}

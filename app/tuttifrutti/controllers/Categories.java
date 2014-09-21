@@ -1,12 +1,12 @@
 package tuttifrutti.controllers;
 
+import static play.libs.Json.parse;
 import static tuttifrutti.utils.JsonUtil.parseListToJson;
 
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 import tuttifrutti.models.Category;
@@ -22,8 +22,6 @@ public class Categories extends Controller {
 	public Result availableCategories(String language) {
 		List<Category> categories = categoryService.categories(language);
 
-		String jsonResult = parseListToJson(categories);
-		
-        return ok(Json.parse(jsonResult));
+        return ok(parse(parseListToJson(categories)));
     }
 }

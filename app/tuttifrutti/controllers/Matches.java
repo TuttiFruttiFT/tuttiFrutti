@@ -1,5 +1,9 @@
 package tuttifrutti.controllers;
 
+import static play.libs.Json.parse;
+import static play.libs.Json.toJson;
+import static tuttifrutti.utils.JsonUtil.parseListToJson;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,7 +24,6 @@ import tuttifrutti.models.Player;
 import tuttifrutti.models.PowerUp;
 import tuttifrutti.models.ResultModel;
 import tuttifrutti.models.Round;
-import tuttifrutti.utils.JsonUtil;
 import tuttifrutti.utils.PushUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -131,14 +134,14 @@ public class Matches extends Controller {
 		
         List<Dupla> wrongDuplas = matchService.play(match,playerId, duplas, time);
         
-		return ok(Json.parse(JsonUtil.parseListToJson(wrongDuplas)));
+		return ok(parse(parseListToJson(wrongDuplas)));
     }
 	
 	public Result roundResult(String matchId,Integer roundNumber){
 		Round round = roundService.getRound(matchId,roundNumber);
 		
 		if(round != null){
-			return ok(Json.toJson(round));
+			return ok(toJson(round));
 		}
 		
 		return notFound();
@@ -148,7 +151,7 @@ public class Matches extends Controller {
 		ResultModel matchResult = ResultModel.matchResult(matchId);
 		
 		if(matchResult != null){
-			return ok(Json.toJson(matchResult));
+			return ok(toJson(matchResult));
 		}
 		
 		return notFound();

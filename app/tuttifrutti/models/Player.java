@@ -91,7 +91,9 @@ public class Player {
 	public Player registerMail(String mail, String clave) {
 		// TODO implementar
 		Player player = new Player();
-		player.setNickname(mail);
+		String[] splittedMail = mail.split("@");
+		player.setNickname((splittedMail.length > 0) ? splittedMail[0] : mail);
+		player.setMail(mail);
 		player.setPassword(clave);
 		
 		mongoDatastore.save(player);

@@ -61,8 +61,8 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			lastRound.setNumber(1);
 			lastRound.setLetter(new LetterWrapper(Letter.A));
 			
-			Player player = savePlayer(dataStore, "SARASA", "sarasas@sarasa.com");
-			Player player2 = savePlayer(dataStore, "SARASA2", "sarasas2@sarasa.com");
+			Player player = savePlayer(dataStore, "sarasas@sarasa.com");
+			Player player2 = savePlayer(dataStore, "sarasas2@sarasa.com");
 
 			savePlayerResult(dataStore, player, 10);
 			PlayerResult playerResult2 = savePlayerResult(dataStore, player2, 10);
@@ -100,7 +100,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 	public void searchPublicMatchReturnsCreatedMatch() {
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
 			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
-			Player player = savePlayer(dataStore, "SARASA", "sarasas@sarasa.com");
+			Player player = savePlayer(dataStore, "sarasas@sarasa.com");
 			String language = "ES";
 
 			saveCategories(dataStore, language);
@@ -131,8 +131,8 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			
 			String language = "ES";
 			
-			Player player = savePlayer(dataStore, "SARASA", "sarasas@sarasa.com");
-			Player player2 = savePlayer(dataStore, "SARASA2", "sarasas2@sarasa.com");
+			Player player = savePlayer(dataStore, "sarasas@sarasa.com");
+			Player player2 = savePlayer(dataStore, "sarasas2@sarasa.com");
 
 			PlayerResult playerResult1 = savePlayerResult(dataStore, player, 35);
 			PlayerResult playerResult2 = savePlayerResult(dataStore, player2, 40);
@@ -262,8 +262,8 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			
 			String language = "ES";
 			
-			Player player = savePlayer(dataStore, "SARASA", "sarasas@sarasa.com");
-			Player player2 = savePlayer(dataStore, "SARASA2", "sarasas2@sarasa.com");
+			Player player = savePlayer(dataStore, "sarasas@sarasa.com");
+			Player player2 = savePlayer(dataStore, "sarasas2@sarasa.com");
 
 			PlayerResult playerResult1 = savePlayerResult(dataStore, player, 35);
 			PlayerResult playerResult2 = savePlayerResult(dataStore, player2, 40);
