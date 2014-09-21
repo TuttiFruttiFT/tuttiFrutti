@@ -7,6 +7,7 @@ import static play.test.Helpers.running;
 import static play.test.Helpers.testServer;
 import static tuttifrutti.models.MatchConfig.NORMAL_MODE;
 import static tuttifrutti.models.MatchConfig.PUBLIC_TYPE;
+import static tuttifrutti.models.MatchState.FINISHED;
 import static tuttifrutti.utils.TestUtils.createMatch;
 import static tuttifrutti.utils.TestUtils.createMatchConfig;
 import static tuttifrutti.utils.TestUtils.saveCategories;
@@ -24,7 +25,6 @@ import tuttifrutti.models.Letter;
 import tuttifrutti.models.LetterWrapper;
 import tuttifrutti.models.Match;
 import tuttifrutti.models.MatchConfig;
-import tuttifrutti.models.MatchState;
 import tuttifrutti.models.Player;
 import tuttifrutti.models.PlayerResult;
 import tuttifrutti.models.Round;
@@ -63,10 +63,10 @@ public class PlayersTest {
 			createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig);
 			createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig);
 			Match match4 = createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig);
-			match4.setState(MatchState.FINISHED);
+			match4.setState(FINISHED);
 			dataStore.save(match4);
 			Match match5 = createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig);
-			match5.setState(MatchState.FINISHED);
+			match5.setState(FINISHED);
 			dataStore.save(match5);
 			
 			WSResponse r = WS.url("http://localhost:9000/player/matches/" + player.getId().toString()).get().get(5000000L);

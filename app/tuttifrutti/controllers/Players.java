@@ -81,7 +81,7 @@ public class Players extends Controller {
 	public Result editProfile() {
 		JsonNode json = request().body().asJson();
 		
-		if(playerService.editarPerfil(json)){
+		if(playerService.editProfile(json)){
 			return ok();
 		}
 		

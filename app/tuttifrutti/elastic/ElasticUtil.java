@@ -55,7 +55,7 @@ public class ElasticUtil {
 				MatchQueryBuilder matchQueryBuilder = matchQuery("value", writtenWord);
 				matchQueryBuilder.fuzziness(AUTO);
 				matchQueryBuilder.prefixLength(1);
-				matchQueryBuilder.maxExpansions(50);
+				matchQueryBuilder.maxExpansions(1);
 				matchQueryBuilder.minimumShouldMatch("100%");
 				
 				boolQueryBuilder.must(matchQueryBuilder);

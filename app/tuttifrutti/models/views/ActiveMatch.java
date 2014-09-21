@@ -16,8 +16,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ActiveMatch {
 
-	@JsonProperty(value = "match_id")
-	private String matchId;
+	private String id;
 	
 	private String name;
 	

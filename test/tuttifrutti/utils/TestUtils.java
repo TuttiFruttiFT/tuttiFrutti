@@ -11,11 +11,15 @@ import org.mongodb.morphia.Datastore;
 import tuttifrutti.models.Category;
 import tuttifrutti.models.Dupla;
 import tuttifrutti.models.DuplaState;
+import tuttifrutti.models.Letter;
+import tuttifrutti.models.LetterWrapper;
 import tuttifrutti.models.Match;
 import tuttifrutti.models.MatchConfig;
+import tuttifrutti.models.MatchState;
 import tuttifrutti.models.Player;
 import tuttifrutti.models.PlayerResult;
 import tuttifrutti.models.Round;
+import tuttifrutti.models.Turn;
 
 public class TestUtils {
 	public static List<Category> getCategoriesFromDuplas(List<Dupla> duplas, String language) {
@@ -43,15 +47,15 @@ public class TestUtils {
 
 	public static Match createMatch(Datastore dataStore, String language,Round lastRound, List<PlayerResult> playerResults, MatchConfig matchConfig) {
 		Category categoryService = SpringApplicationContext.getBeanNamed("category", Category.class);
-		return createMatch(dataStore, language,lastRound, playerResults, matchConfig,categoryService.getPublicMatchCategories(language));
+		return createMatch(dataStore, language,lastRound, playerResults, matchConfig,categoryService.getPublicMatchCategories(language), TO_BE_APPROVED);
 	}
 	
 	public static Match createMatch(Datastore dataStore, String language,Round lastRound, List<PlayerResult> playerResults, MatchConfig matchConfig,
-							  List<Category> categories) {
+							  List<Category> categories, MatchState matchState) {
 		Match match = new Match();
 		match.setConfig(matchConfig);
 		match.setName("Una Partida"); // TODO ver qué poner de nombre
-		match.setState(TO_BE_APPROVED);
+		match.setState(matchState);
 		match.setStartDate(DateTime.now().toDate());
 		match.setCategories(categories);
 		match.setPlayers(playerResults);
@@ -82,8 +86,7 @@ public class TestUtils {
 		return player;
 	}
 	
-	public static MatchConfig createMatchConfig(String language, String mode, String type, int numberOfPlayers, 
-										  boolean powerUpsEnabled, int numberOfRounds) {
+	public static MatchConfig createMatchConfig(String language, String mode, String type, int numberOfPlayers, boolean powerUpsEnabled, int numberOfRounds) {
 		MatchConfig matchConfig = new MatchConfig();
 		matchConfig.setLanguage(language);
 		matchConfig.setMode(mode);
@@ -118,5 +121,22 @@ public class TestUtils {
 		saveCategory(datastore, language,"verbs","verbos_img","Verbos");
 		saveCategory(datastore, language,"jobs","trabajos_img","Trabajos");
 		saveCategory(datastore, language,"bands","bands_img","Bandas de Música");
+	}
+
+	public static Round createRound(Turn turn, int roundNumber, Letter letter) {
+		Round lastRound = new Round();
+		lastRound.setNumber(roundNumber);
+		lastRound.setLetter(new LetterWrapper(letter));
+		lastRound.addTurn(turn);
+		return lastRound;
+	}
+
+	public static Turn createTurn(String playerId, Integer endTime, Integer score, List<Dupla> duplas2) {
+		Turn turn = new Turn();
+		turn.setPlayerId(playerId);
+		turn.setEndTime(endTime);
+		turn.setScore(score);
+		turn.setDuplas(duplas2);
+		return turn;
 	}
 }

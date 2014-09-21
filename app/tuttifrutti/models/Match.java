@@ -5,6 +5,8 @@ import static org.springframework.util.StringUtils.isEmpty;
 import static tuttifrutti.models.DuplaState.WRONG;
 import static tuttifrutti.models.MatchConfig.PUBLIC_TYPE;
 import static tuttifrutti.models.MatchState.FINISHED;
+import static tuttifrutti.models.MatchState.OPPONENT_TURN;
+import static tuttifrutti.models.MatchState.REJECTED;
 import static tuttifrutti.models.MatchState.TO_BE_APPROVED;
 
 import java.util.ArrayList;
@@ -80,6 +82,7 @@ public class Match {
 	@Transient
 	private List<PowerUp> powerUps;
 	
+	@JsonProperty(value = "current_round")
 	private Round lastRound;
 	
 	@Transient
@@ -110,16 +113,25 @@ public class Match {
 		// TODO implementar, partidas de idJugador que no estén en FINISHED
 		List<ActiveMatch> activeMatches = new ArrayList<>();
 		Query<Match> query = mongoDatastore.find(Match.class, "state <>", FINISHED.toString());
-		query.and(query.criteria("players.player.id").equal(new ObjectId(playerId)));
+		query.and(query.criteria("state").notEqual(REJECTED),
+				  query.criteria("players.player.id").equal(new ObjectId(playerId)));
 		for(Match match : query.asList()){
 			ActiveMatch activeMatch = new ActiveMatch();
 			activeMatch.setCurrentRound(match.getLastRound());
-			activeMatch.setMatchId(match.getId().toString());
+			activeMatch.setId(match.getId().toString());
 			activeMatch.setName(match.getName());
 			activeMatch.setState(match.getState().toString());
+			if(!match.getState().equals(TO_BE_APPROVED) && playerHasAlreadyPlayed(match, playerId)){
+				activeMatch.setState(OPPONENT_TURN.toString());
+			}
 			activeMatches.add(activeMatch);
 		}
 		return activeMatches;
+	}
+
+	private boolean playerHasAlreadyPlayed(Match match, String playerId) {
+		List<Turn> turns = match.getLastRound().getTurns();
+		return !turns.isEmpty() && turns.stream().anyMatch(turn -> turn.getPlayerId().equals(playerId));
 	}
 
 	public Match match(String matchId) {
@@ -135,6 +147,7 @@ public class Match {
 		query.and(query.criteria("config.language").equal(config.getLanguage()), 
 				  query.criteria("config.type").equal(type),
 				  query.criteria("config.mode").equal(config.getMode()),
+				  query.criteria("state").equal(TO_BE_APPROVED),
 				  query.criteria("players.player.id").notEqual(new ObjectId(playerId)));
 		
 		return query.get();

@@ -9,11 +9,17 @@ import static tuttifrutti.models.Category.DEFAULT_CATEGORIES_NUMBER;
 import static tuttifrutti.models.DuplaState.CORRECTED;
 import static tuttifrutti.models.DuplaState.PERFECT;
 import static tuttifrutti.models.DuplaState.WRONG;
+import static tuttifrutti.models.Letter.A;
+import static tuttifrutti.models.Letter.R;
+import static tuttifrutti.models.Letter.S;
 import static tuttifrutti.models.MatchConfig.NORMAL_MODE;
 import static tuttifrutti.models.MatchConfig.PUBLIC_TYPE;
+import static tuttifrutti.models.MatchState.PLAYER_TURN;
 import static tuttifrutti.models.MatchState.TO_BE_APPROVED;
 import static tuttifrutti.utils.TestUtils.createMatch;
 import static tuttifrutti.utils.TestUtils.createMatchConfig;
+import static tuttifrutti.utils.TestUtils.createRound;
+import static tuttifrutti.utils.TestUtils.createTurn;
 import static tuttifrutti.utils.TestUtils.getCategoriesFromDuplas;
 import static tuttifrutti.utils.TestUtils.saveCategories;
 import static tuttifrutti.utils.TestUtils.saveDupla;
@@ -92,7 +98,57 @@ public class MatchesTest extends ElasticSearchAwareTest {
 					assertThat(playerResult.getScore()).isEqualTo(10);
 				}
 			}
-			assertThat(letter.getLetter()).isEqualTo(Letter.A);
+			assertThat(letter.getLetter()).isEqualTo(A);
+		});
+	}
+	
+	@Test
+	public void searchPublicMatchReturnsANewOneBecauseTheyAreAllStarted() {
+		running(testServer(9000, fakeApplication()), (Runnable) () -> {
+			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
+			
+			String language = "ES";
+			int roundNumber = 1;
+			
+			Player player = savePlayer(dataStore, "sarasas@sarasa.com");
+			Player player2 = savePlayer(dataStore, "sarasas2@sarasa.com");
+			Player otherPlayer = savePlayer(dataStore, "sarasas3@sarasa.com");
+
+			PlayerResult playerResult1 = savePlayerResult(dataStore, player, 35);
+			PlayerResult playerResult2 = savePlayerResult(dataStore, player2, 40);
+			
+			saveCategories(dataStore, language);
+
+			List<Dupla> duplas = new ArrayList<>();
+			saveDupla(new Category("bands"), duplas, "Radiohead", 15);
+			saveDupla(new Category("colors"), duplas, "Marron", 24);
+			saveDupla(new Category("meals"), duplas, "Risotto", 35);
+			saveDupla(new Category("countries"), duplas, "Rumania", 39);
+			
+			List<Dupla> duplas2 = new ArrayList<>();
+			saveDupla(new Category("bands"), duplas2, "Rolling Stone", "rolling stones",15, CORRECTED);
+			saveDupla(new Category("colors"), duplas2, "Rojo", "rojo",24, PERFECT);
+			saveDupla(new Category("meals"), duplas2, "", null,35, WRONG);
+			saveDupla(new Category("countries"), duplas2, null, null,39, WRONG);
+			
+			Turn turn = createTurn(player2.getId().toString(), 45, 0, duplas2);
+			
+			Round lastRound = createRound(turn, roundNumber, R);
+			
+			MatchConfig matchConfig = createMatchConfig(language, NORMAL_MODE, PUBLIC_TYPE, 3, true, 25);
+			Match match = createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig,
+									  getCategoriesFromDuplas(duplas, language), PLAYER_TURN);
+			
+			WSResponse r = WS.url("http://localhost:9000/match/public").setContentType("application/json")
+					 .post("{\"player_id\" : \"" + otherPlayer.getId().toString() + "\", \"config\":" 
+							+ Json.toJson(matchConfig).toString()+ "}")
+					 .get(5000000L);
+			assertThat(r).isNotNull();
+			assertThat(r.getStatus()).isEqualTo(OK);
+			
+			JsonNode jsonNode = r.asJson();
+			
+			assertThat(jsonNode.get("id").asText()).isNotEqualTo(match.getId().toString());
 		});
 	}
 
@@ -124,12 +180,13 @@ public class MatchesTest extends ElasticSearchAwareTest {
 	}
 	
 	@Test
-	public void turn() {
+	public void turnWithTwoPlayers() {
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
 			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
 			Round roundService = SpringApplicationContext.getBeanNamed("round", Round.class);
 			
 			String language = "ES";
+			int roundNumber = 1;
 			
 			Player player = savePlayer(dataStore, "sarasas@sarasa.com");
 			Player player2 = savePlayer(dataStore, "sarasas2@sarasa.com");
@@ -151,22 +208,13 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			saveDupla(new Category("meals"), duplas2, "", null,35, WRONG);
 			saveDupla(new Category("countries"), duplas2, null, null,39, WRONG);
 			
-			Turn turn = new Turn();
-			turn.setPlayerId(player2.getId().toString());
-			turn.setEndTime(45);
-			turn.setScore(0);
-			turn.setDuplas(duplas2);
+			Turn turn = createTurn(player2.getId().toString(), 45, 0, duplas2);
 			
-			int roundNumber = 1;
-			
-			Round lastRound = new Round();
-			lastRound.setNumber(roundNumber);
-			lastRound.setLetter(new LetterWrapper(Letter.R));
-			lastRound.addTurn(turn);
+			Round lastRound = createRound(turn, roundNumber, R);
 			
 			MatchConfig matchConfig = createMatchConfig(language, NORMAL_MODE, PUBLIC_TYPE, 3, true, 25);
 			Match match = createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig,
-									  getCategoriesFromDuplas(duplas, language));
+									  getCategoriesFromDuplas(duplas, language), PLAYER_TURN);
 			
 			WSResponse r = WS.url("http://localhost:9000/match/turn").setContentType("application/json")
 					 .post("{\"player_id\" : \"" + player.getId().toString() + "\", \"match_id\":\"" + match.getId().toString() 
@@ -254,13 +302,14 @@ public class MatchesTest extends ElasticSearchAwareTest {
 	}
 	
 	@Test
-	public void test() {
+	public void turnWithThreePlayers() { //TODO
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
 			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
 			Round roundService = SpringApplicationContext.getBeanNamed("round", Round.class);
 			populateElastic(getJsonFilesFotCategories());
 			
 			String language = "ES";
+			int roundNumber = 1;
 			
 			Player player = savePlayer(dataStore, "sarasas@sarasa.com");
 			Player player2 = savePlayer(dataStore, "sarasas2@sarasa.com");
@@ -286,22 +335,13 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			saveDupla(new Category("meals"), duplas2, "sandia", "savia de abedul",35, CORRECTED);
 			saveDupla(new Category("colors"), duplas2, "salmon", "salmón",40, CORRECTED);
 			
-			Turn turn = new Turn();
-			turn.setPlayerId(player2.getId().toString());
-			turn.setEndTime(45);
-			turn.setScore(0);
-			turn.setDuplas(duplas2);
+			Turn turn = createTurn(player2.getId().toString(), 45, 0, duplas2);
 			
-			int roundNumber = 1;
-			
-			Round lastRound = new Round();
-			lastRound.setNumber(roundNumber);
-			lastRound.setLetter(new LetterWrapper(Letter.S));
-			lastRound.addTurn(turn);
+			Round lastRound = createRound(turn, roundNumber, S);
 			
 			MatchConfig matchConfig = createMatchConfig(language, NORMAL_MODE, PUBLIC_TYPE, 3, true, 25);
 			Match match = createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig,
-									  getCategoriesFromDuplas(duplas, language));
+									  getCategoriesFromDuplas(duplas, language), PLAYER_TURN);
 			
 			WSResponse r = WS.url("http://localhost:9000/match/turn").setContentType("application/json")
 					 .post("{\"player_id\" : \"" + player.getId().toString() + "\", \"match_id\":\"" + match.getId().toString() 
@@ -323,7 +363,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			Round newRound = modifiedMatch.getLastRound();
 			
 			assertThat(newRound.getLetter()).isNotEqualTo(modifiedRound.getLetter());
-			assertThat(newRound.getLetter().getPreviousLetters()).contains(Letter.S.toString());
+			assertThat(newRound.getLetter().getPreviousLetters()).contains(S.toString());
 			
 //			for(PlayerResult playerResult : modifiedMatch.getPlayers()){
 //				if(playerResult.getPlayer().getId().toString().equals(player.getId().toString())){

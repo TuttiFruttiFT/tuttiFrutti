@@ -1,5 +1,10 @@
 package tuttifrutti.controllers;
 
+import static play.libs.Json.parse;
+import static tuttifrutti.utils.JsonUtil.parseListToJson;
+
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import play.mvc.Controller;
@@ -15,18 +20,14 @@ public class Searches extends Controller {
 	private Player playerService;
 	
 	public Result searchPlayers(String palabraABuscar) {
-		Player players = playerService.getPlayers(palabraABuscar);
+		List<Player> players = playerService.searchPlayers(palabraABuscar);
 		
-		//TODO ver como crear un json desde una lista
-		
-        return ok();
+        return ok(parse(parseListToJson(players)));
     }
 	
 	public Result searchOthers(String playerId) {
-		Player players = playerService.getOthersPlayers(playerId);
+		List<Player> players = playerService.searchOthersPlayers(playerId);
 		
-		//TODO ver como crear un json desde una lista
-		
-        return ok();
+        return ok(parse(parseListToJson(players)));
     }
 }

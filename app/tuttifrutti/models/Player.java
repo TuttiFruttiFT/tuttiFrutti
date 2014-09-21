@@ -111,7 +111,7 @@ public class Player {
 		return null;
 	}
 
-	public boolean editarPerfil(JsonNode json) {
+	public boolean editProfile(JsonNode json) {
 		// TODO implementar
 		return false;
 	}
@@ -130,12 +130,12 @@ public class Player {
 		
 	}
 
-	public Player getPlayers(String palabraABuscar) {
+	public List<Player> searchPlayers(String palabraABuscar) {
 		// TODO implementar
 		return null;
 	}
 
-	public Player getOthersPlayers(String idJugador) {
+	public List<Player> searchOthersPlayers(String idJugador) {
 		// TODO implementar
 		return null;
 	}
