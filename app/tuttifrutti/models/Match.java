@@ -1,6 +1,7 @@
 package tuttifrutti.models;
 
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.springframework.util.StringUtils.isEmpty;
 import static tuttifrutti.models.DuplaState.WRONG;
 import static tuttifrutti.models.MatchConfig.PUBLIC_TYPE;
@@ -17,6 +18,7 @@ import java.util.function.Predicate;
 import lombok.Getter;
 import lombok.Setter;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
 import org.mongodb.morphia.Datastore;
@@ -131,7 +133,7 @@ public class Match {
 
 	private boolean playerHasAlreadyPlayed(Match match, String playerId) {
 		List<Turn> turns = match.getLastRound().getTurns();
-		return !turns.isEmpty() && turns.stream().anyMatch(turn -> turn.getPlayerId().equals(playerId));
+		return isNotEmpty(turns) && turns.stream().anyMatch(turn -> turn.getPlayerId().equals(playerId));
 	}
 
 	public Match match(String matchId) {
