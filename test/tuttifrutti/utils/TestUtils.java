@@ -5,6 +5,7 @@ import static tuttifrutti.models.MatchState.TO_BE_APPROVED;
 
 import java.util.List;
 
+import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
 import org.mongodb.morphia.Datastore;
 
@@ -133,7 +134,9 @@ public class TestUtils {
 
 	public static Turn createTurn(String playerId, Integer endTime, Integer score, List<Dupla> duplas2) {
 		Turn turn = new Turn();
-		turn.setPlayerId(playerId);
+		Player player = new Player();
+		player.setId(new ObjectId(playerId));
+		turn.setPlayer(player);
 		turn.setEndTime(endTime);
 		turn.setScore(score);
 		turn.setDuplas(duplas2);

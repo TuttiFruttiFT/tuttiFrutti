@@ -254,7 +254,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			
 			assertThat(modifiedRound.getEndTime()).isEqualTo(41);
 			for(Turn modifiedTurn : modifiedRound.getTurns()){
-				if(modifiedTurn.getPlayerId().equals(player.getId().toString())){
+				if(modifiedTurn.getPlayer().getId().toString().equals(player.getId().toString())){
 					assertThat(modifiedTurn.getEndTime()).isEqualTo(41);
 					assertThat(modifiedTurn.getScore()).isEqualTo(50);
 					for(Dupla modifiedDupla : modifiedTurn.getDuplas()){
@@ -276,7 +276,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 					}
 				}
 				
-				if(modifiedTurn.getPlayerId().equals(player2.getId().toString())){
+				if(modifiedTurn.getPlayer().getId().toString().equals(player2.getId().toString())){
 					assertThat(modifiedTurn.getEndTime()).isEqualTo(45);
 					assertThat(modifiedTurn.getScore()).isEqualTo(30);
 					for(Dupla modifiedDupla : modifiedTurn.getDuplas()){

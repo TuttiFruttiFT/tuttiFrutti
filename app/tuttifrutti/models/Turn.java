@@ -20,8 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Turn {
-	@JsonProperty(value = "player_id")
-	private String playerId;
+	private Player player;
 	
 	@Property("end_time")
 	@JsonProperty(value = "end_time")

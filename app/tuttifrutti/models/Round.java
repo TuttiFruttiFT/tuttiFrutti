@@ -55,7 +55,7 @@ public class Round {
 	
 	@Embedded(value = "stop_player")
 	@JsonProperty(value = "stop_player")
-	private StopPlayer stopPlayer;
+	private Player stopPlayer;
 	
 	@Embedded
 	private List<Turn> turns;

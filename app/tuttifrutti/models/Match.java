@@ -132,7 +132,7 @@ public class Match {
 
 	private boolean playerHasAlreadyPlayed(Match match, String playerId) {
 		List<Turn> turns = match.getLastRound().getTurns();
-		return isNotEmpty(turns) && turns.stream().anyMatch(turn -> turn.getPlayerId().equals(playerId));
+		return isNotEmpty(turns) && turns.stream().anyMatch(turn -> turn.getPlayer().getId().toString().equals(playerId));
 	}
 
 	public Match match(String matchId) {
@@ -243,19 +243,13 @@ public class Match {
 		for(Turn turn : turns){
 			int turnScore = turn.getDuplas().stream().mapToInt(dupla -> dupla.getScore()).sum();
 			turn.setScore(turnScore);
-			PlayerResult playerResult = match.getPlayers().stream().filter(player -> player.getPlayer().getId().toString().equals(turn.getPlayerId())).findFirst().get();
+			PlayerResult playerResult = match.getPlayers().stream().filter(player -> player.getPlayer().getId().toString().equals(turn.getPlayer().getId().toString())).findFirst().get();
 			playerResult.setScore(playerResult.getScore() + turnScore);
 		}
 	}
 
-	private StopPlayer getStopPlayer(List<Turn> turns, Integer minTime, Match match) {
-		StopPlayer stopPlayer = new StopPlayer();
-		String playerId = turns.stream().filter(turn -> turn.getEndTime() == minTime).findFirst().get().getPlayerId();
-		PlayerResult playerResult = match.getPlayers().stream().filter(player -> player.getPlayer().getId().toString().equals(playerId))
-									.findFirst().get();
-		stopPlayer.setStopPlayerId(playerId);
-		stopPlayer.setNickname(playerResult.getPlayer().getNickname());
-		return stopPlayer;
+	private Player getStopPlayer(List<Turn> turns, Integer minTime, Match match) {
+		return turns.stream().filter(turn -> turn.getEndTime() == minTime).findFirst().get().getPlayer();
 	}
 
 	private Integer getMinimumTime(List<Turn> turns) {
@@ -311,7 +305,10 @@ public class Match {
 	private void createTurn(Match match, String playerId, List<Dupla> duplas, int time) {
 		Turn turn = new Turn();
 		turn.setDuplas(duplas);
-		turn.setPlayerId(playerId);
+		Player player = new Player();
+		player.setId(new ObjectId(playerId));
+		player.setNickname(nicknameFrom(playerId,match));
+		turn.setPlayer(player);
 		turn.setEndTime(time);
 		Round round = match.getLastRound();
 		round.addTurn(turn);
@@ -326,6 +323,11 @@ public class Match {
 	public void playerReject(String playerId) {
 		// TODO implementar
 		
+	}
+	
+	private String nicknameFrom(String playerId, Match match) {
+		return match.getPlayers().stream().filter(playerResult -> playerResult.getPlayer().getId().toString().equals(playerId))
+					.findFirst().get().getPlayer().getNickname();
 	}
 
 	public boolean readyToStart() {
