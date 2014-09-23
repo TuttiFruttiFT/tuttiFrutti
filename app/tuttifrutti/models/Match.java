@@ -81,6 +81,7 @@ public class Match {
 	private List<Category> categories;
 	
 	@Embedded
+	@JsonProperty(value = "players")
 	private List<PlayerResult> playerResults;
 	
 	@Transient
