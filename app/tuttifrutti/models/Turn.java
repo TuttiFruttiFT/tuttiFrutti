@@ -10,6 +10,7 @@ import org.mongodb.morphia.annotations.Property;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author rfanego
@@ -19,9 +20,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Turn {
+	@JsonProperty(value = "player_id")
 	private String playerId;
 	
 	@Property("end_time")
+	@JsonProperty(value = "end_time")
 	private Integer endTime;
 	
 	private Integer score;

@@ -22,6 +22,7 @@ import tuttifrutti.serializers.ObjectIdSerializer;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -52,7 +53,8 @@ public class Round {
 	@Property("end_time")
 	private Integer endTime;
 	
-	@Embedded
+	@Embedded(value = "stop_player")
+	@JsonProperty(value = "stop_player")
 	private StopPlayer stopPlayer;
 	
 	@Embedded
