@@ -1,12 +1,15 @@
 package tuttifrutti.controllers;
 
+import static play.libs.Json.fromJson;
 import static play.libs.Json.parse;
 import static play.libs.Json.toJson;
 import static tuttifrutti.utils.JsonUtil.parseListToJson;
+import static tuttifrutti.utils.PushUtil.publicMatchReady;
+import static tuttifrutti.utils.PushUtil.rejected;
+import static tuttifrutti.utils.PushUtil.rejectedByPlayer;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.annotations.Transient;
@@ -24,7 +27,6 @@ import tuttifrutti.models.Player;
 import tuttifrutti.models.PowerUp;
 import tuttifrutti.models.ResultModel;
 import tuttifrutti.models.Round;
-import tuttifrutti.utils.PushUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -66,9 +68,7 @@ public class Matches extends Controller {
 		PowerUp.generate(match);
 		if(match.readyToStart()){
 			match.setState(MatchState.PLAYER_TURN);
-			List<String> playerIds = match.getPlayers().stream().map(result -> result.getPlayer().getId().toString())
-					.filter(id -> !id.equals(playerId)).collect(Collectors.toList());
-			PushUtil.match(playerIds,match);
+			publicMatchReady(match.playerIdsExcept(playerId),match);
 		}
 		mongoDatastore.save(match);
         return ok(Json.toJson(match));
@@ -81,7 +81,7 @@ public class Matches extends Controller {
 		JsonNode jsonConfig = json.get("config");
 		JsonNode jsonPlayers = json.get("players");
 		
-		MatchConfig config = Json.fromJson(jsonConfig, MatchConfig.class);
+		MatchConfig config = fromJson(jsonConfig, MatchConfig.class);
 		List<String> players = new ArrayList<>();
 		
 		for(JsonNode jsonPlayer : jsonPlayers){
@@ -90,7 +90,7 @@ public class Matches extends Controller {
 		
 		Match match = matchService.create(playerId, config,players);
 		
-		PushUtil.match(players,match);
+		publicMatchReady(players,match);
 		
         return ok(Json.toJson(match));
     }
@@ -104,13 +104,13 @@ public class Matches extends Controller {
 		Match match = matchService.match(matchId);
 		match.playerReject(playerId);
 		
-		List<Player> players = match.getPlayers().stream().map(result -> result.getPlayer()).collect(Collectors.toList());
+		List<Player> players = match.players();
 		
 		if(players.size() == 1){
 			match.rejected();
-			PushUtil.rejected(players,match);
+			rejected(players,match);
 		}else{
-			PushUtil.rejectedByPlayer(players,playerId,match);
+			rejectedByPlayer(players,playerId,match);
 		}
 		
 		return ok();

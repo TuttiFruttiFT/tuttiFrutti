@@ -1,6 +1,10 @@
 package tuttifrutti.utils;
 
 import static play.libs.F.Promise.promise;
+import static tuttifrutti.utils.PushType.MATCH_RESULT;
+import static tuttifrutti.utils.PushType.PRIVATE_MATCH_READY;
+import static tuttifrutti.utils.PushType.PUBLIC_MATCH_READY;
+import static tuttifrutti.utils.PushType.ROUND_RESULT;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,35 +37,48 @@ public class PushUtil {
     private static final Integer ANDROID_DEVICE_TYPE = 3;
     private static final Integer RETRIES_NUMBER = 5;
 
-	public static void match(List<String> playerIds, Match match) {
+	public static void publicMatchReady(List<String> playerIds, Match match) {
 		promise(() -> {
-			sendMessage(Json.toJson(match).toString(), playerIds);
+			sendMessageTo(playerIds, match,PUBLIC_MATCH_READY);
 			return null;
 		});
 	}
 
-	public static void rejected(List<Player> players, Match match) {
-		// TODO implementar
-		
-	}
-
-	public static void rejectedByPlayer(List<Player> players, String playerId, Match match) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void roundResult(String matchId, Integer roundNumber,List<String> playerIds) {
+	public static void privateMatchReady(List<String> playerIds, Match match) {
 		promise(() -> {
-			ObjectNode json = Json.newObject().put("type", PushType.ROUND_RESULT.toString()).put("match_id", matchId)
-					.put("round_number", roundNumber);
-			for(String playerId : playerIds){
-				sendMessage(json.put("player_id", playerId).toString(), Arrays.asList(playerId));
-			}		
+			sendMessageTo(playerIds, match,PRIVATE_MATCH_READY);
 			return null;
 		});
 	}
 	
-	private static void sendMessage(String jsonData,List<String> playerIds){
+	public static void rejected(List<Player> players, Match match) {
+		// TODO implementar
+	}
+
+	public static void rejectedByPlayer(List<Player> players, String playerId, Match match) {
+		// TODO implementar
+	}
+
+	public void roundResult(Match match, Integer roundNumber) {
+		promise(() -> {
+			ObjectNode json = Json.newObject().put("type", ROUND_RESULT.toString()).put("match_id", match.getId().toString())
+											  .put("round_number", roundNumber);
+			for(String playerId : match.playerIds()){
+				sendPushwooshMessage(json.put("player_id", playerId).toString(), Arrays.asList(playerId));
+			}
+			return null;
+		});
+	}
+	
+
+	public void matchResult(Match match) {
+		promise(() -> {
+			sendMessageTo(match.playerIds(), match,MATCH_RESULT);
+			return null;
+		});
+	}
+	
+	private static void sendPushwooshMessage(String jsonData,List<String> playerIds){
 		ArrayNode notifications = Json.newObject().arrayNode();
 		notifications.add(Json.newObject().put("send_date", "now").put("data", jsonData));
 		JsonNode requestBody = Json.newObject().put("auth", AUTH_TOKEN).put("devices_filter",playerPushTags(playerIds))
@@ -151,4 +168,11 @@ public class PushUtil {
 		return StringUtils.join(tags," + ");
 	}
 
+	private static void sendMessageTo(List<String> playerIds, Match match,PushType pushType) {
+		sendPushwooshMessage(Json.toJson(match).toString(), playerIds);
+		ObjectNode json = Json.newObject().put("type", pushType.toString()).put("match_id", match.getId().toString());
+		for(String playerId : playerIds){
+			sendPushwooshMessage(json.put("player_id", playerId).toString(), Arrays.asList(playerId));
+		}
+	}
 }

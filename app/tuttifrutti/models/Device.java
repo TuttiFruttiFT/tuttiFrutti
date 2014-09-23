@@ -4,6 +4,7 @@
 package tuttifrutti.models;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import org.bson.types.ObjectId;
@@ -22,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  */
 @Entity
 @Getter @Setter
+@NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Component
@@ -38,6 +40,12 @@ public class Device {
 	
 	@Autowired
 	private Datastore mongoDatastore;
+	
+	public Device(String playerId,String pushToken,String hardwareId){
+		this.playerId = playerId;
+		this.pushToken = pushToken;
+		this.hardwareId = hardwareId;
+	}
 	
 	public Device device(String playerId){
 		return mongoDatastore.get(Device.class,new ObjectId(playerId));

@@ -33,6 +33,7 @@ import java.util.List;
 import org.junit.Test;
 import org.mongodb.morphia.Datastore;
 
+import play.Logger;
 import play.libs.Json;
 import play.libs.ws.WS;
 import play.libs.ws.WSResponse;
@@ -92,7 +93,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			assertThat(resultMatch).isNotNull();
 			assertThat(resultMatch.getId().toString()).isEqualTo(match.getId().toString());
 			LetterWrapper letter = commonMatchAssertions(language, resultMatch);
-			for(PlayerResult playerResult : resultMatch.getPlayers()){
+			for(PlayerResult playerResult : resultMatch.getPlayerResults()){
 				Player playerAux = playerResult.getPlayer();
 				if(playerAux.getNickname().equals("SARASA2")){
 					assertThat(playerResult.getScore()).isEqualTo(10);
@@ -233,7 +234,8 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			assertThat(jsonWrongDupla.get("written_word").asText()).isEqualTo("marron");
 			assertThat(jsonWrongDupla.get("time").asInt()).isEqualTo(24);
 			assertThat(jsonWrongDupla.get("state").asText()).isEqualTo("WRONG");
-			assertThat(jsonWrongDupla.get("score").asInt()).isEqualTo(0);
+			
+			sleep(500L);
 			
 			Match modifiedMatch = dataStore.get(Match.class, match.getId());
 			Round modifiedRound = roundService.getRound(match.getId().toString(), roundNumber);
@@ -242,7 +244,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			assertThat(newRound.getLetter()).isNotEqualTo(modifiedRound.getLetter());
 			assertThat(newRound.getLetter().getPreviousLetters()).contains(Letter.R.toString());
 			
-			for(PlayerResult playerResult : modifiedMatch.getPlayers()){
+			for(PlayerResult playerResult : modifiedMatch.getPlayerResults()){
 				if(playerResult.getPlayer().getId().toString().equals(player.getId().toString())){
 					assertThat(playerResult.getScore()).isEqualTo(85);
 				}
@@ -358,6 +360,9 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			
 			assertThat(jsonWrongDupla).isNotNull();
 		
+			
+			sleep(500L);
+			
 			Match modifiedMatch = dataStore.get(Match.class, match.getId());
 			Round modifiedRound = roundService.getRound(match.getId().toString(), roundNumber);
 			Round newRound = modifiedMatch.getLastRound();
@@ -379,6 +384,14 @@ public class MatchesTest extends ElasticSearchAwareTest {
 		});
 	}
 	
+	private void sleep(long timeInMillis) {
+		try {
+			Thread.sleep(timeInMillis);
+		} catch (Exception e) {
+			Logger.error("In Sleep",e);
+		}
+	}
+
 	private LetterWrapper commonMatchAssertions(String language, Match resultMatch) {
 		assertThat(resultMatch.getState()).isEqualTo(TO_BE_APPROVED);
 		assertThat(resultMatch.getConfig()).isNotNull();
@@ -387,8 +400,8 @@ public class MatchesTest extends ElasticSearchAwareTest {
 		assertThat(resultMatch.getConfig().getLanguage()).isEqualTo(language);
 		assertThat(resultMatch.getConfig().getNumberOfPlayers()).isEqualTo(3);
 		assertThat(resultMatch.getCategories().size()).isEqualTo(DEFAULT_CATEGORIES_NUMBER);
-		assertThat(resultMatch.getPlayers()).isNotNull();
-		for(PlayerResult playerResult : resultMatch.getPlayers()){
+		assertThat(resultMatch.getPlayerResults()).isNotNull();
+		for(PlayerResult playerResult : resultMatch.getPlayerResults()){
 			Player player = playerResult.getPlayer();
 			if(player.getNickname().equals("SARASA")){
 				assertThat(playerResult.getScore()).isEqualTo(0);

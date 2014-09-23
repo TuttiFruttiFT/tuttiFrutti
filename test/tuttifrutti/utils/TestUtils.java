@@ -59,7 +59,7 @@ public class TestUtils {
 		match.setState(matchState);
 		match.setStartDate(DateTime.now().toDate());
 		match.setCategories(categories);
-		match.setPlayers(playerResults);
+		match.setPlayerResults(playerResults);
 		match.setLastRound(lastRound);
 		dataStore.save(match);
 		return match;

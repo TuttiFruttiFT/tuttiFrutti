@@ -3,6 +3,7 @@ package tuttifrutti.models;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.springframework.util.StringUtils.isEmpty;
+import static play.libs.F.Promise.promise;
 import static tuttifrutti.models.DuplaState.WRONG;
 import static tuttifrutti.models.MatchConfig.PUBLIC_TYPE;
 import static tuttifrutti.models.MatchState.FINISHED;
@@ -11,9 +12,11 @@ import static tuttifrutti.models.MatchState.REJECTED;
 import static tuttifrutti.models.MatchState.TO_BE_APPROVED;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -78,7 +81,7 @@ public class Match {
 	private List<Category> categories;
 	
 	@Embedded
-	private List<PlayerResult> players;
+	private List<PlayerResult> playerResults;
 	
 	@Transient
 	private List<PowerUp> powerUps;
@@ -111,11 +114,10 @@ public class Match {
 	private PushUtil pushUtil;
 
 	public List<ActiveMatch> activeMatches(String playerId) {
-		// TODO implementar, partidas de idJugador que no estén en FINISHED
 		List<ActiveMatch> activeMatches = new ArrayList<>();
 		Query<Match> query = mongoDatastore.find(Match.class, "state <>", FINISHED.toString());
 		query.and(query.criteria("state").notEqual(REJECTED),
-				  query.criteria("players.player.id").equal(new ObjectId(playerId)));
+				  query.criteria("playerResults.player.id").equal(new ObjectId(playerId)));
 		for(Match match : query.asList()){
 			ActiveMatch activeMatch = new ActiveMatch();
 			activeMatch.setCurrentRound(match.getLastRound());
@@ -149,7 +151,7 @@ public class Match {
 				  query.criteria("config.type").equal(type),
 				  query.criteria("config.mode").equal(config.getMode()),
 				  query.criteria("state").equal(TO_BE_APPROVED),
-				  query.criteria("players.player.id").notEqual(new ObjectId(playerId)));
+				  query.criteria("playerResults.player.id").notEqual(new ObjectId(playerId)));
 		
 		return query.get();
 	}
@@ -168,7 +170,7 @@ public class Match {
 		match.setState(TO_BE_APPROVED);
 		match.setStartDate(DateTime.now().toDate());
 		match.setCategories(categoryService.getPublicMatchCategories(config.getLanguage()));
-		match.setPlayers(new ArrayList<>());
+		match.setPlayerResults(new ArrayList<>());
 		roundService.create(match);
 		return match;
 	}
@@ -181,7 +183,7 @@ public class Match {
 		}
 		playerResult.setPlayer(player);
 		playerResult.setScore(0);
-		match.getPlayers().add(playerResult);
+		match.getPlayerResults().add(playerResult);
 	}
 
 	public Match create(String idJugador, MatchConfig configuracion, List<String> jugadores) {
@@ -194,7 +196,10 @@ public class Match {
 		
 		this.createTurn(match,idJugador, duplas, time);
 		
-		calculateResult(match);
+		promise(() -> {
+			calculateResult(match);
+			return null;
+		});
 		
 		return getWrongDuplas(duplas);
 	}
@@ -206,44 +211,75 @@ public class Match {
 	private void calculateResult(Match match) {
 		Round round = match.getLastRound();
 		List<Turn> turns = round.getTurns();
-		if(turns.size() == match.getPlayers().size()){
+		if(turns.size() == match.getPlayerResults().size()){
 			Integer minTime = getMinimumTime(turns); 
+			
 			List<Dupla> allDuplas = flatDuplasFromTurns(turns);
-			scoreEmptyWrongAndOutOfTimeDuplas(allDuplas, minTime);
-			List<Dupla> filteredDuplas = filterEmptyWrongAndOutOfTimeDuplas(allDuplas, minTime);
-			for(Category category : match.getCategories()){
-				List<Dupla> categoryDuplas = getDuplasByCategory(filteredDuplas, category);
-				
-				if(!categoryDuplas.isEmpty()){
-					if(categoryDuplas.size() == 1){
-						categoryDuplas.get(0).setScore(ALONE_SCORE);
-					}else{
-						comparingAndScoring(categoryDuplas);
-					}
-				}
-			}
+			
+			List<Dupla> validDuplas = processInvalidDuplas(minTime,allDuplas);
+			
+			processValidDuplas(match, validDuplas);
 			
 			calculateTurnScores(turns, match);
 			
-			round.setEndTime(minTime);
-			round.setStopPlayer(getStopPlayer(round.getTurns(),minTime, match));
-			round.setMatchId(match.getId().toString());
-			mongoDatastore.save(round);
-			roundService.create(match);
-			mongoDatastore.save(match);
-			pushUtil.roundResult(match.getId().toString(),round.getNumber(),playerIds(match.getPlayers()));
+			saveOldRound(match, round, minTime);
+			
+			if(matchIsFinished(match, round)){
+				match.calculateWinner();
+				match.setState(FINISHED);
+				mongoDatastore.save(match);
+				pushUtil.matchResult(match);
+			}else{				
+				roundService.create(match);
+				pushUtil.roundResult(match,round.getNumber());
+			}
 		}
 	}
 
-	private List<String> playerIds(List<PlayerResult> players) {
-		return players.stream().map(playerResult -> playerResult.getPlayer().getId().toString()).collect(toList());
+	private void calculateWinner() {
+		this.winnerId = playerResults.stream().max(new PlayerResultComparator()::compare).get().getPlayer().getId().toString();
+	}
+
+	private boolean matchIsFinished(Match match, Round round) {
+		return round.getNumber() == match.getConfig().getRounds();
+	}
+
+	private void processValidDuplas(Match match, List<Dupla> validDuplas) {
+		for(Category category : match.getCategories()){
+			List<Dupla> categoryDuplas = getDuplasByCategory(validDuplas, category);
+			
+			if(!categoryDuplas.isEmpty()){
+				if(categoryDuplas.size() == 1){
+					categoryDuplas.get(0).setScore(ALONE_SCORE);
+				}else{
+					comparingAndScoring(categoryDuplas);
+				}
+			}
+		}
+	}
+
+	private List<Dupla> processInvalidDuplas(Integer minTime,List<Dupla> allDuplas) {
+		scoreEmptyWrongAndOutOfTimeDuplas(allDuplas, minTime);
+		List<Dupla> filteredDuplas = filterEmptyWrongAndOutOfTimeDuplas(allDuplas, minTime);
+		return filteredDuplas;
+	}
+
+	private void saveOldRound(Match match, Round round,Integer minTime) {
+		round.setEndTime(minTime);
+		round.setStopPlayer(getStopPlayer(round.getTurns(),minTime, match));
+		round.setMatchId(match.getId().toString());
+		mongoDatastore.save(round);
+	}
+	
+	public List<String> playerIds() {
+		return playerResults.stream().map(playerResult -> playerResult.getPlayer().getId().toString()).collect(toList());
 	}
 
 	private void calculateTurnScores(List<Turn> turns, Match match) {
 		for(Turn turn : turns){
 			int turnScore = turn.getDuplas().stream().mapToInt(dupla -> dupla.getScore()).sum();
 			turn.setScore(turnScore);
-			PlayerResult playerResult = match.getPlayers().stream().filter(player -> player.getPlayer().getId().toString().equals(turn.getPlayer().getId().toString())).findFirst().get();
+			PlayerResult playerResult = match.getPlayerResults().stream().filter(player -> player.getPlayer().getId().toString().equals(turn.getPlayer().getId().toString())).findFirst().get();
 			playerResult.setScore(playerResult.getScore() + turnScore);
 		}
 	}
@@ -326,11 +362,36 @@ public class Match {
 	}
 	
 	private String nicknameFrom(String playerId, Match match) {
-		return match.getPlayers().stream().filter(playerResult -> playerResult.getPlayer().getId().toString().equals(playerId))
+		return match.getPlayerResults().stream().filter(playerResult -> playerResult.getPlayer().getId().toString().equals(playerId))
 					.findFirst().get().getPlayer().getNickname();
 	}
 
 	public boolean readyToStart() {
-		return this.getPlayers().size() == this.config.getNumberOfPlayers();
+		return this.getPlayerResults().size() == this.config.getNumberOfPlayers();
 	}
+
+	public List<String> playerIdsExcept(String playerId) {
+		return this.getPlayerResults().stream().map(result -> result.getPlayer().getId().toString())
+				.filter(id -> !id.equals(playerId)).collect(Collectors.toList());
+	}
+
+	public List<Player> players() {
+		return this.getPlayerResults().stream().map(result -> result.getPlayer()).collect(Collectors.toList());
+	}
+}
+
+class PlayerResultComparator implements Comparator<PlayerResult>{
+
+	@Override
+	public int compare(PlayerResult p1, PlayerResult p2) {
+		if(p1.getScore() > p2.getScore()){
+			return 1;
+		}else{
+			if(p1.getScore() < p2.getScore()){
+				return -1;
+			}
+		}
+		return 0;
+	}
+	
 }
