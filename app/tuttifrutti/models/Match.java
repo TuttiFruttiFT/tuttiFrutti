@@ -192,15 +192,12 @@ public class Match {
 		return null;
 	}
 
-	public List<Dupla> play(Match match, String idJugador, List<Dupla> duplas, int time) {		
+	public List<Dupla> play(Match match, String playerId, List<Dupla> duplas, int time) {		
 		elasticUtil.validar(duplas,match.getLastRound().getLetter());
 		
-		this.createTurn(match,idJugador, duplas, time);
+		this.createTurn(match,playerId, duplas, time);
 		
-		promise(() -> {
-			calculateResult(match);
-			return null;
-		});
+		calculateResult(match);
 		
 		return getWrongDuplas(duplas);
 	}
