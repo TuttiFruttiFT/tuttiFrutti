@@ -3,7 +3,6 @@ package tuttifrutti.models;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.springframework.util.StringUtils.isEmpty;
-import static play.libs.F.Promise.promise;
 import static tuttifrutti.models.DuplaState.WRONG;
 import static tuttifrutti.models.MatchConfig.PUBLIC_TYPE;
 import static tuttifrutti.models.MatchState.FINISHED;
@@ -209,7 +208,7 @@ public class Match {
 	private void calculateResult(Match match) {
 		Round round = match.getLastRound();
 		List<Turn> turns = round.getTurns();
-		if(turns.size() == match.getPlayerResults().size()){
+		if(turns.size() == match.getConfig().getNumberOfPlayers()){
 			Integer minTime = getMinimumTime(turns); 
 			
 			List<Dupla> allDuplas = flatDuplasFromTurns(turns);

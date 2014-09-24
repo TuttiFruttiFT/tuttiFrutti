@@ -41,6 +41,7 @@ public class Round {
 	private ObjectId id;
 	
 	@Property("match_id")
+	@JsonProperty(value = "match_id")
 	private String matchId;
 	
 	private Integer number;
@@ -51,6 +52,7 @@ public class Round {
 	private LetterWrapper letter;
 	
 	@Property("end_time")
+	@JsonProperty(value = "end_time")
 	private Integer endTime;
 	
 	@Embedded(value = "stop_player")
