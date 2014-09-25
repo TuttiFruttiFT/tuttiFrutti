@@ -1,8 +1,10 @@
 package tuttifrutti.models;
 
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.springframework.util.StringUtils.isEmpty;
+import static play.libs.F.Promise.promise;
 import static tuttifrutti.models.DuplaState.WRONG;
 import static tuttifrutti.models.MatchConfig.PUBLIC_TYPE;
 import static tuttifrutti.models.MatchState.FINISHED;
@@ -186,8 +188,7 @@ public class Match {
 		match.getPlayerResults().add(playerResult);
 	}
 
-	public Match create(String idJugador, MatchConfig configuracion, List<String> jugadores) {
-		// TODO implementar
+	public Match create(String playerId, MatchConfig config, List<String> players) {
 		return null;
 	}
 
@@ -196,7 +197,10 @@ public class Match {
 		
 		this.createTurn(match,playerId, duplas, time);
 		
-		calculateResult(match);
+		promise(() -> {
+			calculateResult(match);
+			return null;
+		});
 		
 		return getWrongDuplas(duplas);
 	}
@@ -374,6 +378,14 @@ public class Match {
 
 	public List<Player> players() {
 		return this.getPlayerResults().stream().map(result -> result.getPlayer()).collect(Collectors.toList());
+	}
+
+	public boolean playerHasAlreadyPlayed(String playerId) {
+		List<Turn> turns = this.lastRound.getTurns();
+		if(isEmpty(turns)){
+			return false;
+		}
+		return turns.stream().anyMatch(turn -> turn.getPlayer().getId().toString().equals(playerId));
 	}
 }
 

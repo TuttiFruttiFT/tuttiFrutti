@@ -5,6 +5,7 @@ import static play.libs.Json.parse;
 import static play.libs.Json.toJson;
 import static tuttifrutti.models.MatchState.PLAYER_TURN;
 import static tuttifrutti.utils.JsonUtil.parseListToJson;
+import static tuttifrutti.utils.PushUtil.privateMatchReady;
 import static tuttifrutti.utils.PushUtil.publicMatchReady;
 import static tuttifrutti.utils.PushUtil.rejected;
 import static tuttifrutti.utils.PushUtil.rejectedByPlayer;
@@ -80,6 +81,7 @@ public class Matches extends Controller {
 		String playerId = json.get("player_id").asText();
 		JsonNode jsonConfig = json.get("config");
 		JsonNode jsonPlayers = json.get("players");
+		JsonNode jsonCategories = json.get("categories");
 		
 		MatchConfig config = fromJson(jsonConfig, MatchConfig.class);
 		List<String> players = new ArrayList<>();
@@ -90,7 +92,7 @@ public class Matches extends Controller {
 		
 		Match match = matchService.create(playerId, config,players);
 		
-		publicMatchReady(players,match);
+		privateMatchReady(players,match);
 		
         return ok(Json.toJson(match));
     }
@@ -123,14 +125,17 @@ public class Matches extends Controller {
 		String matchId = json.get("match_id").asText();
 		int time = json.get("time").asInt();
 		JsonNode jsonDuplas = json.get("duplas");
-		
 		List<Dupla> duplas = new ArrayList<>();
+		
+		Match match = matchService.match(matchId);
+		
+		if(match.playerHasAlreadyPlayed(playerId)){
+			return badRequest("Player " + playerId + " has already played.");
+		}
 		
 		for(JsonNode jsonDupla : jsonDuplas){
 			duplas.add(Json.fromJson(jsonDupla, Dupla.class));
 		}
-		
-		Match match = matchService.match(matchId);
 		
         List<Dupla> wrongDuplas = matchService.play(match,playerId, duplas, time);
         

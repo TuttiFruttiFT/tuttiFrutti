@@ -1,5 +1,6 @@
 package tuttifrutti.elastic;
 
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.elasticsearch.common.unit.Fuzziness.AUTO;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
@@ -91,7 +92,7 @@ public class ElasticUtil {
 		
 		for(Entry<String, Dupla> entry : mapDuplas.entrySet()){
 			Dupla dupla = entry.getValue();
-			if(StringUtils.isEmpty(dupla.getFinalWord())){
+			if(isEmpty(dupla.getFinalWord())){
 				dupla.setWrongState();
 			}
 		}

@@ -169,7 +169,6 @@ public class PushUtil {
 	}
 
 	private static void sendMessageTo(List<String> playerIds, Match match,PushType pushType) {
-		sendPushwooshMessage(Json.toJson(match).toString(), playerIds);
 		ObjectNode json = Json.newObject().put("type", pushType.toString()).put("match_id", match.getId().toString());
 		for(String playerId : playerIds){
 			sendPushwooshMessage(json.put("player_id", playerId).toString(), Arrays.asList(playerId));
