@@ -131,8 +131,7 @@ public class Player {
 	}
 
 	public List<Player> searchPlayers(String palabraABuscar) {
-		// TODO implementar
-		return null;
+		return mongoDatastore.find(Player.class).asList();
 	}
 
 	public List<Player> searchOthersPlayers(String idJugador) {

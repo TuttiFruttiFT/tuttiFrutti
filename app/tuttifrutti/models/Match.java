@@ -125,22 +125,26 @@ public class Match {
 			activeMatch.setCurrentRound(match.getLastRound());
 			activeMatch.setId(match.getId().toString());
 			activeMatch.setName(match.getName());
+			changeMatchStateDependingOnPlayersGame(playerId, match);
 			activeMatch.setState(match.getState().toString());
-			if(!match.getState().equals(TO_BE_APPROVED) && playerHasAlreadyPlayed(match, playerId)){
-				activeMatch.setState(OPPONENT_TURN.toString());
-			}
 			activeMatches.add(activeMatch);
 		}
 		return activeMatches;
 	}
 
-	private boolean playerHasAlreadyPlayed(Match match, String playerId) {
-		List<Turn> turns = match.getLastRound().getTurns();
-		return isNotEmpty(turns) && turns.stream().anyMatch(turn -> turn.getPlayer().getId().toString().equals(playerId));
-	}
 
-	public Match match(String matchId) {
-		return mongoDatastore.get(Match.class,new ObjectId(matchId));
+	public Match match(String matchId, String playerId) {
+		Match match = mongoDatastore.get(Match.class,new ObjectId(matchId));
+		if(playerId != null){			
+			changeMatchStateDependingOnPlayersGame(playerId, match);
+		}
+		return match;
+	}
+	
+	private void changeMatchStateDependingOnPlayersGame(String playerId,Match match) {
+		if(!match.getState().equals(TO_BE_APPROVED) && playerHasAlreadyPlayed(match, playerId)){
+			match.setState(OPPONENT_TURN);
+		}
 	}
 
 	public Match findPublicMatch(String playerId, MatchConfig config) {
@@ -386,6 +390,11 @@ public class Match {
 			return false;
 		}
 		return turns.stream().anyMatch(turn -> turn.getPlayer().getId().toString().equals(playerId));
+	}
+	
+	private boolean playerHasAlreadyPlayed(Match match, String playerId) {
+		List<Turn> turns = match.getLastRound().getTurns();
+		return isNotEmpty(turns) && turns.stream().anyMatch(turn -> turn.getPlayer().getId().toString().equals(playerId));
 	}
 }
 

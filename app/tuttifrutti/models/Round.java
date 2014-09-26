@@ -1,5 +1,7 @@
 package tuttifrutti.models;
 
+import static java.util.Collections.rotate;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -102,5 +104,11 @@ public class Round {
 		Query<Round> query = mongoDatastore.find(Round.class, "match_id =", matchId);
 		query.and(query.criteria("number").equal(roundNumber));
 		return query.get();
+	}
+
+	public void reorderTurns(String playerId) {
+		while(!this.getTurns().get(0).getPlayer().getId().toString().equals(playerId)){
+			rotate(this.getTurns(), 1);
+		}			
 	}
 }

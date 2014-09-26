@@ -46,10 +46,11 @@ public class Matches extends Controller {
 	@Autowired
 	private Datastore mongoDatastore;
 	
-	public Result getMatch(String matchId) {
-		Match match = matchService.match(matchId);
+	public Result getMatch(String matchId,String playerId) {
+		Match match = matchService.match(matchId, playerId);
 		
 		PowerUp.generate(match);
+		
         return ok(Json.toJson(match));
     }
 	
@@ -81,7 +82,7 @@ public class Matches extends Controller {
 		String playerId = json.get("player_id").asText();
 		JsonNode jsonConfig = json.get("config");
 		JsonNode jsonPlayers = json.get("players");
-		JsonNode jsonCategories = json.get("categories");
+//		JsonNode jsonCategories = json.get("categories");
 		
 		MatchConfig config = fromJson(jsonConfig, MatchConfig.class);
 		List<String> players = new ArrayList<>();
@@ -103,7 +104,7 @@ public class Matches extends Controller {
 		String playerId = json.get("player_id").asText();
 		String matchId = json.get("match_id").asText();
 		
-		Match match = matchService.match(matchId);
+		Match match = matchService.match(matchId, null);
 		match.playerReject(playerId);
 		
 		List<Player> players = match.players();
@@ -127,7 +128,7 @@ public class Matches extends Controller {
 		JsonNode jsonDuplas = json.get("duplas");
 		List<Dupla> duplas = new ArrayList<>();
 		
-		Match match = matchService.match(matchId);
+		Match match = matchService.match(matchId, playerId);
 		
 		if(match.playerHasAlreadyPlayed(playerId)){
 			return badRequest("Player " + playerId + " has already played.");
@@ -142,10 +143,11 @@ public class Matches extends Controller {
 		return ok(parse(parseListToJson(wrongDuplas)));
     }
 	
-	public Result roundResult(String matchId,Integer roundNumber){
+	public Result roundResult(String matchId,Integer roundNumber,String playerId){
 		Round round = roundService.getRound(matchId,roundNumber);
 		
 		if(round != null){
+			round.reorderTurns(playerId);
 			return ok(toJson(round));
 		}
 		
