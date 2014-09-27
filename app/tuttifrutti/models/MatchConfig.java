@@ -35,9 +35,9 @@ public class MatchConfig {
 	@JsonProperty(value = "number_of_players")
 	private Integer numberOfPlayers;
 	
-	@Property("current_number_of_players")
-	@JsonProperty(value = "current_number_of_players")
-	private int currentNumberOfPlayers;
+	@Property("current_total_number_of_players")
+	@JsonProperty(value = "current_total_number_of_players")
+	private int currentTotalNumberOfPlayers;
 	
 	private String language;
 }

@@ -179,7 +179,6 @@ public class Match {
 		playerResult.setPlayer(player);
 		playerResult.setScore(0);
 		match.getPlayerResults().add(playerResult);
-		match.getConfig().setCurrentNumberOfPlayers(match.getConfig().getCurrentNumberOfPlayers() + 1);
 	}
 
 	public Match createPrivate(String playerId, MatchConfig config, List<String> playerIds, List<String> categoryIds) {
@@ -240,7 +239,7 @@ public class Match {
 	}
 
 	private boolean isRoundOver() {
-		return this.getLastRound().getTurns().size() == this.getConfig().getCurrentNumberOfPlayers();
+		return this.getLastRound().getTurns().size() == this.getConfig().getCurrentTotalNumberOfPlayers();
 	}
 
 
@@ -288,6 +287,7 @@ public class Match {
 		config.setType(type);
 		config.setPowerUpsEnabled(true);
 		config.setRounds(25);
+		config.setCurrentTotalNumberOfPlayers(config.getNumberOfPlayers());
 		match.setConfig(config);
 		match.setName("Nombre Partida"); //TODO ver qué poner de nombre
 		match.setState(TO_BE_APPROVED);
@@ -299,7 +299,7 @@ public class Match {
 	}
 
 	private Match create(MatchConfig config, MatchType type) {
-		return this.create(config, type, categoryService.getPublicMatchCategories(config.getLanguage()), new ArrayList<PlayerResult>());
+		return create(config, type, categoryService.getPublicMatchCategories(config.getLanguage()), new ArrayList<PlayerResult>());
 	}
 	
 	private void calculateTurnScores(List<Turn> turns, Match match) {
@@ -379,7 +379,7 @@ public class Match {
 
 	private boolean thereAreMissingOpponents() {
 		MatchConfig config = this.getConfig();
-		return config.getCurrentNumberOfPlayers() < config.getNumberOfPlayers();
+		return config.getCurrentTotalNumberOfPlayers() < config.getNumberOfPlayers();
 	}
 
 

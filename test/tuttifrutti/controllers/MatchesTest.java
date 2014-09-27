@@ -17,6 +17,7 @@ import static tuttifrutti.models.enums.DuplaState.PERFECT;
 import static tuttifrutti.models.enums.DuplaState.WRONG;
 import static tuttifrutti.models.enums.MatchMode.N;
 import static tuttifrutti.models.enums.MatchState.PLAYER_TURN;
+import static tuttifrutti.models.enums.MatchState.TO_BE_APPROVED;
 import static tuttifrutti.models.enums.MatchType.PUBLIC;
 import static tuttifrutti.utils.TestUtils.createMatch;
 import static tuttifrutti.utils.TestUtils.createMatchConfig;
@@ -50,6 +51,7 @@ import tuttifrutti.models.Player;
 import tuttifrutti.models.PlayerResult;
 import tuttifrutti.models.Round;
 import tuttifrutti.models.Turn;
+import tuttifrutti.models.enums.MatchState;
 import tuttifrutti.utils.JsonUtil;
 import tuttifrutti.utils.SpringApplicationContext;
 
@@ -78,7 +80,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			
 			saveCategories(dataStore, language);
 
-			MatchConfig matchConfig = createMatchConfig(language, N, PUBLIC, 2, 1, true, 25);
+			MatchConfig matchConfig = createMatchConfig(language, N, PUBLIC, 2, true, 25);
 			Match match = createMatch(dataStore, language, lastRound,Arrays.asList(playerResult2), matchConfig);
 			
 			String playerId = player.getId().toString();
@@ -94,7 +96,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			
 			assertThat(resultMatch).isNotNull();
 			assertThat(resultMatch.getId().toString()).isEqualTo(match.getId().toString());
-			LetterWrapper letter = commonMatchAssertions(language, resultMatch);
+			LetterWrapper letter = commonMatchAssertions(language, resultMatch, PLAYER_TURN);
 			for(PlayerResult playerResult : resultMatch.getPlayerResults()){
 				Player playerAux = playerResult.getPlayer();
 				if(playerAux.getNickname().equals("SARASA2")){
@@ -138,7 +140,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			
 			Round lastRound = createRound(turn, roundNumber, R);
 			
-			MatchConfig matchConfig = createMatchConfig(language, N, PUBLIC, 2, 2, true, 25);
+			MatchConfig matchConfig = createMatchConfig(language, N, PUBLIC, 2, true, 25);
 			Match match = createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig,
 									  getCategoriesFromDuplas(duplas, language), PLAYER_TURN);
 			
@@ -164,7 +166,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 
 			saveCategories(dataStore, language);
 			
-			MatchConfig matchConfig = createMatchConfig(language, N, PUBLIC, 2, 1, true, 25);
+			MatchConfig matchConfig = createMatchConfig(language, N, PUBLIC, 2, true, 25);
 			
 			WSResponse r = WS.url("http://localhost:9000/match/public").setContentType("application/json")
 							 .post("{\"player_id\" : \"" + player.getId().toString() + "\", \"config\":" 
@@ -178,7 +180,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			
 			assertThat(resultMatch).isNotNull();
 			assertThat(resultMatch.getId()).isNotNull();
-			commonMatchAssertions(language, resultMatch);
+			commonMatchAssertions(language, resultMatch, TO_BE_APPROVED);
 		});
 	}
 	
@@ -215,7 +217,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			
 			Round lastRound = createRound(turn, roundNumber, R);
 			
-			MatchConfig matchConfig = createMatchConfig(language, N, PUBLIC, 2, 2, true, 25);
+			MatchConfig matchConfig = createMatchConfig(language, N, PUBLIC, 2, true, 25);
 			Match match = createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig,
 									  getCategoriesFromDuplas(duplas, language), PLAYER_TURN);
 			
@@ -343,7 +345,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			
 			Round lastRound = createRound(turn, roundNumber, S);
 			
-			MatchConfig matchConfig = createMatchConfig(language, N, PUBLIC, 2, 2, true, 25);
+			MatchConfig matchConfig = createMatchConfig(language, N, PUBLIC, 2, true, 25);
 			Match match = createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig,
 									  getCategoriesFromDuplas(duplas, language), PLAYER_TURN);
 			
@@ -394,8 +396,8 @@ public class MatchesTest extends ElasticSearchAwareTest {
 		}
 	}
 
-	private LetterWrapper commonMatchAssertions(String language, Match resultMatch) {
-		assertThat(resultMatch.getState()).isEqualTo(PLAYER_TURN);
+	private LetterWrapper commonMatchAssertions(String language, Match resultMatch, MatchState matchState) {
+		assertThat(resultMatch.getState()).isEqualTo(matchState);
 		assertThat(resultMatch.getConfig()).isNotNull();
 		assertThat(resultMatch.getConfig().getType()).isEqualTo(PUBLIC);
 		assertThat(resultMatch.getConfig().getMode()).isEqualTo(N);

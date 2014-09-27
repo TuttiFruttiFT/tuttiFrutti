@@ -57,7 +57,7 @@ public class PlayersTest {
 			
 			saveCategories(dataStore, language);
 
-			MatchConfig matchConfig = createMatchConfig(language, N, PUBLIC, 2, 2, true, 25);
+			MatchConfig matchConfig = createMatchConfig(language, N, PUBLIC, 2, true, 25);
 			
 			createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig);
 			createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig);
