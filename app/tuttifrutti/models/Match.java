@@ -126,7 +126,10 @@ public class Match {
 				  query.criteria("playerResults.player.id").equal(new ObjectId(playerId)));
 		for(Match match : query.asList()){
 			ActiveMatch activeMatch = new ActiveMatch();
-			activeMatch.setCurrentRound(match.getLastRound());
+			Round round = new Round();
+			round.setNumber(match.getLastRound().getNumber());
+			round.setLetter(match.getLastRound().getLetter());
+			activeMatch.setCurrentRound(round);
 			activeMatch.setId(match.getId().toString());
 			activeMatch.setName(match.getName());
 			changeMatchStateDependingOnPlayersGame(playerId, match);
