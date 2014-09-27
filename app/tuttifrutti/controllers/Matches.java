@@ -65,7 +65,7 @@ public class Matches extends Controller {
 		PowerUp.generate(match);
 		if(match.readyToStart()){
 			match.setState(PLAYER_TURN);
-			match.publicMatchReady(playerId);
+			matchService.publicMatchReady(playerId, match);
 		}
 		mongoDatastore.save(match);
         return ok(Json.toJson(match));
@@ -77,18 +77,23 @@ public class Matches extends Controller {
 		String playerId = json.get("player_id").asText();
 		JsonNode jsonConfig = json.get("config");
 		JsonNode jsonPlayers = json.get("players");
-//		JsonNode jsonCategories = json.get("categories");
+		JsonNode jsonCategories = json.get("categories");
 		
 		MatchConfig config = fromJson(jsonConfig, MatchConfig.class);
-		List<String> players = new ArrayList<>();
+		List<String> playerIds = new ArrayList<>();
+		List<String> categoryIds = new ArrayList<>();
 		
 		for(JsonNode jsonPlayer : jsonPlayers){
-			players.add(jsonPlayer.asText());
+			playerIds.add(jsonPlayer.asText());
 		}
 		
-		Match match = matchService.create(playerId, config,players);
+		for(JsonNode jsonCategory : jsonCategories){
+			categoryIds.add(jsonCategory.asText());
+		}
 		
-		match.privateMatchReady(players);
+		Match match = matchService.createPrivate(playerId, config,playerIds, playerIds);
+		
+		matchService.privateMatchReady(playerIds, match);
 		
         return ok(Json.toJson(match));
     }

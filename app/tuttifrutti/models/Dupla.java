@@ -35,7 +35,7 @@ public class Dupla implements Comparable<Dupla>{
 	
 	private DuplaState state;
 	
-	private Integer score;
+	private DuplaScore score;
 	
 	public String getWrittenWord(){
 		return writtenWord != null ? writtenWord.toLowerCase() : writtenWord;

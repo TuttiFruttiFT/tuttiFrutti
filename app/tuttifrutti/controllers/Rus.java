@@ -1,16 +1,19 @@
 package tuttifrutti.controllers;
 
+import static play.libs.Json.parse;
+import static tuttifrutti.utils.JsonUtil.parseListToJson;
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 import play.mvc.Controller;
 import play.mvc.Result;
 import tuttifrutti.models.Pack;
-import tuttifrutti.models.Player;
+import tuttifrutti.services.PlayerService;
 import tuttifrutti.utils.GoogleUtil;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * @author rfanego
@@ -18,7 +21,7 @@ import tuttifrutti.utils.GoogleUtil;
 @org.springframework.stereotype.Controller
 public class Rus extends Controller {
 	@Autowired
-	private Player playerService;
+	private PlayerService playerService;
 	
 	public Result buy(){
 		JsonNode json = request().body().asJson();
@@ -35,11 +38,8 @@ public class Rus extends Controller {
 	}
 
 	public Result packs(){
-		
 		List<Pack> packs = Pack.packs();
 		
-		//TODO ver como crear un json desde una lista
-		
-		return ok();
+		return ok(parse(parseListToJson(packs)));
 	}
 }

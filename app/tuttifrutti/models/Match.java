@@ -3,15 +3,21 @@ package tuttifrutti.models;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.joda.time.DateTime.now;
 import static org.springframework.util.StringUtils.isEmpty;
 import static play.libs.F.Promise.promise;
+import static tuttifrutti.models.DuplaScore.ALONE_SCORE;
+import static tuttifrutti.models.DuplaScore.DUPLICATE_SCORE;
+import static tuttifrutti.models.DuplaScore.UNIQUE_SCORE;
+import static tuttifrutti.models.DuplaScore.ZERO_SCORE;
 import static tuttifrutti.models.DuplaState.WRONG;
-import static tuttifrutti.models.MatchConfig.PUBLIC_TYPE;
 import static tuttifrutti.models.MatchState.FINISHED;
 import static tuttifrutti.models.MatchState.OPPONENT_TURN;
 import static tuttifrutti.models.MatchState.REJECTED;
 import static tuttifrutti.models.MatchState.TO_BE_APPROVED;
 import static tuttifrutti.models.MatchState.WAITING_FOR_OPPONENTS;
+import static tuttifrutti.models.MatchType.PRIVATE_TYPE;
+import static tuttifrutti.models.MatchType.PUBLIC_TYPE;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -24,7 +30,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import org.bson.types.ObjectId;
-import org.joda.time.DateTime;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.annotations.Embedded;
 import org.mongodb.morphia.annotations.Entity;
@@ -38,6 +43,7 @@ import org.springframework.stereotype.Component;
 import tuttifrutti.elastic.ElasticUtil;
 import tuttifrutti.models.views.ActiveMatch;
 import tuttifrutti.serializers.ObjectIdSerializer;
+import tuttifrutti.services.PlayerService;
 import tuttifrutti.utils.PushUtil;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -54,11 +60,6 @@ import com.fasterxml.jackson.databind.ser.std.DateSerializer;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Component
 public class Match {
-	private static final int ALONE_SCORE = 20;
-	private static final int UNIQUE_SCORE = 10;
-	private static final int DUPLICATE_SCORE = 5;
-	private static final int ZERO_SCORE = 0;
-	
 	@Id 
 	@JsonSerialize(using = ObjectIdSerializer.class)
 	private ObjectId id;
@@ -106,7 +107,7 @@ public class Match {
 	
 	@Transient
 	@Autowired
-	private Player playerService;
+	private PlayerService playerService;
 	
 	@Transient
 	@Autowired
@@ -136,7 +137,7 @@ public class Match {
 
 	public Match match(String matchId, String playerId) {
 		Match match = mongoDatastore.get(Match.class,new ObjectId(matchId));
-		if(playerId != null){			
+		if(playerId != null){
 			changeMatchStateDependingOnPlayersGame(playerId, match);
 		}
 		return match;
@@ -152,10 +153,10 @@ public class Match {
 		return findMatch(playerId, config, PUBLIC_TYPE);
 	}
 
-	public Match findMatch(String playerId, MatchConfig config, String type) {
+	public Match findMatch(String playerId, MatchConfig config, MatchType type) {
 		Query<Match> query = mongoDatastore.find(Match.class, "config.number_of_players =", config.getNumberOfPlayers());
 		query.and(query.criteria("config.language").equal(config.getLanguage()), 
-				  query.criteria("config.type").equal(type),
+				  query.criteria("config.type").equal(type.toString()),
 				  query.criteria("config.mode").equal(config.getMode()),
 				  query.criteria("state").equal(TO_BE_APPROVED),
 				  query.criteria("playerResults.player.id").notEqual(new ObjectId(playerId)));
@@ -163,23 +164,8 @@ public class Match {
 		return query.get();
 	}
 
-	public Match createPublic(MatchConfig matchConfig) {
-		return create(matchConfig, PUBLIC_TYPE);
-	}
-
-	public Match create(MatchConfig config, String type) {
-		Match match = new Match();
-		config.setType(type);
-		config.setPowerUpsEnabled(true);
-		config.setRounds(25);
-		match.setConfig(config);
-		match.setName("Nombre Partida"); //TODO ver qué poner de nombre
-		match.setState(TO_BE_APPROVED);
-		match.setStartDate(DateTime.now().toDate());
-		match.setCategories(categoryService.getPublicMatchCategories(config.getLanguage()));
-		match.setPlayerResults(new ArrayList<>());
-		roundService.create(match);
-		return match;
+	public Match createPublic(MatchConfig config) {
+		return create(config, PUBLIC_TYPE);
 	}
 
 	public void addPlayer(Match match, String playerId) {
@@ -194,8 +180,8 @@ public class Match {
 		match.getConfig().setCurrentNumberOfPlayers(match.getConfig().getCurrentNumberOfPlayers() + 1);
 	}
 
-	public Match create(String playerId, MatchConfig config, List<String> players) {
-		return null;
+	public Match createPrivate(String playerId, MatchConfig config, List<String> playerIds, List<String> categoryIds) {
+		return create(config, PRIVATE_TYPE,playerService.playersFromIds(playerIds),categoryService.categoriesFromIds(categoryIds));
 	}
 
 	public List<Dupla> play(Match match, String playerId, List<Dupla> duplas, int time) {		
@@ -227,7 +213,7 @@ public class Match {
 			Round round = match.getLastRound();
 			List<Turn> turns = round.getTurns();
 			
-			Integer minTime = getMinimumTime(turns); 
+			Integer minTime = getMinimumTime(turns);
 			
 			List<Dupla> allDuplas = flatDuplasFromTurns(turns);
 			
@@ -242,12 +228,12 @@ public class Match {
 			if(matchIsFinished(match, round)){
 				match.calculateWinner();
 				match.setState(FINISHED);
-				mongoDatastore.save(match);
 				pushUtil.matchResult(match);
 			}else{				
 				roundService.create(match);
 				pushUtil.roundResult(match,round.getNumber());
 			}
+			mongoDatastore.save(match);
 		}
 	}
 
@@ -295,9 +281,28 @@ public class Match {
 		return playerResults.stream().map(playerResult -> playerResult.getPlayer().getId().toString()).collect(toList());
 	}
 
+	private Match create(MatchConfig config, MatchType type,List<Category> categories,List<PlayerResult> playerResults) {
+		Match match = new Match();
+		config.setType(type);
+		config.setPowerUpsEnabled(true);
+		config.setRounds(25);
+		match.setConfig(config);
+		match.setName("Nombre Partida"); //TODO ver qué poner de nombre
+		match.setState(TO_BE_APPROVED);
+		match.setStartDate(now().toDate());
+		match.setCategories(categories);
+		match.setPlayerResults(playerResults);
+		roundService.create(match);
+		return match;
+	}
+
+	private Match create(MatchConfig config, MatchType type) {
+		return this.create(config, type, categoryService.getPublicMatchCategories(config.getLanguage()), new ArrayList<>());
+	}
+	
 	private void calculateTurnScores(List<Turn> turns, Match match) {
 		for(Turn turn : turns){
-			int turnScore = turn.getDuplas().stream().mapToInt(dupla -> dupla.getScore()).sum();
+			int turnScore = turn.getDuplas().stream().mapToInt(dupla -> dupla.getScore().getScore()).sum();
 			turn.setScore(turnScore);
 			PlayerResult playerResult = match.getPlayerResults().stream().filter(player -> player.getPlayer().getId().toString().equals(turn.getPlayer().getId().toString())).findFirst().get();
 			playerResult.setScore(playerResult.getScore() + turnScore);
@@ -422,13 +427,13 @@ public class Match {
 	}
 
 
-	public void publicMatchReady(String playerId) {
-		pushUtil.publicMatchReady(this.playerIdsExcept(playerId),this);
+	public void publicMatchReady(String playerId, Match match) {
+		pushUtil.publicMatchReady(match.playerIdsExcept(playerId),match);
 	}
 
 
-	public void privateMatchReady(List<String> players) {
-		pushUtil.privateMatchReady(players, this);
+	public void privateMatchReady(List<String> players, Match match) {
+		pushUtil.privateMatchReady(players, match);
 	}
 }
 

@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import play.mvc.Controller;
 import play.mvc.Result;
 import tuttifrutti.models.Player;
+import tuttifrutti.services.PlayerService;
 
 /**
  * @author rfanego
@@ -18,7 +19,7 @@ import tuttifrutti.models.Player;
 @org.springframework.stereotype.Controller
 public class Searches extends Controller {
 	@Autowired
-	private Player playerService;
+	private PlayerService playerService;
 	
 	public Result searchPlayers(String playerId,String palabraABuscar) {
 		List<Player> players = new ArrayList<>();

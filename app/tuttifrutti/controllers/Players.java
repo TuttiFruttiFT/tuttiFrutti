@@ -18,6 +18,7 @@ import tuttifrutti.models.Device;
 import tuttifrutti.models.Match;
 import tuttifrutti.models.Player;
 import tuttifrutti.models.views.ActiveMatch;
+import tuttifrutti.services.PlayerService;
 import tuttifrutti.utils.FacebookUtil;
 import tuttifrutti.utils.JsonUtil;
 import tuttifrutti.utils.PushUtil;
@@ -30,7 +31,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 @org.springframework.stereotype.Controller
 public class Players extends Controller {
 	@Autowired
-	private Player playerService;
+	private PlayerService playerService;
 	
 	@Autowired
 	private Match matchService;

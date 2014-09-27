@@ -16,7 +16,9 @@ import tuttifrutti.models.Letter;
 import tuttifrutti.models.LetterWrapper;
 import tuttifrutti.models.Match;
 import tuttifrutti.models.MatchConfig;
+import tuttifrutti.models.MatchMode;
 import tuttifrutti.models.MatchState;
+import tuttifrutti.models.MatchType;
 import tuttifrutti.models.Player;
 import tuttifrutti.models.PlayerResult;
 import tuttifrutti.models.Round;
@@ -87,7 +89,7 @@ public class TestUtils {
 		return player;
 	}
 	
-	public static MatchConfig createMatchConfig(String language, String mode, String type, int numberOfPlayers, int currentNumberOfPlayers, boolean powerUpsEnabled, int numberOfRounds) {
+	public static MatchConfig createMatchConfig(String language, MatchMode mode, MatchType type, int numberOfPlayers, int currentNumberOfPlayers, boolean powerUpsEnabled, int numberOfRounds) {
 		MatchConfig matchConfig = new MatchConfig();
 		matchConfig.setLanguage(language);
 		matchConfig.setMode(mode);

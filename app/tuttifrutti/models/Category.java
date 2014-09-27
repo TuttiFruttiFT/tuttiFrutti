@@ -1,6 +1,8 @@
 package tuttifrutti.models;
 
-import java.util.Collections;
+import static java.util.Collections.shuffle;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+
 import java.util.List;
 import java.util.Random;
 
@@ -8,7 +10,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import org.apache.commons.lang3.StringUtils;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
@@ -54,7 +55,7 @@ public class Category {
 	}
 	
 	public List<Category> categories(String language) {
-		if(StringUtils.isEmpty(language)){
+		if(isEmpty(language)){
 			language = "ES";
 		}
 		Query<Category> query = mongoDatastore.find(Category.class, "language =", language);
@@ -63,7 +64,11 @@ public class Category {
 
 	public List<Category> getPublicMatchCategories(String language) {
 		List<Category> categories = this.categories(language);
-		Collections.shuffle(categories, new Random());
+		shuffle(categories, new Random());
 		return categories.subList(0, DEFAULT_CATEGORIES_NUMBER);
+	}
+
+	public List<PlayerResult> categoriesFromIds(List<String> categoryIds) {
+		return null;
 	}
 }
