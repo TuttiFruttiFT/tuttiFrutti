@@ -6,18 +6,18 @@ import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.joda.time.DateTime.now;
 import static org.springframework.util.StringUtils.isEmpty;
 import static play.libs.F.Promise.promise;
-import static tuttifrutti.models.DuplaScore.ALONE_SCORE;
-import static tuttifrutti.models.DuplaScore.DUPLICATE_SCORE;
-import static tuttifrutti.models.DuplaScore.UNIQUE_SCORE;
-import static tuttifrutti.models.DuplaScore.ZERO_SCORE;
-import static tuttifrutti.models.DuplaState.WRONG;
-import static tuttifrutti.models.MatchState.FINISHED;
-import static tuttifrutti.models.MatchState.OPPONENT_TURN;
-import static tuttifrutti.models.MatchState.REJECTED;
-import static tuttifrutti.models.MatchState.TO_BE_APPROVED;
-import static tuttifrutti.models.MatchState.WAITING_FOR_OPPONENTS;
-import static tuttifrutti.models.MatchType.PRIVATE_TYPE;
-import static tuttifrutti.models.MatchType.PUBLIC_TYPE;
+import static tuttifrutti.models.enums.DuplaScore.ALONE_SCORE;
+import static tuttifrutti.models.enums.DuplaScore.DUPLICATE_SCORE;
+import static tuttifrutti.models.enums.DuplaScore.UNIQUE_SCORE;
+import static tuttifrutti.models.enums.DuplaScore.ZERO_SCORE;
+import static tuttifrutti.models.enums.DuplaState.WRONG;
+import static tuttifrutti.models.enums.MatchState.FINISHED;
+import static tuttifrutti.models.enums.MatchState.OPPONENT_TURN;
+import static tuttifrutti.models.enums.MatchState.REJECTED;
+import static tuttifrutti.models.enums.MatchState.TO_BE_APPROVED;
+import static tuttifrutti.models.enums.MatchState.WAITING_FOR_OPPONENTS;
+import static tuttifrutti.models.enums.MatchType.PRIVATE;
+import static tuttifrutti.models.enums.MatchType.PUBLIC;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -41,6 +41,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import tuttifrutti.elastic.ElasticUtil;
+import tuttifrutti.models.enums.MatchState;
+import tuttifrutti.models.enums.MatchType;
 import tuttifrutti.models.views.ActiveMatch;
 import tuttifrutti.serializers.ObjectIdSerializer;
 import tuttifrutti.services.PlayerService;
@@ -150,7 +152,7 @@ public class Match {
 	}
 
 	public Match findPublicMatch(String playerId, MatchConfig config) {
-		return findMatch(playerId, config, PUBLIC_TYPE);
+		return findMatch(playerId, config, PUBLIC);
 	}
 
 	public Match findMatch(String playerId, MatchConfig config, MatchType type) {
@@ -165,7 +167,7 @@ public class Match {
 	}
 
 	public Match createPublic(MatchConfig config) {
-		return create(config, PUBLIC_TYPE);
+		return create(config, PUBLIC);
 	}
 
 	public void addPlayer(Match match, String playerId) {
@@ -181,7 +183,7 @@ public class Match {
 	}
 
 	public Match createPrivate(String playerId, MatchConfig config, List<String> playerIds, List<String> categoryIds) {
-		return create(config, PRIVATE_TYPE,playerService.playersFromIds(playerIds),categoryService.categoriesFromIds(categoryIds));
+		return create(config, PRIVATE,playerService.playersFromIds(playerIds),categoryService.categoriesFromIds(categoryIds));
 	}
 
 	public List<Dupla> play(Match match, String playerId, List<Dupla> duplas, int time) {		
@@ -256,7 +258,7 @@ public class Match {
 			
 			if(!categoryDuplas.isEmpty()){
 				if(categoryDuplas.size() == 1){
-					categoryDuplas.get(0).setScore(ALONE_SCORE);
+					categoryDuplas.get(0).setScore(ALONE_SCORE.getScore());
 				}else{
 					comparingAndScoring(categoryDuplas);
 				}
@@ -297,12 +299,12 @@ public class Match {
 	}
 
 	private Match create(MatchConfig config, MatchType type) {
-		return this.create(config, type, categoryService.getPublicMatchCategories(config.getLanguage()), new ArrayList<>());
+		return this.create(config, type, categoryService.getPublicMatchCategories(config.getLanguage()), new ArrayList<PlayerResult>());
 	}
 	
 	private void calculateTurnScores(List<Turn> turns, Match match) {
 		for(Turn turn : turns){
-			int turnScore = turn.getDuplas().stream().mapToInt(dupla -> dupla.getScore().getScore()).sum();
+			int turnScore = turn.getDuplas().stream().mapToInt(dupla -> dupla.getScore()).sum();
 			turn.setScore(turnScore);
 			PlayerResult playerResult = match.getPlayerResults().stream().filter(player -> player.getPlayer().getId().toString().equals(turn.getPlayer().getId().toString())).findFirst().get();
 			playerResult.setScore(playerResult.getScore() + turnScore);
@@ -324,7 +326,7 @@ public class Match {
 	}
 
 	private void scoreEmptyWrongAndOutOfTimeDuplas(List<Dupla> categoryDuplas, Integer minTime) {
-		categoryDuplas.stream().filter(emptyWrongAndOutOfTime(minTime)).forEach(dupla -> dupla.setScore(ZERO_SCORE));
+		categoryDuplas.stream().filter(emptyWrongAndOutOfTime(minTime)).forEach(dupla -> dupla.setScore(ZERO_SCORE.getScore()));
 	}
 	
 	private List<Dupla> filterEmptyWrongAndOutOfTimeDuplas(List<Dupla> allDuplas,Integer minTime) {
@@ -343,20 +345,20 @@ public class Match {
 		Dupla dupla = validDuplas.get(0);
 		for(Dupla otherDupla : validDuplas.subList(1, validDuplas.size())){
 			if(dupla.getFinalWord().equals(otherDupla.getFinalWord())){
-				dupla.setScore(DUPLICATE_SCORE);
-				otherDupla.setScore(DUPLICATE_SCORE);
+				dupla.setScore(DUPLICATE_SCORE.getScore());
+				otherDupla.setScore(DUPLICATE_SCORE.getScore());
 			}
 		}
 		
 		if(dupla.getScore() == null){
-			dupla.setScore(UNIQUE_SCORE);
+			dupla.setScore(UNIQUE_SCORE.getScore());
 		}
 		
 		validDuplas.remove(0);
 		if(validDuplas.size() == 1){
 			Dupla remainingDupla = validDuplas.get(0); 
 			if(remainingDupla.getScore() == null){
-				remainingDupla.setScore(UNIQUE_SCORE);
+				remainingDupla.setScore(UNIQUE_SCORE.getScore());
 			}
 			return;
 		}

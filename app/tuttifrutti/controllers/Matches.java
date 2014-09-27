@@ -3,7 +3,7 @@ package tuttifrutti.controllers;
 import static play.libs.Json.fromJson;
 import static play.libs.Json.parse;
 import static play.libs.Json.toJson;
-import static tuttifrutti.models.MatchState.PLAYER_TURN;
+import static tuttifrutti.models.enums.MatchState.PLAYER_TURN;
 import static tuttifrutti.utils.JsonUtil.parseListToJson;
 
 import java.util.ArrayList;

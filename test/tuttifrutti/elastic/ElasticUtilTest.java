@@ -4,8 +4,8 @@ import static org.fest.assertions.Assertions.assertThat;
 import static play.test.Helpers.fakeApplication;
 import static play.test.Helpers.running;
 import static play.test.Helpers.testServer;
-import static tuttifrutti.models.DuplaState.CORRECTED;
-import static tuttifrutti.models.DuplaState.WRONG;
+import static tuttifrutti.models.enums.DuplaState.CORRECTED;
+import static tuttifrutti.models.enums.DuplaState.WRONG;
 
 import java.util.ArrayList;
 import java.util.List;

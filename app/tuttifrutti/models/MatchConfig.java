@@ -6,6 +6,9 @@ import lombok.Setter;
 import org.mongodb.morphia.annotations.Embedded;
 import org.mongodb.morphia.annotations.Property;
 
+import tuttifrutti.models.enums.MatchMode;
+import tuttifrutti.models.enums.MatchType;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;

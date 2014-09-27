@@ -1,13 +1,15 @@
 package tuttifrutti.models;
 
-import static tuttifrutti.models.DuplaState.CORRECTED;
-import static tuttifrutti.models.DuplaState.PERFECT;
-import static tuttifrutti.models.DuplaState.WRONG;
+import static tuttifrutti.models.enums.DuplaState.CORRECTED;
+import static tuttifrutti.models.enums.DuplaState.PERFECT;
+import static tuttifrutti.models.enums.DuplaState.WRONG;
 import lombok.Getter;
 import lombok.Setter;
 
 import org.mongodb.morphia.annotations.Embedded;
 import org.mongodb.morphia.annotations.Property;
+
+import tuttifrutti.models.enums.DuplaState;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -35,7 +37,7 @@ public class Dupla implements Comparable<Dupla>{
 	
 	private DuplaState state;
 	
-	private DuplaScore score;
+	private Integer score;
 	
 	public String getWrittenWord(){
 		return writtenWord != null ? writtenWord.toLowerCase() : writtenWord;

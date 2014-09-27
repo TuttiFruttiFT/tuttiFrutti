@@ -1,7 +1,7 @@
 package tuttifrutti.utils;
 
 import static java.util.stream.Collectors.toList;
-import static tuttifrutti.models.MatchState.TO_BE_APPROVED;
+import static tuttifrutti.models.enums.MatchState.TO_BE_APPROVED;
 
 import java.util.List;
 
@@ -11,18 +11,18 @@ import org.mongodb.morphia.Datastore;
 
 import tuttifrutti.models.Category;
 import tuttifrutti.models.Dupla;
-import tuttifrutti.models.DuplaState;
 import tuttifrutti.models.Letter;
 import tuttifrutti.models.LetterWrapper;
 import tuttifrutti.models.Match;
 import tuttifrutti.models.MatchConfig;
-import tuttifrutti.models.MatchMode;
-import tuttifrutti.models.MatchState;
-import tuttifrutti.models.MatchType;
 import tuttifrutti.models.Player;
 import tuttifrutti.models.PlayerResult;
 import tuttifrutti.models.Round;
 import tuttifrutti.models.Turn;
+import tuttifrutti.models.enums.DuplaState;
+import tuttifrutti.models.enums.MatchMode;
+import tuttifrutti.models.enums.MatchState;
+import tuttifrutti.models.enums.MatchType;
 
 public class TestUtils {
 	public static List<Category> getCategoriesFromDuplas(List<Dupla> duplas, String language) {

@@ -6,18 +6,18 @@ import static play.test.Helpers.fakeApplication;
 import static play.test.Helpers.running;
 import static play.test.Helpers.testServer;
 import static tuttifrutti.models.Category.DEFAULT_CATEGORIES_NUMBER;
-import static tuttifrutti.models.DuplaScore.ALONE_SCORE;
-import static tuttifrutti.models.DuplaScore.UNIQUE_SCORE;
-import static tuttifrutti.models.DuplaScore.ZERO_SCORE;
-import static tuttifrutti.models.DuplaState.CORRECTED;
-import static tuttifrutti.models.DuplaState.PERFECT;
-import static tuttifrutti.models.DuplaState.WRONG;
 import static tuttifrutti.models.Letter.A;
 import static tuttifrutti.models.Letter.R;
 import static tuttifrutti.models.Letter.S;
-import static tuttifrutti.models.MatchMode.NORMAL_MODE;
-import static tuttifrutti.models.MatchState.PLAYER_TURN;
-import static tuttifrutti.models.MatchType.PUBLIC_TYPE;
+import static tuttifrutti.models.enums.DuplaScore.ALONE_SCORE;
+import static tuttifrutti.models.enums.DuplaScore.UNIQUE_SCORE;
+import static tuttifrutti.models.enums.DuplaScore.ZERO_SCORE;
+import static tuttifrutti.models.enums.DuplaState.CORRECTED;
+import static tuttifrutti.models.enums.DuplaState.PERFECT;
+import static tuttifrutti.models.enums.DuplaState.WRONG;
+import static tuttifrutti.models.enums.MatchMode.N;
+import static tuttifrutti.models.enums.MatchState.PLAYER_TURN;
+import static tuttifrutti.models.enums.MatchType.PUBLIC;
 import static tuttifrutti.utils.TestUtils.createMatch;
 import static tuttifrutti.utils.TestUtils.createMatchConfig;
 import static tuttifrutti.utils.TestUtils.createRound;
@@ -78,7 +78,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			
 			saveCategories(dataStore, language);
 
-			MatchConfig matchConfig = createMatchConfig(language, NORMAL_MODE, PUBLIC_TYPE, 2, 1, true, 25);
+			MatchConfig matchConfig = createMatchConfig(language, N, PUBLIC, 2, 1, true, 25);
 			Match match = createMatch(dataStore, language, lastRound,Arrays.asList(playerResult2), matchConfig);
 			
 			String playerId = player.getId().toString();
@@ -105,7 +105,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 		});
 	}
 	
-	//@Test
+	@Test
 	public void searchPublicMatchReturnsANewOneBecauseTheyAreAllStarted() {
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
 			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
@@ -138,7 +138,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			
 			Round lastRound = createRound(turn, roundNumber, R);
 			
-			MatchConfig matchConfig = createMatchConfig(language, NORMAL_MODE, PUBLIC_TYPE, 2, 2, true, 25);
+			MatchConfig matchConfig = createMatchConfig(language, N, PUBLIC, 2, 2, true, 25);
 			Match match = createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig,
 									  getCategoriesFromDuplas(duplas, language), PLAYER_TURN);
 			
@@ -155,7 +155,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 		});
 	}
 
-	//@Test
+	@Test
 	public void searchPublicMatchReturnsCreatedMatch() {
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
 			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
@@ -164,7 +164,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 
 			saveCategories(dataStore, language);
 			
-			MatchConfig matchConfig = createMatchConfig(language, NORMAL_MODE, PUBLIC_TYPE, 2, 1, true, 25);
+			MatchConfig matchConfig = createMatchConfig(language, N, PUBLIC, 2, 1, true, 25);
 			
 			WSResponse r = WS.url("http://localhost:9000/match/public").setContentType("application/json")
 							 .post("{\"player_id\" : \"" + player.getId().toString() + "\", \"config\":" 
@@ -182,7 +182,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 		});
 	}
 	
-	//@Test
+	@Test
 	public void turnWithTwoPlayers() {
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
 			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
@@ -215,7 +215,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			
 			Round lastRound = createRound(turn, roundNumber, R);
 			
-			MatchConfig matchConfig = createMatchConfig(language, NORMAL_MODE, PUBLIC_TYPE, 2, 2, true, 25);
+			MatchConfig matchConfig = createMatchConfig(language, N, PUBLIC, 2, 2, true, 25);
 			Match match = createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig,
 									  getCategoriesFromDuplas(duplas, language), PLAYER_TURN);
 			
@@ -263,19 +263,19 @@ public class MatchesTest extends ElasticSearchAwareTest {
 					assertThat(modifiedTurn.getScore()).isEqualTo(50);
 					for(Dupla modifiedDupla : modifiedTurn.getDuplas()){
 						if(modifiedDupla.getCategory().getId().equals("bands")){
-							assertThat(modifiedDupla.getScore()).isEqualTo(UNIQUE_SCORE);
+							assertThat(modifiedDupla.getScore()).isEqualTo(UNIQUE_SCORE.getScore());
 						}
 						
 						if(modifiedDupla.getCategory().getId().equals("colors")){
-							assertThat(modifiedDupla.getScore()).isEqualTo(ZERO_SCORE);
+							assertThat(modifiedDupla.getScore()).isEqualTo(ZERO_SCORE.getScore());
 						}
 						
 						if(modifiedDupla.getCategory().getId().equals("meals")){
-							assertThat(modifiedDupla.getScore()).isEqualTo(ALONE_SCORE);
+							assertThat(modifiedDupla.getScore()).isEqualTo(ALONE_SCORE.getScore());
 						}
 						
 						if(modifiedDupla.getCategory().getId().equals("countries")){
-							assertThat(modifiedDupla.getScore()).isEqualTo(ALONE_SCORE);
+							assertThat(modifiedDupla.getScore()).isEqualTo(ALONE_SCORE.getScore());
 						}
 					}
 				}
@@ -285,19 +285,19 @@ public class MatchesTest extends ElasticSearchAwareTest {
 					assertThat(modifiedTurn.getScore()).isEqualTo(30);
 					for(Dupla modifiedDupla : modifiedTurn.getDuplas()){
 						if(modifiedDupla.getCategory().getId().equals("bands")){
-							assertThat(modifiedDupla.getScore()).isEqualTo(UNIQUE_SCORE);
+							assertThat(modifiedDupla.getScore()).isEqualTo(UNIQUE_SCORE.getScore());
 						}
 						
 						if(modifiedDupla.getCategory().getId().equals("colors")){
-							assertThat(modifiedDupla.getScore()).isEqualTo(ALONE_SCORE);
+							assertThat(modifiedDupla.getScore()).isEqualTo(ALONE_SCORE.getScore());
 						}
 						
 						if(modifiedDupla.getCategory().getId().equals("meals")){
-							assertThat(modifiedDupla.getScore()).isEqualTo(ZERO_SCORE);
+							assertThat(modifiedDupla.getScore()).isEqualTo(ZERO_SCORE.getScore());
 						}
 						
 						if(modifiedDupla.getCategory().getId().equals("countries")){
-							assertThat(modifiedDupla.getScore()).isEqualTo(ZERO_SCORE);
+							assertThat(modifiedDupla.getScore()).isEqualTo(ZERO_SCORE.getScore());
 						}
 					}
 				}
@@ -305,7 +305,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 		});
 	}
 	
-	//@Test
+	@Test
 	public void turnWithThreePlayers() { //TODO
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
 			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
@@ -343,7 +343,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			
 			Round lastRound = createRound(turn, roundNumber, S);
 			
-			MatchConfig matchConfig = createMatchConfig(language, NORMAL_MODE, PUBLIC_TYPE, 2, 2, true, 25);
+			MatchConfig matchConfig = createMatchConfig(language, N, PUBLIC, 2, 2, true, 25);
 			Match match = createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig,
 									  getCategoriesFromDuplas(duplas, language), PLAYER_TURN);
 			
@@ -397,8 +397,8 @@ public class MatchesTest extends ElasticSearchAwareTest {
 	private LetterWrapper commonMatchAssertions(String language, Match resultMatch) {
 		assertThat(resultMatch.getState()).isEqualTo(PLAYER_TURN);
 		assertThat(resultMatch.getConfig()).isNotNull();
-		assertThat(resultMatch.getConfig().getType()).isEqualTo(PUBLIC_TYPE);
-		assertThat(resultMatch.getConfig().getMode()).isEqualTo(NORMAL_MODE);
+		assertThat(resultMatch.getConfig().getType()).isEqualTo(PUBLIC);
+		assertThat(resultMatch.getConfig().getMode()).isEqualTo(N);
 		assertThat(resultMatch.getConfig().getLanguage()).isEqualTo(language);
 		assertThat(resultMatch.getConfig().getNumberOfPlayers()).isEqualTo(2);
 		assertThat(resultMatch.getCategories().size()).isEqualTo(DEFAULT_CATEGORIES_NUMBER);

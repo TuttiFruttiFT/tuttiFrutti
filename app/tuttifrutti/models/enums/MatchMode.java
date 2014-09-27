@@ -1,25 +1,26 @@
-package tuttifrutti.models;
+package tuttifrutti.models.enums;
 
 import lombok.Getter;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 @Getter
-public enum MatchType {
-	PUBLIC_TYPE("PUBLIC"),
-
-	PRIVATE_TYPE("PRIVATE");
-
+@JsonFormat(shape=JsonFormat.Shape.OBJECT)
+public enum MatchMode {
+	Q("Q"),
+	N("N");
+	
 	private String name;
 	
-	MatchType(String name){
+	MatchMode(String name){
 		this.name = name;
 	}
 	
 	@JsonCreator
-	public MatchType forValue(String value) {
-	    return MatchType.valueOf(value);
+	public MatchMode forValue(String value) {
+	    return valueOf(value);
 	}
 	
 	@JsonValue

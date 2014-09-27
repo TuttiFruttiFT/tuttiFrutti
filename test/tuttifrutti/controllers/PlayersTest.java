@@ -5,9 +5,9 @@ import static play.mvc.Http.Status.OK;
 import static play.test.Helpers.fakeApplication;
 import static play.test.Helpers.running;
 import static play.test.Helpers.testServer;
-import static tuttifrutti.models.MatchMode.NORMAL_MODE;
-import static tuttifrutti.models.MatchState.FINISHED;
-import static tuttifrutti.models.MatchType.PUBLIC_TYPE;
+import static tuttifrutti.models.enums.MatchMode.N;
+import static tuttifrutti.models.enums.MatchState.FINISHED;
+import static tuttifrutti.models.enums.MatchType.PUBLIC;
 import static tuttifrutti.utils.TestUtils.createMatch;
 import static tuttifrutti.utils.TestUtils.createMatchConfig;
 import static tuttifrutti.utils.TestUtils.saveCategories;
@@ -57,7 +57,7 @@ public class PlayersTest {
 			
 			saveCategories(dataStore, language);
 
-			MatchConfig matchConfig = createMatchConfig(language, NORMAL_MODE, PUBLIC_TYPE, 2, 2, true, 25);
+			MatchConfig matchConfig = createMatchConfig(language, N, PUBLIC, 2, 2, true, 25);
 			
 			createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig);
 			createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig);
