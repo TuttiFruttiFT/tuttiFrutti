@@ -18,7 +18,7 @@ POST	/player/:playerId/powerup/:idPowerUp	    @tuttifrutti.controllers.Players.p
 
 POST	/player/device								@tuttifrutti.controllers.Players.registerDevice()
 
-GET		/match/:matchId							    @tuttifrutti.controllers.Matches.getMatch(matchId,playerId ?= null)
+GET		/match/:matchId							    @tuttifrutti.controllers.Matches.getMatch(matchId,player_id ?= null)
 
 POST	/match/public								@tuttifrutti.controllers.Matches.publicMatch()
 
