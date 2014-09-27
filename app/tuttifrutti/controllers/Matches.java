@@ -5,10 +5,6 @@ import static play.libs.Json.parse;
 import static play.libs.Json.toJson;
 import static tuttifrutti.models.MatchState.PLAYER_TURN;
 import static tuttifrutti.utils.JsonUtil.parseListToJson;
-import static tuttifrutti.utils.PushUtil.privateMatchReady;
-import static tuttifrutti.utils.PushUtil.publicMatchReady;
-import static tuttifrutti.utils.PushUtil.rejected;
-import static tuttifrutti.utils.PushUtil.rejectedByPlayer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +20,6 @@ import play.mvc.Result;
 import tuttifrutti.models.Dupla;
 import tuttifrutti.models.Match;
 import tuttifrutti.models.MatchConfig;
-import tuttifrutti.models.Player;
 import tuttifrutti.models.PowerUp;
 import tuttifrutti.models.ResultModel;
 import tuttifrutti.models.Round;
@@ -70,7 +65,7 @@ public class Matches extends Controller {
 		PowerUp.generate(match);
 		if(match.readyToStart()){
 			match.setState(PLAYER_TURN);
-			publicMatchReady(match.playerIdsExcept(playerId),match);
+			match.publicMatchReady(playerId);
 		}
 		mongoDatastore.save(match);
         return ok(Json.toJson(match));
@@ -93,7 +88,7 @@ public class Matches extends Controller {
 		
 		Match match = matchService.create(playerId, config,players);
 		
-		privateMatchReady(players,match);
+		match.privateMatchReady(players);
 		
         return ok(Json.toJson(match));
     }
@@ -104,17 +99,8 @@ public class Matches extends Controller {
 		String playerId = json.get("player_id").asText();
 		String matchId = json.get("match_id").asText();
 		
-		Match match = matchService.match(matchId, null);
+		Match match = matchService.match(matchId, playerId);
 		match.playerReject(playerId);
-		
-		List<Player> players = match.players();
-		
-		if(players.size() == 1){
-			match.rejected();
-			rejected(players,match);
-		}else{
-			rejectedByPlayer(players,playerId,match);
-		}
 		
 		return ok();
 	}

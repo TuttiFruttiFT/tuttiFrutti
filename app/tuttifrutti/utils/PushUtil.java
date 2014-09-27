@@ -37,25 +37,25 @@ public class PushUtil {
     private static final Integer ANDROID_DEVICE_TYPE = 3;
     private static final Integer RETRIES_NUMBER = 5;
 
-	public static void publicMatchReady(List<String> playerIds, Match match) {
+	public void publicMatchReady(List<String> playerIds, Match match) {
 		promise(() -> {
 			sendMessageTo(playerIds, match,PUBLIC_MATCH_READY);
 			return null;
 		});
 	}
 
-	public static void privateMatchReady(List<String> playerIds, Match match) {
+	public void privateMatchReady(List<String> playerIds, Match match) {
 		promise(() -> {
 			sendMessageTo(playerIds, match,PRIVATE_MATCH_READY);
 			return null;
 		});
 	}
 	
-	public static void rejected(List<Player> players, Match match) {
+	public void rejected(List<Player> players, Match match) {
 		// TODO implementar
 	}
 
-	public static void rejectedByPlayer(List<Player> players, String playerId, Match match) {
+	public void rejectedByPlayer(List<Player> players, String playerId, Match match) {
 		// TODO implementar
 	}
 
@@ -78,7 +78,7 @@ public class PushUtil {
 		});
 	}
 	
-	private static void sendPushwooshMessage(String jsonData,List<String> playerIds){
+	private void sendPushwooshMessage(String jsonData,List<String> playerIds){
 		ArrayNode notifications = Json.newObject().arrayNode();
 		notifications.add(Json.newObject().put("send_date", "now").put("data", jsonData));
 		JsonNode requestBody = Json.newObject().put("auth", AUTH_TOKEN).put("devices_filter",playerPushTags(playerIds))
@@ -104,7 +104,7 @@ public class PushUtil {
 		Logger.error("Could not send message " + jsonData + " to players " + StringUtils.join(playerIds, ","));
 	}
 
-	public static void registerDevice(String pushToken,String hardwareId,String language){
+	public void registerDevice(String pushToken,String hardwareId,String language){
 		ObjectNode registerJsonBody = Json.newObject();
 		registerJsonBody.put("application", APPLICATION_CODE);
 		registerJsonBody.put("push_token", pushToken);
@@ -119,7 +119,7 @@ public class PushUtil {
 		processPushResponse(r, "registering device with hwid " + hardwareId);
 	}
 	
-	public static void setTag(String hardwareId,String playerId){
+	public void setTag(String hardwareId,String playerId){
 		ObjectNode tagJson = Json.newObject().put("player_id", playerId);
 		ObjectNode jsonBody = Json.newObject();
 		jsonBody.put("application", APPLICATION_CODE);
@@ -132,7 +132,7 @@ public class PushUtil {
 		processPushResponse(r, "set tag for player " + playerId);
 	}
 
-	public static void unRegisterDevice(String hardwareId) {
+	public void unRegisterDevice(String hardwareId) {
 		ObjectNode jsonBody = Json.newObject();
 		jsonBody.put("application", APPLICATION_CODE);
 		jsonBody.put("hwid", hardwareId);
@@ -143,7 +143,7 @@ public class PushUtil {
 		processPushResponse(r, "unregistering device with hwid " + hardwareId);
 	}
 	
-	private static void processPushResponse(WSResponse r, String partialErrorMessage) {
+	private void processPushResponse(WSResponse r, String partialErrorMessage) {
 		if(r.getStatus() == Status.OK){
 			JsonNode response = r.asJson();
 			Integer statusCode = response.get("status_code").asInt();
@@ -160,7 +160,7 @@ public class PushUtil {
 		throw new RuntimeException(errorMessage);
 	}
 	
-	private static String playerPushTags(List<String> playerIds) {
+	private String playerPushTags(List<String> playerIds) {
 		List<String> tags = new ArrayList<>();
 		for(String playerId : playerIds){
 			tags.add(String.format("T(\"playerId\", EQ, \"%s\")", playerId));
@@ -168,7 +168,7 @@ public class PushUtil {
 		return StringUtils.join(tags," + ");
 	}
 
-	private static void sendMessageTo(List<String> playerIds, Match match,PushType pushType) {
+	private void sendMessageTo(List<String> playerIds, Match match,PushType pushType) {
 		ObjectNode json = Json.newObject().put("type", pushType.toString()).put("match_id", match.getId().toString());
 		for(String playerId : playerIds){
 			sendPushwooshMessage(json.put("player_id", playerId).toString(), Arrays.asList(playerId));

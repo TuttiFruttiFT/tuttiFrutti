@@ -87,7 +87,7 @@ public class TestUtils {
 		return player;
 	}
 	
-	public static MatchConfig createMatchConfig(String language, String mode, String type, int numberOfPlayers, boolean powerUpsEnabled, int numberOfRounds) {
+	public static MatchConfig createMatchConfig(String language, String mode, String type, int numberOfPlayers, int currentNumberOfPlayers, boolean powerUpsEnabled, int numberOfRounds) {
 		MatchConfig matchConfig = new MatchConfig();
 		matchConfig.setLanguage(language);
 		matchConfig.setMode(mode);
@@ -95,6 +95,7 @@ public class TestUtils {
 		matchConfig.setNumberOfPlayers(numberOfPlayers);
 		matchConfig.setPowerUpsEnabled(powerUpsEnabled);
 		matchConfig.setRounds(numberOfRounds);
+		matchConfig.setCurrentNumberOfPlayers(currentNumberOfPlayers);
 		return matchConfig;
 	}
 	

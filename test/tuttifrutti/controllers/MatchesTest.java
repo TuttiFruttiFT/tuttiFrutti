@@ -76,7 +76,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			
 			saveCategories(dataStore, language);
 
-			MatchConfig matchConfig = createMatchConfig(language, NORMAL_MODE, PUBLIC_TYPE, 3, true, 25);
+			MatchConfig matchConfig = createMatchConfig(language, NORMAL_MODE, PUBLIC_TYPE, 3, 1, true, 25);
 			Match match = createMatch(dataStore, language, lastRound,Arrays.asList(playerResult2), matchConfig);
 			
 			String playerId = player.getId().toString();
@@ -136,7 +136,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			
 			Round lastRound = createRound(turn, roundNumber, R);
 			
-			MatchConfig matchConfig = createMatchConfig(language, NORMAL_MODE, PUBLIC_TYPE, 3, true, 25);
+			MatchConfig matchConfig = createMatchConfig(language, NORMAL_MODE, PUBLIC_TYPE, 3, 2, true, 25);
 			Match match = createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig,
 									  getCategoriesFromDuplas(duplas, language), PLAYER_TURN);
 			
@@ -162,7 +162,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 
 			saveCategories(dataStore, language);
 			
-			MatchConfig matchConfig = createMatchConfig(language, NORMAL_MODE, PUBLIC_TYPE, 3, true, 25);
+			MatchConfig matchConfig = createMatchConfig(language, NORMAL_MODE, PUBLIC_TYPE, 3, 1, true, 25);
 			
 			WSResponse r = WS.url("http://localhost:9000/match/public").setContentType("application/json")
 							 .post("{\"player_id\" : \"" + player.getId().toString() + "\", \"config\":" 
@@ -213,7 +213,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			
 			Round lastRound = createRound(turn, roundNumber, R);
 			
-			MatchConfig matchConfig = createMatchConfig(language, NORMAL_MODE, PUBLIC_TYPE, 2, true, 25);
+			MatchConfig matchConfig = createMatchConfig(language, NORMAL_MODE, PUBLIC_TYPE, 2, 2, true, 25);
 			Match match = createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig,
 									  getCategoriesFromDuplas(duplas, language), PLAYER_TURN);
 			
@@ -341,7 +341,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			
 			Round lastRound = createRound(turn, roundNumber, S);
 			
-			MatchConfig matchConfig = createMatchConfig(language, NORMAL_MODE, PUBLIC_TYPE, 2, true, 25);
+			MatchConfig matchConfig = createMatchConfig(language, NORMAL_MODE, PUBLIC_TYPE, 2, 2, true, 25);
 			Match match = createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig,
 									  getCategoriesFromDuplas(duplas, language), PLAYER_TURN);
 			

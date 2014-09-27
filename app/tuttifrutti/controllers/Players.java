@@ -1,13 +1,13 @@
 package tuttifrutti.controllers;
 
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
-import static tuttifrutti.utils.PushUtil.setTag;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.mongodb.morphia.Datastore;
+import org.mongodb.morphia.annotations.Transient;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import play.libs.Json;
@@ -40,6 +40,10 @@ public class Players extends Controller {
 	
 	@Autowired
 	private Datastore mongoDatastore;
+	
+	@Transient
+	@Autowired
+	private PushUtil pushUtil;
 	
 	@BodyParser.Of(BodyParser.Json.class)
 	public Result register() {
@@ -143,15 +147,15 @@ public class Players extends Controller {
 		Device device = deviceService.device(playerId);
 		
 		if(device == null){
-			PushUtil.registerDevice(pushToken, hardwareId, "ES");
-			setTag(hardwareId, playerId);
+			pushUtil.registerDevice(pushToken, hardwareId, "ES");
+			pushUtil.setTag(hardwareId, playerId);
 			device = new Device(playerId,pushToken,hardwareId);
 			mongoDatastore.save(device);
 			return null;
 		}else{
 			if(!pushToken.equals(device.getPushToken())){
-				PushUtil.unRegisterDevice(hardwareId);
-				PushUtil.registerDevice(pushToken, hardwareId, "ES");
+				pushUtil.unRegisterDevice(hardwareId);
+				pushUtil.registerDevice(pushToken, hardwareId, "ES");
 				device.setPushToken(pushToken);
 				mongoDatastore.save(device);
 			}

@@ -11,6 +11,7 @@ import static tuttifrutti.models.MatchState.FINISHED;
 import static tuttifrutti.models.MatchState.OPPONENT_TURN;
 import static tuttifrutti.models.MatchState.REJECTED;
 import static tuttifrutti.models.MatchState.TO_BE_APPROVED;
+import static tuttifrutti.models.MatchState.WAITING_FOR_OPPONENTS;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -190,6 +191,7 @@ public class Match {
 		playerResult.setPlayer(player);
 		playerResult.setScore(0);
 		match.getPlayerResults().add(playerResult);
+		match.getConfig().setCurrentNumberOfPlayers(match.getConfig().getCurrentNumberOfPlayers() + 1);
 	}
 
 	public Match create(String playerId, MatchConfig config, List<String> players) {
@@ -197,9 +199,16 @@ public class Match {
 	}
 
 	public List<Dupla> play(Match match, String playerId, List<Dupla> duplas, int time) {		
-		elasticUtil.validar(duplas,match.getLastRound().getLetter());
+		Round round = match.getLastRound();
+		elasticUtil.validar(duplas,round.getLetter());
 		
 		this.createTurn(match,playerId, duplas, time);
+		
+		if(round.getNumber() == 1 && match.thereAreMissingOpponents()){
+			match.setState(WAITING_FOR_OPPONENTS);
+		}
+		
+		mongoDatastore.save(match);
 		
 		promise(() -> {
 			calculateResult(match);
@@ -214,9 +223,10 @@ public class Match {
 	}
 
 	private void calculateResult(Match match) {
-		Round round = match.getLastRound();
-		List<Turn> turns = round.getTurns();
-		if(turns.size() == match.getConfig().getNumberOfPlayers()){
+		if(match.isRoundOver()){
+			Round round = match.getLastRound();
+			List<Turn> turns = round.getTurns();
+			
 			Integer minTime = getMinimumTime(turns); 
 			
 			List<Dupla> allDuplas = flatDuplasFromTurns(turns);
@@ -240,6 +250,11 @@ public class Match {
 			}
 		}
 	}
+
+	private boolean isRoundOver() {
+		return this.getLastRound().getTurns().size() == this.getConfig().getCurrentNumberOfPlayers();
+	}
+
 
 	private void calculateWinner() {
 		this.winnerId = playerResults.stream().max(new PlayerResultComparator()::compare).get().getPlayer().getId().toString();
@@ -353,17 +368,26 @@ public class Match {
 		turn.setEndTime(time);
 		Round round = match.getLastRound();
 		round.addTurn(turn);
-		mongoDatastore.save(match);
 	}
 
+	private boolean thereAreMissingOpponents() {
+		MatchConfig config = this.getConfig();
+		return config.getCurrentNumberOfPlayers() < config.getNumberOfPlayers();
+	}
+
+
 	public void rejected() {
-		// TODO implementar
-		
+		pushUtil.rejected(this.players(),this);
 	}
 
 	public void playerReject(String playerId) {
-		// TODO implementar
+		List<Player> players = this.players();
 		
+		if(players.size() == 1){
+			pushUtil.rejected(players,this);
+		}else{
+			pushUtil.rejectedByPlayer(players,playerId,this);
+		}
 	}
 	
 	private String nicknameFrom(String playerId, Match match) {
@@ -395,6 +419,16 @@ public class Match {
 	private boolean playerHasAlreadyPlayed(Match match, String playerId) {
 		List<Turn> turns = match.getLastRound().getTurns();
 		return isNotEmpty(turns) && turns.stream().anyMatch(turn -> turn.getPlayer().getId().toString().equals(playerId));
+	}
+
+
+	public void publicMatchReady(String playerId) {
+		pushUtil.publicMatchReady(this.playerIdsExcept(playerId),this);
+	}
+
+
+	public void privateMatchReady(List<String> players) {
+		pushUtil.privateMatchReady(players, this);
 	}
 }
 
