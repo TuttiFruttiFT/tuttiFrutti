@@ -185,7 +185,7 @@ public class Match {
 	}
 
 	public Match createPrivate(String playerId, MatchConfig config, List<String> playerIds, List<String> categoryIds) {
-		return create(config, PRIVATE,playerService.playersFromIds(playerIds),categoryService.categoriesFromIds(categoryIds));
+		return create(config, PRIVATE,categoryService.categoriesFromIds(categoryIds),playerService.playerResultsFromIds(playerIds));
 	}
 
 	public List<Dupla> play(Match match, String playerId, List<Dupla> duplas, int time) {		
@@ -194,7 +194,7 @@ public class Match {
 		
 		this.createTurn(match,playerId, duplas, time);
 		
-		if(round.getNumber() == 1 && match.thereAreMissingOpponents()){
+		if(match.thereAreMissingOpponents()){
 			match.setState(WAITING_FOR_OPPONENTS);
 		}
 		
@@ -382,7 +382,7 @@ public class Match {
 
 	private boolean thereAreMissingOpponents() {
 		MatchConfig config = this.getConfig();
-		return config.getCurrentTotalNumberOfPlayers() < config.getNumberOfPlayers();
+		return this.getLastRound().getNumber() == 1 && (this.getLastRound().getTurns().size() < config.getNumberOfPlayers());
 	}
 
 

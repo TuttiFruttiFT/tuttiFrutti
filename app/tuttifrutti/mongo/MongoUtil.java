@@ -56,8 +56,4 @@ public class MongoUtil {
 		}
 		return mongoClient;
 	}
-
-	private void mongoTest() {
-
-	}
 }

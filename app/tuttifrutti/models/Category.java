@@ -68,7 +68,7 @@ public class Category {
 		return categories.subList(0, DEFAULT_CATEGORIES_NUMBER);
 	}
 
-	public List<PlayerResult> categoriesFromIds(List<String> categoryIds) {
-		return null;
+	public List<Category> categoriesFromIds(List<String> categoryIds) {
+		return mongoDatastore.find(Category.class).field("_id").hasAllOf(categoryIds).asList();
 	}
 }

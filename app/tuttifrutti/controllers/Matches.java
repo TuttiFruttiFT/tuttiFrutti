@@ -104,8 +104,7 @@ public class Matches extends Controller {
 		String playerId = json.get("player_id").asText();
 		String matchId = json.get("match_id").asText();
 		
-		Match match = matchService.match(matchId, playerId);
-		match.playerReject(playerId);
+		matchService.match(matchId, playerId).playerReject(playerId);
 		
 		return ok();
 	}

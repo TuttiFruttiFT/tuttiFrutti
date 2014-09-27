@@ -3,6 +3,7 @@
  */
 package tuttifrutti.services;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bson.types.ObjectId;
@@ -11,9 +12,9 @@ import org.mongodb.morphia.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import tuttifrutti.models.Category;
 import tuttifrutti.models.Pack;
 import tuttifrutti.models.Player;
+import tuttifrutti.models.PlayerResult;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -100,8 +101,13 @@ public class PlayerService {
 		return query.get();
 	}
 
-	public List<Category> playersFromIds(List<String> playerIds) {
-		mongoDatastore.find(Player.class);
-		return null;
+	public List<PlayerResult> playerResultsFromIds(List<String> playerIds) {
+		List<PlayerResult> playerResults = new ArrayList<>();
+		this.playersFromIds(playerIds).stream().forEach(player -> playerResults.add(new PlayerResult(player,0)));
+		return playerResults;
+	}
+	
+	public List<Player> playersFromIds(List<String> playerIds) {
+		return mongoDatastore.find(Player.class).field("_id").hasAllOf(playerIds).asList();
 	}
 }

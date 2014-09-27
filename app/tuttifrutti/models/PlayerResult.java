@@ -1,6 +1,8 @@
 package tuttifrutti.models;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import org.mongodb.morphia.annotations.Embedded;
@@ -13,6 +15,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  */
 @Embedded
 @Getter @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PlayerResult {
