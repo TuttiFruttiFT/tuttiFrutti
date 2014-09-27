@@ -1,5 +1,8 @@
 package tuttifrutti.models;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 import lombok.Getter;
 
 @Getter
@@ -15,5 +18,15 @@ public enum MatchState {
 	
 	MatchState(String name){
 		this.name = name;
+	}
+	
+	@JsonCreator
+	public MatchState forValue(String value) {
+	    return valueOf(value);
+	}
+	
+	@JsonValue
+	public String toValue() {
+		return this.getName();
 	}
 }

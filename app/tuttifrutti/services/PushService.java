@@ -1,4 +1,4 @@
-package tuttifrutti.utils;
+package tuttifrutti.services;
 
 import static org.apache.commons.lang3.StringUtils.join;
 import static play.libs.F.Promise.promise;
@@ -21,6 +21,8 @@ import play.libs.ws.WSResponse;
 import play.mvc.Http.Status;
 import tuttifrutti.models.Match;
 import tuttifrutti.models.Player;
+import tuttifrutti.utils.ConfigurationAccessor;
+import tuttifrutti.utils.PushType;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -30,7 +32,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author rfanego
  */
 @Component
-public class PushUtil {
+public class PushService {
 	
 	public static final String PUSHWOOSH_SERVICE_BASE_URL = ConfigurationAccessor.s("pushwoosh.url");
     private static final String AUTH_TOKEN = "AIzaSyDQw_q4WGGwTswqdtrdyIYMniuxG70d8sA";

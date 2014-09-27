@@ -19,9 +19,9 @@ import tuttifrutti.models.Match;
 import tuttifrutti.models.Player;
 import tuttifrutti.models.views.ActiveMatch;
 import tuttifrutti.services.PlayerService;
+import tuttifrutti.services.PushService;
 import tuttifrutti.utils.FacebookUtil;
 import tuttifrutti.utils.JsonUtil;
-import tuttifrutti.utils.PushUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -44,7 +44,7 @@ public class Players extends Controller {
 	
 	@Transient
 	@Autowired
-	private PushUtil pushUtil;
+	private PushService pushUtil;
 	
 	@BodyParser.Of(BodyParser.Json.class)
 	public Result register() {

@@ -1,5 +1,8 @@
 package tuttifrutti.models;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 import lombok.Getter;
 
 @Getter
@@ -13,5 +16,15 @@ public enum DuplaScore {
 	
 	DuplaScore(int score){
 		this.score = score;
+	}
+	
+	@JsonCreator
+	public DuplaScore forValue(String value) {
+	    return valueOf(value);
+	}
+	
+	@JsonValue
+	public int toValue() {
+		return this.getScore();
 	}
 }

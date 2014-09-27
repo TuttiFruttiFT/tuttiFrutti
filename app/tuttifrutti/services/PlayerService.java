@@ -101,7 +101,7 @@ public class PlayerService {
 	}
 
 	public List<Category> playersFromIds(List<String> playerIds) {
-		// TODO Auto-generated method stub
+		mongoDatastore.find(Player.class);
 		return null;
 	}
 }

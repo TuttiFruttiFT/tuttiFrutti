@@ -44,7 +44,7 @@ import tuttifrutti.elastic.ElasticUtil;
 import tuttifrutti.models.views.ActiveMatch;
 import tuttifrutti.serializers.ObjectIdSerializer;
 import tuttifrutti.services.PlayerService;
-import tuttifrutti.utils.PushUtil;
+import tuttifrutti.services.PushService;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -115,7 +115,7 @@ public class Match {
 	
 	@Transient
 	@Autowired
-	private PushUtil pushUtil;
+	private PushService pushUtil;
 
 	public List<ActiveMatch> activeMatches(String playerId) {
 		List<ActiveMatch> activeMatches = new ArrayList<>();
