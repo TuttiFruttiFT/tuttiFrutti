@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import org.bson.types.ObjectId;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
@@ -29,7 +28,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @Component
 public class Device {
 	@Id
-	@Property("player_id")
 	private String playerId;
 	
 	@Property("push_token")
@@ -48,7 +46,7 @@ public class Device {
 	}
 	
 	public Device device(String playerId){
-		return mongoDatastore.get(Device.class,new ObjectId(playerId));
+		return mongoDatastore.get(Device.class,playerId);
 	}
 	
 }

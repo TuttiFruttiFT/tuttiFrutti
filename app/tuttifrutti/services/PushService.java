@@ -114,7 +114,7 @@ public class PushService {
 		registerJsonBody.put("language", language);
 		registerJsonBody.put("hwid", hardwareId);
 		registerJsonBody.put("device_type", ANDROID_DEVICE_TYPE);
-		JsonNode registerJson = newObject().put("register", registerJsonBody);
+		JsonNode registerJson = newObject().set("register", registerJsonBody);
 		WSResponse r = WS.url(PUSHWOOSH_SERVICE_BASE_URL + "registerDevice").setContentType("application/json")
 				 .post(registerJson)
 				 .get(5000L);

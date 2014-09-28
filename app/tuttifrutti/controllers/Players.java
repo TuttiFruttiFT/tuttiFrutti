@@ -152,7 +152,6 @@ public class Players extends Controller {
 			pushUtil.setTag(hardwareId, playerId);
 			device = new Device(playerId,pushToken,hardwareId);
 			mongoDatastore.save(device);
-			return null;
 		}else{
 			if(!pushToken.equals(device.getPushToken())){
 				pushUtil.unRegisterDevice(hardwareId);

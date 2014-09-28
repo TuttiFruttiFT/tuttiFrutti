@@ -149,7 +149,12 @@ public class Match {
 	}
 	
 	private void changeMatchStateDependingOnPlayersGame(String playerId,Match match) {
-		if(!match.getState().equals(TO_BE_APPROVED) && playerHasAlreadyPlayed(match, playerId)){
+		boolean playerHasAlreadyPlayed = playerHasAlreadyPlayed(match, playerId);
+		MatchState matchState = match.getState();
+		if(matchState.equals(TO_BE_APPROVED) && playerHasAlreadyPlayed){
+			match.setState(WAITING_FOR_OPPONENTS);
+		}
+		if(!matchState.equals(TO_BE_APPROVED) && playerHasAlreadyPlayed){
 			match.setState(OPPONENT_TURN);
 		}
 	}
@@ -193,10 +198,6 @@ public class Match {
 		elasticUtil.validar(duplas,round.getLetter());
 		
 		this.createTurn(match,playerId, duplas, time);
-		
-		if(match.thereAreMissingOpponents()){
-			match.setState(WAITING_FOR_OPPONENTS);
-		}
 		
 		mongoDatastore.save(match);
 		
@@ -378,11 +379,6 @@ public class Match {
 		turn.setEndTime(time);
 		Round round = match.getLastRound();
 		round.addTurn(turn);
-	}
-
-	private boolean thereAreMissingOpponents() {
-		MatchConfig config = this.getConfig();
-		return this.getLastRound().getNumber() == 1 && (this.getLastRound().getTurns().size() < config.getNumberOfPlayers());
 	}
 
 
