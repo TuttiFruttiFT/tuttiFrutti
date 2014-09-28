@@ -149,6 +149,12 @@ public class Match {
 		return match;
 	}
 	
+	public Match endedMatch(String matchId){
+		Query<Match> query = mongoDatastore.find(Match.class,"state =",MatchState.FINISHED.toString());
+		query.and(query.criteria("id").equal(new ObjectId(matchId)));
+		return query.get();
+	}
+	
 	private void changeMatchStateDependingOnPlayersGame(String playerId,Match match) {
 		boolean playerHasAlreadyPlayed = playerHasAlreadyPlayed(match, playerId);
 		MatchState matchState = match.getState();

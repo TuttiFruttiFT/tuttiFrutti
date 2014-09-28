@@ -21,7 +21,6 @@ import tuttifrutti.models.Dupla;
 import tuttifrutti.models.Match;
 import tuttifrutti.models.MatchConfig;
 import tuttifrutti.models.PowerUp;
-import tuttifrutti.models.ResultModel;
 import tuttifrutti.models.Round;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -83,6 +82,7 @@ public class Matches extends Controller {
 		List<String> playerIds = new ArrayList<>();
 		List<String> categoryIds = new ArrayList<>();
 		
+		playerIds.add(playerId);
 		for(JsonNode jsonPlayer : jsonPlayers){
 			playerIds.add(jsonPlayer.asText());
 		}
@@ -148,9 +148,12 @@ public class Matches extends Controller {
 	}
 	
 	public Result matchResult(String matchId){
-		ResultModel matchResult = ResultModel.matchResult(matchId);
+		Match match = matchService.endedMatch(matchId);
 		
-		if(matchResult != null){
+		if(match != null){
+			Match matchResult = new Match();
+			matchResult.setWinnerId(match.getWinnerId());
+			matchResult.setPlayerResults(match.getPlayerResults());
 			return ok(toJson(matchResult));
 		}
 		

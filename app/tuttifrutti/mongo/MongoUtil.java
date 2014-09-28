@@ -11,7 +11,6 @@ import tuttifrutti.models.Category;
 import tuttifrutti.models.Dupla;
 import tuttifrutti.models.Match;
 import tuttifrutti.models.MatchConfig;
-import tuttifrutti.models.MatchResult;
 import tuttifrutti.models.Pack;
 import tuttifrutti.models.Player;
 import tuttifrutti.models.PlayerResult;
@@ -41,7 +40,7 @@ public class MongoUtil {
 		Morphia morphia = new Morphia();
 		morphia.map(Category.class).map(Dupla.class).map(Match.class).map(MatchConfig.class)
 			   .map(Pack.class).map(Player.class).map(PlayerResult.class).map(PowerUp.class)
-			   .map(Round.class).map(Suggestion.class).map(Turn.class).map(MatchResult.class);
+			   .map(Round.class).map(Suggestion.class).map(Turn.class);
 		
 		Datastore datastore = morphia.createDatastore(mongoClient, ConfigFactory.load().getString("mongo.db.name"));
 		return datastore;
