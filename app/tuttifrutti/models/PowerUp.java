@@ -33,10 +33,12 @@ public class PowerUp {
 	@Transient
     private List<Dupla> duplas;
 
-	public static void generate(Match partida) {		
-		PowerUp.generarAutoCompletarPalabra(partida);
-		PowerUp.generarSugerirPalabra(partida);
-		PowerUp.generarPalabrasOponente(partida);
+	public static void generate(Match match) {
+		if(match.getConfig().isPowerUpsEnabled()){			
+			PowerUp.generarAutoCompletarPalabra(match);
+			PowerUp.generarSugerirPalabra(match);
+			PowerUp.generarPalabrasOponente(match);
+		}
 	}
 
 	private static void generarPalabrasOponente(Match partida) {

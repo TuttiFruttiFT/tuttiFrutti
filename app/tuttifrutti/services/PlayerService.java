@@ -108,6 +108,8 @@ public class PlayerService {
 	}
 	
 	public List<Player> playersFromIds(List<String> playerIds) {
-		return mongoDatastore.find(Player.class).field("_id").hasAllOf(playerIds).asList();
+		List<ObjectId> playersObjectIds = new ArrayList<>();
+		playerIds.forEach(playerId -> playersObjectIds.add(new ObjectId(playerId)));
+		return mongoDatastore.find(Player.class).field("_id").in(playersObjectIds).asList();
 	}
 }

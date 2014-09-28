@@ -69,6 +69,6 @@ public class Category {
 	}
 
 	public List<Category> categoriesFromIds(List<String> categoryIds) {
-		return mongoDatastore.find(Category.class).field("_id").hasAllOf(categoryIds).asList();
+		return mongoDatastore.find(Category.class).field("_id").in(categoryIds).asList();
 	}
 }

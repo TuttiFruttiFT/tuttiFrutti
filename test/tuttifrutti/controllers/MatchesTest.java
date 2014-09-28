@@ -18,6 +18,7 @@ import static tuttifrutti.models.enums.DuplaState.WRONG;
 import static tuttifrutti.models.enums.MatchMode.N;
 import static tuttifrutti.models.enums.MatchState.PLAYER_TURN;
 import static tuttifrutti.models.enums.MatchState.TO_BE_APPROVED;
+import static tuttifrutti.models.enums.MatchType.PRIVATE;
 import static tuttifrutti.models.enums.MatchType.PUBLIC;
 import static tuttifrutti.utils.TestUtils.createMatch;
 import static tuttifrutti.utils.TestUtils.createMatchConfig;
@@ -43,7 +44,6 @@ import play.libs.ws.WSResponse;
 import tuttifrutti.elastic.ElasticSearchAwareTest;
 import tuttifrutti.models.Category;
 import tuttifrutti.models.Dupla;
-import tuttifrutti.models.Letter;
 import tuttifrutti.models.LetterWrapper;
 import tuttifrutti.models.Match;
 import tuttifrutti.models.MatchConfig;
@@ -51,11 +51,14 @@ import tuttifrutti.models.Player;
 import tuttifrutti.models.PlayerResult;
 import tuttifrutti.models.Round;
 import tuttifrutti.models.Turn;
+import tuttifrutti.models.enums.DuplaScore;
 import tuttifrutti.models.enums.MatchState;
+import tuttifrutti.models.enums.MatchType;
 import tuttifrutti.utils.JsonUtil;
 import tuttifrutti.utils.SpringApplicationContext;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 /**
  * @author rfanego
@@ -76,11 +79,11 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			Player player2 = savePlayer(dataStore, "sarasas2@sarasa.com");
 
 			savePlayerResult(dataStore, player, 10);
-			PlayerResult playerResult2 = savePlayerResult(dataStore, player2, 10);
+			PlayerResult playerResult2 = savePlayerResult(dataStore, player2, 0);
 			
 			saveCategories(dataStore, language);
 
-			MatchConfig matchConfig = createMatchConfig(language, N, PUBLIC, 2, true, 25);
+			MatchConfig matchConfig = createMatchConfig(language, N, PUBLIC, 2, false, 25);
 			Match match = createMatch(dataStore, language, lastRound,Arrays.asList(playerResult2), matchConfig);
 			
 			String playerId = player.getId().toString();
@@ -96,13 +99,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			
 			assertThat(resultMatch).isNotNull();
 			assertThat(resultMatch.getId().toString()).isEqualTo(match.getId().toString());
-			LetterWrapper letter = commonMatchAssertions(language, resultMatch, PLAYER_TURN);
-			for(PlayerResult playerResult : resultMatch.getPlayerResults()){
-				Player playerAux = playerResult.getPlayer();
-				if(playerAux.getNickname().equals("SARASA2")){
-					assertThat(playerResult.getScore()).isEqualTo(10);
-				}
-			}
+			LetterWrapper letter = commonMatchAssertions(language, resultMatch, PLAYER_TURN, PUBLIC, 2, DEFAULT_CATEGORIES_NUMBER);
 			assertThat(letter.getLetter()).isEqualTo(A);
 		});
 	}
@@ -140,7 +137,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			
 			Round lastRound = createRound(turn, roundNumber, R);
 			
-			MatchConfig matchConfig = createMatchConfig(language, N, PUBLIC, 2, true, 25);
+			MatchConfig matchConfig = createMatchConfig(language, N, PUBLIC, 2, false, 25);
 			Match match = createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig,
 									  getCategoriesFromDuplas(duplas, language), PLAYER_TURN);
 			
@@ -166,7 +163,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 
 			saveCategories(dataStore, language);
 			
-			MatchConfig matchConfig = createMatchConfig(language, N, PUBLIC, 2, true, 25);
+			MatchConfig matchConfig = createMatchConfig(language, N, PUBLIC, 2, false, 25);
 			
 			WSResponse r = WS.url("http://localhost:9000/match/public").setContentType("application/json")
 							 .post("{\"player_id\" : \"" + player.getId().toString() + "\", \"config\":" 
@@ -180,7 +177,45 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			
 			assertThat(resultMatch).isNotNull();
 			assertThat(resultMatch.getId()).isNotNull();
-			commonMatchAssertions(language, resultMatch, TO_BE_APPROVED);
+			commonMatchAssertions(language, resultMatch, TO_BE_APPROVED, PUBLIC, 2, DEFAULT_CATEGORIES_NUMBER);
+		});
+	}
+	
+	@Test
+	public void createPrivateMatchFor4Players() {
+		running(testServer(9000, fakeApplication()), (Runnable) () -> {
+			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
+			Player player1 = savePlayer(dataStore, "sarasas1@sarasa.com");
+			Player player2 = savePlayer(dataStore, "sarasas2@sarasa.com");
+			Player player3 = savePlayer(dataStore, "sarasas3@sarasa.com");
+			Player player4 = savePlayer(dataStore, "sarasas4@sarasa.com");
+			String language = "ES";
+			
+			saveCategories(dataStore, language);
+			
+			ArrayNode playersArray = Json.newObject().arrayNode().add(player1.getId().toString()).add(player2.getId().toString())
+			.add(player3.getId().toString()).add(player4.getId().toString());
+			
+			ArrayNode categoriesArray = Json.newObject().arrayNode().add("colors").add("countries").add("animals")
+																	.add("sports").add("jobs").add("musical_instruments");
+			
+			MatchConfig matchConfig = createMatchConfig(language, N, PRIVATE, 4, false, 25);
+			WSResponse r = WS.url("http://localhost:9000/match/private").setContentType("application/json")
+					 .post("{\"player_id\" : \"" + player1.getId().toString() + "\", \"config\":" 
+						   + Json.toJson(matchConfig).toString() + ",\"players\":" + playersArray.toString() 
+						   + ",\"categories\":" + categoriesArray.toString() + "}")
+					 .get(50000000L);
+			
+			assertThat(r).isNotNull();
+			assertThat(r.getStatus()).isEqualTo(OK);
+		
+			JsonNode jsonNode = r.asJson();
+			Match resultMatch = Json.fromJson(jsonNode, Match.class);
+			
+			assertThat(resultMatch).isNotNull();
+			assertThat(resultMatch.getId()).isNotNull();
+			commonMatchAssertions(language, resultMatch, TO_BE_APPROVED, PRIVATE, 4, 6);
+			assertThat(resultMatch.getPlayerResults().size()).isEqualTo(4);
 		});
 	}
 	
@@ -217,7 +252,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			
 			Round lastRound = createRound(turn, roundNumber, R);
 			
-			MatchConfig matchConfig = createMatchConfig(language, N, PUBLIC, 2, true, 25);
+			MatchConfig matchConfig = createMatchConfig(language, N, PUBLIC, 2, false, 25);
 			Match match = createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig,
 									  getCategoriesFromDuplas(duplas, language), PLAYER_TURN);
 			
@@ -246,39 +281,21 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			Round newRound = modifiedMatch.getLastRound();
 			
 			assertThat(newRound.getLetter()).isNotEqualTo(modifiedRound.getLetter());
-			assertThat(newRound.getLetter().getPreviousLetters()).contains(Letter.R.toString());
+			assertThat(newRound.getLetter().getPreviousLetters()).contains(R.toString());
 			
-			for(PlayerResult playerResult : modifiedMatch.getPlayerResults()){
-				if(playerResult.getPlayer().getId().toString().equals(player.getId().toString())){
-					assertThat(playerResult.getScore()).isEqualTo(85);
-				}
-				
-				if(playerResult.getPlayer().getId().toString().equals(player2.getId().toString())){
-					assertThat(playerResult.getScore()).isEqualTo(70);
-				}
-			}
+			assertPlayerScores(modifiedMatch, player, player2, 85, 70);
 			
 			assertThat(modifiedRound.getEndTime()).isEqualTo(41);
 			for(Turn modifiedTurn : modifiedRound.getTurns()){
 				if(modifiedTurn.getPlayer().getId().toString().equals(player.getId().toString())){
 					assertThat(modifiedTurn.getEndTime()).isEqualTo(41);
 					assertThat(modifiedTurn.getScore()).isEqualTo(50);
+					
 					for(Dupla modifiedDupla : modifiedTurn.getDuplas()){
-						if(modifiedDupla.getCategory().getId().equals("bands")){
-							assertThat(modifiedDupla.getScore()).isEqualTo(UNIQUE_SCORE.getScore());
-						}
-						
-						if(modifiedDupla.getCategory().getId().equals("colors")){
-							assertThat(modifiedDupla.getScore()).isEqualTo(ZERO_SCORE.getScore());
-						}
-						
-						if(modifiedDupla.getCategory().getId().equals("meals")){
-							assertThat(modifiedDupla.getScore()).isEqualTo(ALONE_SCORE.getScore());
-						}
-						
-						if(modifiedDupla.getCategory().getId().equals("countries")){
-							assertThat(modifiedDupla.getScore()).isEqualTo(ALONE_SCORE.getScore());
-						}
+						assertDupla(modifiedDupla, "bands", UNIQUE_SCORE);
+						assertDupla(modifiedDupla, "colors", ZERO_SCORE);
+						assertDupla(modifiedDupla, "meals", ALONE_SCORE);
+						assertDupla(modifiedDupla, "countries", ALONE_SCORE);
 					}
 				}
 				
@@ -286,27 +303,16 @@ public class MatchesTest extends ElasticSearchAwareTest {
 					assertThat(modifiedTurn.getEndTime()).isEqualTo(45);
 					assertThat(modifiedTurn.getScore()).isEqualTo(30);
 					for(Dupla modifiedDupla : modifiedTurn.getDuplas()){
-						if(modifiedDupla.getCategory().getId().equals("bands")){
-							assertThat(modifiedDupla.getScore()).isEqualTo(UNIQUE_SCORE.getScore());
-						}
-						
-						if(modifiedDupla.getCategory().getId().equals("colors")){
-							assertThat(modifiedDupla.getScore()).isEqualTo(ALONE_SCORE.getScore());
-						}
-						
-						if(modifiedDupla.getCategory().getId().equals("meals")){
-							assertThat(modifiedDupla.getScore()).isEqualTo(ZERO_SCORE.getScore());
-						}
-						
-						if(modifiedDupla.getCategory().getId().equals("countries")){
-							assertThat(modifiedDupla.getScore()).isEqualTo(ZERO_SCORE.getScore());
-						}
+						assertDupla(modifiedDupla, "bands", UNIQUE_SCORE);
+						assertDupla(modifiedDupla, "colors", ALONE_SCORE);
+						assertDupla(modifiedDupla, "meals", ZERO_SCORE);
+						assertDupla(modifiedDupla, "countries", ZERO_SCORE);						
 					}
 				}
 			}
 		});
 	}
-	
+
 	@Test
 	public void turnWithThreePlayers() { //TODO
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
@@ -345,7 +351,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			
 			Round lastRound = createRound(turn, roundNumber, S);
 			
-			MatchConfig matchConfig = createMatchConfig(language, N, PUBLIC, 2, true, 25);
+			MatchConfig matchConfig = createMatchConfig(language, N, PUBLIC, 2, false, 25);
 			Match match = createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig,
 									  getCategoriesFromDuplas(duplas, language), PLAYER_TURN);
 			
@@ -374,18 +380,30 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			assertThat(newRound.getLetter()).isNotEqualTo(modifiedRound.getLetter());
 			assertThat(newRound.getLetter().getPreviousLetters()).contains(S.toString());
 			
-//			for(PlayerResult playerResult : modifiedMatch.getPlayers()){
-//				if(playerResult.getPlayer().getId().toString().equals(player.getId().toString())){
-//					assertThat(playerResult.getScore()).isEqualTo(85);
-//				}
-//				
-//				if(playerResult.getPlayer().getId().toString().equals(player2.getId().toString())){
-//					assertThat(playerResult.getScore()).isEqualTo(70);
-//				}
-//			}
+			
 			
 			assertThat(modifiedRound.getEndTime()).isEqualTo(45);
 		});
+	}
+	
+	
+	
+	private void assertPlayerScores(Match modifiedMatch, Player player,Player player2, int scorePlayer1, int scorePlayer2) {
+		for(PlayerResult playerResult : modifiedMatch.getPlayerResults()){
+			if(playerResult.getPlayer().getId().toString().equals(player.getId().toString())){
+				assertThat(playerResult.getScore()).isEqualTo(scorePlayer1);
+			}
+			
+			if(playerResult.getPlayer().getId().toString().equals(player2.getId().toString())){
+				assertThat(playerResult.getScore()).isEqualTo(scorePlayer2);
+			}
+		}
+	}
+	
+	private void assertDupla(Dupla modifiedDupla, String categoryId, DuplaScore score) {
+		if(modifiedDupla.getCategory().getId().equals(categoryId)){
+			assertThat(modifiedDupla.getScore()).isEqualTo(score.getScore());
+		}
 	}
 	
 	private void sleep(long timeInMillis) {
@@ -396,21 +414,22 @@ public class MatchesTest extends ElasticSearchAwareTest {
 		}
 	}
 
-	private LetterWrapper commonMatchAssertions(String language, Match resultMatch, MatchState matchState) {
+	private LetterWrapper commonMatchAssertions(String language, Match resultMatch, MatchState matchState, MatchType matchType, int numberOfPlayers, int numberOfCategories) {
 		assertThat(resultMatch.getState()).isEqualTo(matchState);
 		assertThat(resultMatch.getConfig()).isNotNull();
-		assertThat(resultMatch.getConfig().getType()).isEqualTo(PUBLIC);
+		assertThat(resultMatch.getConfig().getType()).isEqualTo(matchType);
 		assertThat(resultMatch.getConfig().getMode()).isEqualTo(N);
 		assertThat(resultMatch.getConfig().getLanguage()).isEqualTo(language);
-		assertThat(resultMatch.getConfig().getNumberOfPlayers()).isEqualTo(2);
-		assertThat(resultMatch.getCategories().size()).isEqualTo(DEFAULT_CATEGORIES_NUMBER);
+		assertThat(resultMatch.getConfig().getNumberOfPlayers()).isEqualTo(numberOfPlayers);
+		assertThat(resultMatch.getCategories().size()).isEqualTo(numberOfCategories);
 		assertThat(resultMatch.getPlayerResults()).isNotNull();
-		for(PlayerResult playerResult : resultMatch.getPlayerResults()){
-			Player player = playerResult.getPlayer();
-			if(player.getNickname().equals("SARASA")){
-				assertThat(playerResult.getScore()).isEqualTo(0);
-			}
-		}
+		resultMatch.getPlayerResults().forEach(playerResult -> assertThat(playerResult.getScore()).isEqualTo(0));
+//		for(PlayerResult playerResult : resultMatch.getPlayerResults()){
+//			Player player = playerResult.getPlayer();
+//			if(player.getNickname().equals("SARASA")){
+//				assertThat(playerResult.getScore()).isEqualTo(0);
+//			}
+//		}
 		Round round = resultMatch.getLastRound();
 		assertThat(round).isNotNull();
 		assertThat(round.getNumber()).isEqualTo(1);

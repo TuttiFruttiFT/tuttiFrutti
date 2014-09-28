@@ -3,6 +3,8 @@ package tuttifrutti.services;
 import static org.apache.commons.lang3.StringUtils.join;
 import static play.libs.F.Promise.promise;
 import static play.libs.Json.newObject;
+import static tuttifrutti.utils.PushType.MATCH_REJECTED;
+import static tuttifrutti.utils.PushType.MATCH_REJECTED_BY_PLAYER;
 import static tuttifrutti.utils.PushType.MATCH_RESULT;
 import static tuttifrutti.utils.PushType.PRIVATE_MATCH_READY;
 import static tuttifrutti.utils.PushType.PUBLIC_MATCH_READY;
@@ -16,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import play.Logger;
+import play.libs.Json;
 import play.libs.ws.WS;
 import play.libs.ws.WSResponse;
 import play.mvc.Http.Status;
@@ -54,12 +57,22 @@ public class PushService {
 		});
 	}
 	
-	public void rejected(List<Player> players, Match match) {
-		// TODO implementar
+	public void rejected(List<String> playerIds, Match match) {
+		promise(() -> {
+			sendMessageTo(playerIds, match,MATCH_REJECTED);
+			return null;
+		});
 	}
 
-	public void rejectedByPlayer(List<Player> players, String playerId, Match match) {
-		// TODO implementar
+	public void rejectedByPlayer(List<String> playerIds, Player rejectorPlayer, Match match) {
+		promise(() -> {
+			ObjectNode json = newObject().put("type", MATCH_REJECTED_BY_PLAYER.toString()).put("match_id", match.getId().toString());
+			for(String playerId : match.playerIds()){
+				JsonNode jsonToSend = json.put("player_id", playerId).set("rejector_player", Json.toJson(rejectorPlayer));
+				sendPushwooshMessage(jsonToSend.toString(), Arrays.asList(playerId));
+			}
+			return null;
+		});
 	}
 
 	public void roundResult(Match match, Integer roundNumber) {
@@ -81,32 +94,6 @@ public class PushService {
 		});
 	}
 	
-	private void sendPushwooshMessage(String jsonData,List<String> playerIds){
-		ArrayNode notifications = newObject().arrayNode();
-		notifications.add(newObject().put("send_date", "now").put("data", jsonData));
-		JsonNode requestBody = newObject().put("auth", AUTH_TOKEN).put("devices_filter",playerPushTags(playerIds))
-											   .set("notifications", notifications);
-		JsonNode request = newObject().set("request", requestBody);
-		for(int i = 0;i < RETRIES_NUMBER;i++){			
-			WSResponse r = WS.url(PUSHWOOSH_SERVICE_BASE_URL + "createTargetedMessage").setContentType("application/json")
-					.post(request)
-					.get(5000L);
-			if(r.getStatus() == Status.OK){
-				JsonNode response = r.asJson();
-				Integer statusCode = response.get("status_code").asInt();
-				if(statusCode == Status.OK){
-					return;
-				}
-				
-				String statusMessage = response.get("status_message").asText();
-				Logger.warn("Argument error trying to send message " + jsonData + ". Status message: " + statusMessage + ". Retry: " + i);
-			}
-			Logger.error("Sending message " + jsonData + " fail with status " + r.getStatus() + ". Retry: " + i);
-		}
-		
-		Logger.error("Could not send message " + jsonData + " to players " + StringUtils.join(playerIds, ","));
-	}
-
 	public void registerDevice(String pushToken,String hardwareId,String language){
 		ObjectNode registerJsonBody = newObject();
 		registerJsonBody.put("application", APPLICATION_CODE);
@@ -144,6 +131,32 @@ public class PushService {
 				 .get(5000L);
 		
 		processPushResponse(r, "unregistering device with hwid " + hardwareId);
+	}
+	
+	private void sendPushwooshMessage(String jsonData,List<String> playerIds){
+		ArrayNode notifications = newObject().arrayNode();
+		notifications.add(newObject().put("send_date", "now").put("data", jsonData));
+		JsonNode requestBody = newObject().put("auth", AUTH_TOKEN).put("devices_filter",playerPushTags(playerIds))
+											   .set("notifications", notifications);
+		JsonNode request = newObject().set("request", requestBody);
+		for(int i = 0;i < RETRIES_NUMBER;i++){			
+			WSResponse r = WS.url(PUSHWOOSH_SERVICE_BASE_URL + "createTargetedMessage").setContentType("application/json")
+					.post(request)
+					.get(5000L);
+			if(r.getStatus() == Status.OK){
+				JsonNode response = r.asJson();
+				Integer statusCode = response.get("status_code").asInt();
+				if(statusCode == Status.OK){
+					return;
+				}
+				
+				String statusMessage = response.get("status_message").asText();
+				Logger.warn("Argument error trying to send message " + jsonData + ". Status message: " + statusMessage + ". Retry: " + i);
+			}
+			Logger.error("Sending message " + jsonData + " fail with status " + r.getStatus() + ". Retry: " + i);
+		}
+		
+		Logger.error("Could not send message " + jsonData + " to players " + StringUtils.join(playerIds, ","));
 	}
 	
 	private void processPushResponse(WSResponse r, String partialErrorMessage) {

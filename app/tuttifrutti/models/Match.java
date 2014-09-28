@@ -22,6 +22,7 @@ import static tuttifrutti.models.enums.MatchType.PUBLIC;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -190,7 +191,7 @@ public class Match {
 	}
 
 	public Match createPrivate(String playerId, MatchConfig config, List<String> playerIds, List<String> categoryIds) {
-		return create(config, PRIVATE,categoryService.categoriesFromIds(categoryIds),playerService.playerResultsFromIds(playerIds));
+		return create(config, PRIVATE,playerService.playerResultsFromIds(playerIds),categoryService.categoriesFromIds(categoryIds));
 	}
 
 	public List<Dupla> play(Match match, String playerId, List<Dupla> duplas, int time) {		
@@ -286,7 +287,7 @@ public class Match {
 		return playerResults.stream().map(playerResult -> playerResult.getPlayer().getId().toString()).collect(toList());
 	}
 
-	private Match create(MatchConfig config, MatchType type,List<Category> categories,List<PlayerResult> playerResults) {
+	private Match create(MatchConfig config, MatchType type,List<PlayerResult> playerResults,List<Category> categories) {
 		Match match = new Match();
 		config.setType(type);
 		config.setPowerUpsEnabled(true);
@@ -303,7 +304,7 @@ public class Match {
 	}
 
 	private Match create(MatchConfig config, MatchType type) {
-		return create(config, type, categoryService.getPublicMatchCategories(config.getLanguage()), new ArrayList<PlayerResult>());
+		return create(config, type, new ArrayList<PlayerResult>(), categoryService.getPublicMatchCategories(config.getLanguage()));
 	}
 	
 	private void calculateTurnScores(List<Turn> turns, Match match) {
@@ -381,19 +382,31 @@ public class Match {
 		round.addTurn(turn);
 	}
 
-
-	public void rejected() {
-		pushUtil.rejected(this.players(),this);
-	}
-
-	public void playerReject(String playerId) {
-		List<Player> players = this.players();
+	public void playerReject(String playerId, Match match) {
+		Iterator<PlayerResult> it = match.getPlayerResults().iterator();
+		Player rejectorPlayer = new Player();
 		
-		if(players.size() == 1){
-			pushUtil.rejected(players,this);
-		}else{
-			pushUtil.rejectedByPlayer(players,playerId,this);
+		while(it.hasNext()){
+			PlayerResult playerResult = it.next();
+			
+			Player player = playerResult.getPlayer();
+			if(player.getId().toString().equals(playerId)){
+				rejectorPlayer.setId(player.getId());
+				rejectorPlayer.setNickname(player.getNickname());
+				it.remove();
+			}
 		}
+		
+		List<String> playerIds = match.playerIds();
+		
+		if(playerIds.size() == 1){
+			match.setState(REJECTED);
+			pushUtil.rejected(playerIds,match);
+		}else{
+			match.getConfig().setCurrentTotalNumberOfPlayers(match.getConfig().getCurrentTotalNumberOfPlayers() - 1);
+			pushUtil.rejectedByPlayer(playerIds,rejectorPlayer,match);
+		}
+		mongoDatastore.save(match);
 	}
 	
 	private String nicknameFrom(String playerId, Match match) {

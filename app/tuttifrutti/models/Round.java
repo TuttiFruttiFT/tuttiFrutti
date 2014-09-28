@@ -73,7 +73,6 @@ public class Round {
 		round.setNumber(getRoundNumber(match));
 		round.setLetter(getLetter(match));
 		match.setLastRound(round);
-//		mongoDatastore.save(match);
 	}
 
 	private LetterWrapper getLetter(Match match) {
