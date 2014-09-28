@@ -39,10 +39,9 @@ public class CategoryLoader extends Controller {
 				processCategory(155,"colors",categoryNumber,json);
 				processCategory(161,"sports",categoryNumber,json);
 				processCategory(164,"musical_styles",categoryNumber,json);
-				processCategory(166,"meals",categoryNumber,json);
-				processCategory(184,"meals",categoryNumber,json);
-				processCategory(295,"meals",categoryNumber,json);
-				processCategory(339,"meals",categoryNumber,json);
+				processCategory(166,"fruits",categoryNumber,json);
+				processCategory(184,"fruits",categoryNumber,json);
+				processCategory(339,"drinks",categoryNumber,json);
 				processCategory(168,"musical_instruments",categoryNumber,json);
 				processCategory(171,"animals",categoryNumber,json);
 				processCategory(174,"animals",categoryNumber,json);
