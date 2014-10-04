@@ -148,14 +148,14 @@ public class Players extends Controller {
 		Device device = deviceService.device(playerId);
 		
 		if(device == null){
-			pushUtil.registerDevice(pushToken, hardwareId, "ES");
+			pushUtil.registerDevice(pushToken, hardwareId, "es");
 			pushUtil.setTag(hardwareId, playerId);
 			device = new Device(playerId,pushToken,hardwareId);
 			mongoDatastore.save(device);
 		}else{
 			if(!pushToken.equals(device.getPushToken())){
 				pushUtil.unRegisterDevice(hardwareId);
-				pushUtil.registerDevice(pushToken, hardwareId, "ES");
+				pushUtil.registerDevice(pushToken, hardwareId, "es");
 				device.setPushToken(pushToken);
 				mongoDatastore.save(device);
 			}

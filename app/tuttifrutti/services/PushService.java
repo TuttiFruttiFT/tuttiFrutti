@@ -101,22 +101,23 @@ public class PushService {
 		registerJsonBody.put("language", language);
 		registerJsonBody.put("hwid", hardwareId);
 		registerJsonBody.put("device_type", ANDROID_DEVICE_TYPE);
-		JsonNode registerJson = newObject().set("register", registerJsonBody);
+		JsonNode registerJson = newObject().set("request", registerJsonBody);
 		WSResponse r = WS.url(PUSHWOOSH_SERVICE_BASE_URL + "registerDevice").setContentType("application/json")
 				 .post(registerJson)
 				 .get(5000L);
 		
-		processPushResponse(r, "registering device with hwid " + hardwareId);
+		Logger.info(registerJson.asText());
+		processPushResponse(r, "registering device with hwid " + hardwareId + " and push token " + pushToken);
 	}
 	
 	public void setTag(String hardwareId,String playerId){
-		ObjectNode tagJson = newObject().put("player_id", playerId);
 		ObjectNode jsonBody = newObject();
 		jsonBody.put("application", APPLICATION_CODE);
 		jsonBody.put("hwid", hardwareId);
-		jsonBody.put("tags", tagJson);
+		jsonBody.put("tags", newObject().put("player_id", playerId));
+		JsonNode tagRequestJson = newObject().set("request", jsonBody);
 		WSResponse r = WS.url(PUSHWOOSH_SERVICE_BASE_URL + "setTags").setContentType("application/json")
-				 .post(jsonBody)
+				 .post(tagRequestJson)
 				 .get(5000L);
 		
 		processPushResponse(r, "set tag for player " + playerId);
@@ -126,8 +127,9 @@ public class PushService {
 		ObjectNode jsonBody = newObject();
 		jsonBody.put("application", APPLICATION_CODE);
 		jsonBody.put("hwid", hardwareId);
+		JsonNode unregisterJson = newObject().set("request", jsonBody);
 		WSResponse r = WS.url(PUSHWOOSH_SERVICE_BASE_URL + "unregisterDevice").setContentType("application/json")
-				 .post(jsonBody)
+				 .post(unregisterJson)
 				 .get(5000L);
 		
 		processPushResponse(r, "unregistering device with hwid " + hardwareId);
