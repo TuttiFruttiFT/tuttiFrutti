@@ -24,6 +24,8 @@ POST	/match/public								@tuttifrutti.controllers.Matches.publicMatch()
 
 POST	/match/private								@tuttifrutti.controllers.Matches.privateMatch()
 
+POST	/match/reject								@tuttifrutti.controllers.Matches.rejectedMatch()
+
 POST	/match/turn									@tuttifrutti.controllers.Matches.turn()
 
 GET		/match/:matchId/round/:roundNumber/result/:playerId	@tuttifrutti.controllers.Matches.roundResult(matchId,roundNumber:Int,playerId)
