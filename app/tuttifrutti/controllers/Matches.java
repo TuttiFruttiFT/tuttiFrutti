@@ -3,7 +3,6 @@ package tuttifrutti.controllers;
 import static play.libs.Json.fromJson;
 import static play.libs.Json.parse;
 import static play.libs.Json.toJson;
-import static tuttifrutti.models.enums.MatchState.PLAYER_TURN;
 import static tuttifrutti.utils.JsonUtil.parseListToJson;
 
 import java.util.ArrayList;
@@ -62,10 +61,6 @@ public class Matches extends Controller {
 		}
 		matchService.addPlayer(match, playerId);
 		PowerUp.generate(match);
-		if(match.readyToStart()){
-			match.setState(PLAYER_TURN);
-			matchService.publicMatchReady(playerId, match);
-		}
 		mongoDatastore.save(match);
         return ok(Json.toJson(match));
     }
@@ -106,8 +101,7 @@ public class Matches extends Controller {
 		String playerId = json.get("player_id").asText();
 		String matchId = json.get("match_id").asText();
 		
-		Match match = matchService.match(matchId, playerId);
-		matchService.playerReject(playerId, match);
+		matchService.playerReject(playerId, matchService.match(matchId, playerId));
 		
 		return ok();
 	}

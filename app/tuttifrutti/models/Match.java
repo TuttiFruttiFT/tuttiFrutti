@@ -13,6 +13,7 @@ import static tuttifrutti.models.enums.DuplaScore.ZERO_SCORE;
 import static tuttifrutti.models.enums.DuplaState.WRONG;
 import static tuttifrutti.models.enums.MatchState.FINISHED;
 import static tuttifrutti.models.enums.MatchState.OPPONENT_TURN;
+import static tuttifrutti.models.enums.MatchState.PLAYER_TURN;
 import static tuttifrutti.models.enums.MatchState.REJECTED;
 import static tuttifrutti.models.enums.MatchState.TO_BE_APPROVED;
 import static tuttifrutti.models.enums.MatchState.WAITING_FOR_OPPONENTS;
@@ -242,6 +243,7 @@ public class Match {
 				match.setState(FINISHED);
 				pushUtil.matchResult(match);
 			}else{				
+				match.setState(PLAYER_TURN);
 				roundService.create(match);
 				pushUtil.roundResult(match,round.getNumber());
 			}
