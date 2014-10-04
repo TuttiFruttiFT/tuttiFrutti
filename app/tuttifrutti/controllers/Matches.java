@@ -21,6 +21,7 @@ import tuttifrutti.models.Match;
 import tuttifrutti.models.MatchConfig;
 import tuttifrutti.models.PowerUp;
 import tuttifrutti.models.Round;
+import tuttifrutti.models.enums.MatchState;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -61,6 +62,10 @@ public class Matches extends Controller {
 		}
 		matchService.addPlayer(match, playerId);
 		PowerUp.generate(match);
+		if(match.readyToStart()){
+			match.setState(MatchState.PLAYER_TURN);
+			matchService.publicMatchReady(playerId, match);
+		}
 		mongoDatastore.save(match);
         return ok(Json.toJson(match));
     }
