@@ -454,7 +454,6 @@ public class Match {
 		return isNotEmpty(turns) && turns.stream().anyMatch(turn -> turn.getPlayer().getId().toString().equals(playerId));
 	}
 
-
 	public void publicMatchReady(String playerId, Match match) {
 		pushUtil.publicMatchReady(match.playerIdsExcept(playerId),match);
 	}

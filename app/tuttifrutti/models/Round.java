@@ -1,6 +1,7 @@
 package tuttifrutti.models;
 
 import static java.util.Collections.rotate;
+import static java.util.Collections.sort;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -109,5 +110,16 @@ public class Round {
 		while(!this.getTurns().get(0).getPlayer().getId().toString().equals(playerId)){
 			rotate(this.getTurns(), 1);
 		}			
+	}
+
+	public void sortDuplasInDescendingOrderByTime() {
+		this.getTurns().forEach(turn -> sort(turn.getDuplas(), (d1, d2) -> {
+			if(d1.getTime() < d2.getTime()){
+				return -1;
+			}else if(d1.getTime() > d2.getTime()){
+				return 1;
+			}
+			return 0;
+		}));
 	}
 }

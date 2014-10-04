@@ -143,6 +143,7 @@ public class Matches extends Controller {
 		
 		if(round != null){
 			round.reorderTurns(playerId);
+			round.sortDuplasInDescendingOrderByTime();
 			return ok(toJson(round));
 		}
 		
