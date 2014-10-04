@@ -209,10 +209,7 @@ public class Match {
 		
 		mongoDatastore.save(match);
 		
-		promise(() -> {
-			calculateResult(match);
-			return null;
-		});
+		calculateResult(match);
 		
 		return getWrongDuplas(duplas);
 	}
@@ -223,31 +220,34 @@ public class Match {
 
 	private void calculateResult(Match match) {
 		if(match.isRoundOver()){
-			Round round = match.getLastRound();
-			List<Turn> turns = round.getTurns();
-			
-			Integer minTime = getMinimumTime(turns);
-			
-			List<Dupla> allDuplas = flatDuplasFromTurns(turns);
-			
-			List<Dupla> validDuplas = processInvalidDuplas(minTime,allDuplas);
-			
-			processValidDuplas(match, validDuplas);
-			
-			calculateTurnScores(turns, match);
-			
-			saveOldRound(match, round, minTime);
-			
-			if(matchIsFinished(match, round)){
-				match.calculateWinner();
-				match.setState(FINISHED);
-				pushUtil.matchResult(match);
-			}else{				
-				match.setState(PLAYER_TURN);
-				roundService.create(match);
-				pushUtil.roundResult(match,round.getNumber());
-			}
-			mongoDatastore.save(match);
+			promise(() -> {				
+				Round round = match.getLastRound();
+				List<Turn> turns = round.getTurns();
+				
+				Integer minTime = getMinimumTime(turns);
+				
+				List<Dupla> allDuplas = flatDuplasFromTurns(turns);
+				
+				List<Dupla> validDuplas = processInvalidDuplas(minTime,allDuplas);
+				
+				processValidDuplas(match, validDuplas);
+				
+				calculateTurnScores(turns, match);
+				
+				saveOldRound(match, round, minTime);
+				
+				if(matchIsFinished(match, round)){
+					match.calculateWinner();
+					match.setState(FINISHED);
+					pushUtil.matchResult(match);
+				}else{				
+					match.setState(PLAYER_TURN);
+					roundService.create(match);
+					pushUtil.roundResult(match,round.getNumber());
+				}
+				mongoDatastore.save(match);
+				return null;
+			});
 		}
 	}
 
@@ -390,31 +390,37 @@ public class Match {
 		round.addTurn(turn);
 	}
 
-	public void playerReject(String playerId, Match match) {
+	public boolean playerReject(String playerId, Match match) {
 		Iterator<PlayerResult> it = match.getPlayerResults().iterator();
-		Player rejectorPlayer = new Player();
+		Player rejectorPlayer = null;
 		
-		while(it.hasNext()){
+		while(it.hasNext() && rejectorPlayer == null){
 			PlayerResult playerResult = it.next();
 			
 			Player player = playerResult.getPlayer();
 			if(player.getId().toString().equals(playerId)){
-				rejectorPlayer.setId(player.getId());
-				rejectorPlayer.setNickname(player.getNickname());
+				rejectorPlayer = new Player(player.getId(),player.getNickname());
 				it.remove();
 			}
 		}
 		
-		List<String> playerIds = match.playerIds();
-		
-		if(playerIds.size() == 1){
-			match.setState(REJECTED);
-			pushUtil.rejected(playerIds,match);
-		}else{
-			match.getConfig().setCurrentTotalNumberOfPlayers(match.getConfig().getCurrentTotalNumberOfPlayers() - 1);
-			pushUtil.rejectedByPlayer(playerIds,rejectorPlayer,match);
+		if(rejectorPlayer != null){			
+			List<String> playerIds = match.playerIds();
+			
+			if(playerIds.size() == 1){
+				match.setState(REJECTED);
+				pushUtil.rejected(playerIds,match);
+			}else{
+				match.getConfig().setCurrentTotalNumberOfPlayers(match.getConfig().getCurrentTotalNumberOfPlayers() - 1);
+				if(match.getLastRound().getTurns().size() == match.getConfig().getCurrentTotalNumberOfPlayers()){
+					this.calculateResult(match);
+				}
+				pushUtil.rejectedByPlayer(playerIds,rejectorPlayer,match);
+			}
+			mongoDatastore.save(match);
+			return true;
 		}
-		mongoDatastore.save(match);
+		return false;		
 	}
 	
 	private String nicknameFrom(String playerId, Match match) {

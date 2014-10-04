@@ -101,9 +101,12 @@ public class Matches extends Controller {
 		String playerId = json.get("player_id").asText();
 		String matchId = json.get("match_id").asText();
 		
-		matchService.playerReject(playerId, matchService.match(matchId, playerId));
+		boolean isPlayerRejected = matchService.playerReject(playerId, matchService.match(matchId, playerId));
 		
-		return ok();
+		if(isPlayerRejected){
+			return ok();
+		}
+		return badRequest(playerId + " is not present in match " + matchId);
 	}
 	
 	@BodyParser.Of(BodyParser.Json.class)

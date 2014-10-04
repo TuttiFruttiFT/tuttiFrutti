@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import org.bson.types.ObjectId;
@@ -25,6 +26,7 @@ import com.fasterxml.jackson.databind.ser.std.DateSerializer;
  */
 @Entity
 @Getter @Setter
+@NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Player {
@@ -59,4 +61,9 @@ public class Player {
 	@JsonSerialize(using = DateSerializer.class)
 	@JsonDeserialize(using = DateDeserializer.class)
 	private Date last;
+	
+	public Player(ObjectId id,String nickname){
+		this.id = id;
+		this.nickname = nickname;
+	}
 }
