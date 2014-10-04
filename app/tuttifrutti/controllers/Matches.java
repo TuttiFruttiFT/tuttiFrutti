@@ -64,7 +64,6 @@ public class Matches extends Controller {
 		PowerUp.generate(match);
 		if(match.readyToStart()){
 			match.setState(MatchState.PLAYER_TURN);
-			matchService.publicMatchReady(playerId, match);
 		}
 		mongoDatastore.save(match);
         return ok(Json.toJson(match));
