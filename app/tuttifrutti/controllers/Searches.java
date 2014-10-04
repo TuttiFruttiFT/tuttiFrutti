@@ -25,11 +25,13 @@ public class Searches extends Controller {
 		List<Player> players = new ArrayList<>();
 		
 		for(Player player : playerService.searchPlayers(palabraABuscar)){
-			Player reducedPlayer = new Player();
-			reducedPlayer.setId(player.getId());
-			reducedPlayer.setNickname(player.getNickname());
-			reducedPlayer.setImage(player.getImage());
-			players.add(reducedPlayer);
+			if(!player.getId().toString().equals(playerId)){				
+				Player reducedPlayer = new Player();
+				reducedPlayer.setId(player.getId());
+				reducedPlayer.setNickname(player.getNickname());
+				reducedPlayer.setImage(player.getImage());
+				players.add(reducedPlayer);
+			}
 		}
 		
         return ok(parse(parseListToJson(players)));
