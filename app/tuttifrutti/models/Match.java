@@ -92,6 +92,7 @@ public class Match {
 	private List<PlayerResult> playerResults;
 	
 	@Transient
+	@JsonProperty(value = "power_ups")
 	private List<PowerUp> powerUps;
 	
 	@JsonProperty(value = "current_round")
