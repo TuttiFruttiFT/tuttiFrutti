@@ -36,6 +36,9 @@ public class Matches extends Controller {
 	@Autowired
 	private Round roundService;
 	
+	@Autowired
+	private PowerUp powerUpService;
+	
 	@Transient
 	@Autowired
 	private Datastore mongoDatastore;
@@ -43,7 +46,7 @@ public class Matches extends Controller {
 	public Result getMatch(String matchId,String playerId) {
 		Match match = matchService.match(matchId, playerId);
 		
-		PowerUp.generate(match);
+		powerUpService.generate(match, playerId);
 		
         return ok(Json.toJson(match));
     }
@@ -61,7 +64,7 @@ public class Matches extends Controller {
 			match = matchService.createPublic(config);
 		}
 		matchService.addPlayer(match, playerId);
-		PowerUp.generate(match);
+		powerUpService.generate(match, playerId);
 		if(match.readyToStart()){
 			match.setState(MatchState.PLAYER_TURN);
 		}

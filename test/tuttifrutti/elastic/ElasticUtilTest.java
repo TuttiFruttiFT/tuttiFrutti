@@ -32,7 +32,7 @@ public class ElasticUtilTest extends ElasticSearchAwareTest {
 			saveDupla(new Category("meals"), duplas, "", 19);
 			saveDupla(new Category("countries"), duplas, null, 19);
 			
-			elasticUtil.validar(duplas, new LetterWrapper(Letter.R));
+			elasticUtil.validate(duplas, new LetterWrapper(Letter.R));
 			
 			for(Dupla dupla : duplas){
 				if(dupla.getCategory().getId().equals("bands")){

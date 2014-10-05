@@ -203,7 +203,7 @@ public class Match {
 
 	public List<Dupla> play(Match match, String playerId, List<Dupla> duplas, int time) {		
 		Round round = match.getLastRound();
-		elasticUtil.validar(duplas,round.getLetter());
+		elasticUtil.validate(duplas,round.getLetter());
 		
 		this.createTurn(match,playerId, duplas, time);
 		

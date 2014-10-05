@@ -43,6 +43,7 @@ import play.libs.ws.WS;
 import play.libs.ws.WSResponse;
 import tuttifrutti.elastic.ElasticSearchAwareTest;
 import tuttifrutti.models.Category;
+import tuttifrutti.models.Device;
 import tuttifrutti.models.Dupla;
 import tuttifrutti.models.LetterWrapper;
 import tuttifrutti.models.Match;
@@ -65,7 +66,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
  */
 public class MatchesTest extends ElasticSearchAwareTest {
 
-	@Test
+	//@Test
 	public void searchPublicMatchReturnsExistingMatch() {
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
 			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
@@ -104,7 +105,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 		});
 	}
 	
-	@Test
+	//@Test
 	public void searchPublicMatchReturnsANewOneBecauseTheyAreAllStarted() {
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
 			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
@@ -154,7 +155,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 		});
 	}
 
-	@Test
+	//@Test
 	public void searchPublicMatchReturnsCreatedMatch() {
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
 			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
@@ -187,6 +188,10 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
 			Player player1 = savePlayer(dataStore, "sarasas1@sarasa.com");
 			Player player2 = savePlayer(dataStore, "sarasas2@sarasa.com");
+			List<Device> devices = new ArrayList<>();
+			devices.add(new Device("Aaabbb3425","ooooPPPP98543"));
+			player2.setDevices(devices);
+			dataStore.save(player2);
 			Player player3 = savePlayer(dataStore, "sarasas3@sarasa.com");
 			Player player4 = savePlayer(dataStore, "sarasas4@sarasa.com");
 			String language = "ES";
@@ -219,7 +224,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 		});
 	}
 	
-	@Test
+	//@Test
 	public void turnWithTwoPlayers() {
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
 			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
@@ -313,7 +318,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 		});
 	}
 
-	@Test
+	//@Test
 	public void turnWithThreePlayers() { //TODO
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
 			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);

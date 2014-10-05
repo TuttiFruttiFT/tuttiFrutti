@@ -1,15 +1,24 @@
 package tuttifrutti.elastic;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.elasticsearch.action.search.SearchType.QUERY_THEN_FETCH;
+import static org.elasticsearch.common.lucene.search.function.CombineFunction.SUM;
 import static org.elasticsearch.common.unit.Fuzziness.AUTO;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
+import static org.elasticsearch.index.query.QueryBuilders.functionScoreQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
+import static org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders.randomFunction;
+import static tuttifrutti.utils.ConfigurationAccessor.i;
+import static tuttifrutti.utils.ConfigurationAccessor.s;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.search.MultiSearchRequest;
@@ -20,6 +29,8 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.MatchQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +38,7 @@ import org.springframework.stereotype.Component;
 
 import play.Logger;
 import tuttifrutti.models.Dupla;
+import tuttifrutti.models.Letter;
 import tuttifrutti.models.LetterWrapper;
 import tuttifrutti.models.ScoreCalculator;
 
@@ -35,6 +47,9 @@ import tuttifrutti.models.ScoreCalculator;
  */
 @Component
 public class ElasticUtil {
+	private static final int TIMEOUT_IN_MILLIS = i("elasticsearch.timeout");
+
+	private static final String INDEX = s("elasticsearch.index");
 	
 	@Autowired
 	private Client elasticSearchClient;
@@ -42,7 +57,7 @@ public class ElasticUtil {
 	@Autowired
 	private ScoreCalculator scoreCalculator;
 
-	public void validar(List<Dupla> duplas, LetterWrapper letter) {
+	public void validate(List<Dupla> duplas, LetterWrapper letter) {
 		Map<String,Dupla> mapDuplas = new HashMap<>();
 		MultiSearchRequest mSearch = new MultiSearchRequest();
 		
@@ -63,7 +78,7 @@ public class ElasticUtil {
 				boolQueryBuilder.should(matchQuery("letter", letter.getLetter().toString()));
 				boolQueryBuilder.minimumNumberShouldMatch(1);
 				
-				SearchRequestBuilder searchQuery = elasticSearchClient.prepareSearch("categories").setTypes(categoryId).setSize(1);
+				SearchRequestBuilder searchQuery = elasticSearchClient.prepareSearch(INDEX).setTypes(categoryId).setSize(1);
 				searchQuery.setQuery(boolQueryBuilder);
 				
 				mSearch.add(searchQuery);
@@ -97,5 +112,23 @@ public class ElasticUtil {
 			}
 		}
 	}
-
+	
+	public List<String> searchWords(Letter letter,String category,int numberOfWords){
+		List<String> words = new ArrayList<>();
+		SearchRequestBuilder searchQuery = elasticSearchClient.prepareSearch(INDEX).setSearchType(QUERY_THEN_FETCH)
+				.setSize(numberOfWords).setTypes(category);
+		QueryBuilder queryBuilder = matchQuery("letter", letter.getLetter().toString());
+		FunctionScoreQueryBuilder functionQueryBuilder = functionScoreQuery(queryBuilder).boostMode(SUM).scoreMode("sum");
+		functionQueryBuilder.add(randomFunction(new Random().nextLong()));
+		searchQuery.setQuery(functionQueryBuilder);
+		
+		SearchResponse searchResponse =  searchQuery.execute().actionGet(TIMEOUT_IN_MILLIS, MILLISECONDS);
+		SearchHits hits = searchResponse.getHits();
+		Iterator<SearchHit> it = hits.iterator();
+		while (it.hasNext()){
+			SearchHit hit = it.next();
+			words.add(hit.sourceAsMap().get("value").toString());
+		}
+		return words;
+	}
 }
