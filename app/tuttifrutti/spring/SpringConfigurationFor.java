@@ -11,7 +11,6 @@ import tuttifrutti.models.MatchConfig;
 import tuttifrutti.models.Pack;
 import tuttifrutti.models.Player;
 import tuttifrutti.models.PlayerResult;
-import tuttifrutti.models.PowerUp;
 import tuttifrutti.models.Round;
 import tuttifrutti.models.Suggestion;
 import tuttifrutti.models.Turn;

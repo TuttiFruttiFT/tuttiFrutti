@@ -37,9 +37,6 @@ public class Players extends Controller {
 	private Match matchService;
 	
 	@Autowired
-	private Device deviceService;
-	
-	@Autowired
 	private Datastore mongoDatastore;
 	
 	@Transient
@@ -141,24 +138,26 @@ public class Players extends Controller {
 	@BodyParser.Of(BodyParser.Json.class)
 	public Result registerDevice(){
 		JsonNode json = request().body().asJson();
-		String pushToken = json.get("push_token").asText();
+		String registrationId = json.get("registration_id").asText();
 		String hardwareId = json.get("hwid").asText();
 		String playerId = json.get("player_id").asText();
 		
-		Device device = deviceService.device(playerId);
+		Player player = playerService.player(playerId);
 		
-		if(device == null){
-			pushUtil.registerDevice(pushToken, hardwareId, "es");
-			pushUtil.setTag(hardwareId, playerId);
-			device = new Device(playerId,pushToken,hardwareId);
-			mongoDatastore.save(device);
+		if(player == null){
+			return badRequest("Player " + playerId + " does not exist");
 		}else{
-			if(!pushToken.equals(device.getPushToken())){
-				pushUtil.unRegisterDevice(hardwareId);
-				pushUtil.registerDevice(pushToken, hardwareId, "es");
-				device.setPushToken(pushToken);
-				mongoDatastore.save(device);
+			if(player.getDevices() == null){
+				List<Device> devices = new ArrayList<>();
+				devices.add(new Device(registrationId,hardwareId));
+				player.setDevices(devices);
+			}else{
+				if(player.getDevices().stream().anyMatch(device -> device.getRegistrationId().equals(registrationId))){
+					return badRequest("registration id " + registrationId + " for player " + playerId + " already registered");
+				}
+				player.getDevices().add(new Device(registrationId,hardwareId));
 			}
+			mongoDatastore.save(player);
 		}
 		
 		return ok();

@@ -5,6 +5,7 @@ import static play.mvc.Http.Status.OK;
 import static play.test.Helpers.fakeApplication;
 import static play.test.Helpers.running;
 import static play.test.Helpers.testServer;
+import static tuttifrutti.utils.TestUtils.savePlayer;
 
 import org.junit.Test;
 import org.mongodb.morphia.Datastore;
@@ -12,6 +13,7 @@ import org.mongodb.morphia.Datastore;
 import play.libs.ws.WS;
 import play.libs.ws.WSResponse;
 import tuttifrutti.models.Device;
+import tuttifrutti.models.Player;
 import tuttifrutti.utils.SpringApplicationContext;
 
 public class PushServiceTest {
@@ -21,27 +23,21 @@ public class PushServiceTest {
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
 			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
 			
+			Player player = savePlayer(dataStore, "sarasas@sarasa.com");
+			
 			WSResponse r = WS.url("http://localhost:9000/player/device").setContentType("application/json")
-					   .post("{\"push_token\":\"87feyw08f7yer8\",\"hwid\":\"1122eedd\",\"player_id\":\"541f1b66e4b01fc869ae8af5\"}")
+					   .post("{\"registration_id\":\"87feyw08f7yer8\",\"hwid\":\"1122eedd\",\"player_id\":\"" + player.getId().toString()  + "\"}")
 					   .get(5000000L);
 			
 			assertThat(r.getStatus()).isEqualTo(OK);
 			
-			Device device = dataStore.get(Device.class,"541f1b66e4b01fc869ae8af5");
-			assertThat(device).isNotNull();
+			Player modifiedPlayer = dataStore.get(Player.class,player.getId());
+			assertThat(modifiedPlayer).isNotNull();
+			
+			Device device = modifiedPlayer.getDevices().get(0);
 			
 			assertThat(device.getHardwareId()).isEqualTo("1122eedd");
-			assertThat(device.getPlayerId().toString()).isEqualTo("541f1b66e4b01fc869ae8af5");
-			assertThat(device.getPushToken()).isEqualTo("87feyw08f7yer8");
+			assertThat(device.getRegistrationId()).isEqualTo("87feyw08f7yer8");
 		});
 	}
-
-	@Test
-	public void updateDeviceInfo() {
-		running(testServer(9000, fakeApplication()), (Runnable) () -> {
-			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
-			//TODO implementar
-		});
-	}
-	
 }

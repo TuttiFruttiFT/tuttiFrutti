@@ -26,7 +26,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -406,7 +405,7 @@ public class Match {
 		}
 		
 		if(rejectorPlayer != null){			
-			List<String> playerIds = match.playerIds();
+			List<Player> playerIds = match.players();
 			
 			if(playerIds.size() == 1){
 				match.setState(REJECTED);
@@ -416,7 +415,7 @@ public class Match {
 				if(match.getLastRound().getTurns().size() == match.getConfig().getCurrentTotalNumberOfPlayers()){
 					this.calculateResult(match);
 				}
-				pushUtil.rejectedByPlayer(playerIds,rejectorPlayer,match);
+				pushUtil.rejectedByPlayer(rejectorPlayer,match);
 			}
 			mongoDatastore.save(match);
 			return true;
@@ -435,11 +434,16 @@ public class Match {
 
 	public List<String> playerIdsExcept(String playerId) {
 		return this.getPlayerResults().stream().map(result -> result.getPlayer().getId().toString())
-				.filter(id -> !id.equals(playerId)).collect(Collectors.toList());
+				.filter(id -> !id.equals(playerId)).collect(toList());
 	}
 
 	public List<Player> players() {
-		return this.getPlayerResults().stream().map(result -> result.getPlayer()).collect(Collectors.toList());
+		return this.getPlayerResults().stream().map(result -> result.getPlayer()).collect(toList());
+	}
+	
+	public List<Player> playersExcept(String playerId) {
+		return this.getPlayerResults().stream().map(result -> result.getPlayer())
+				.filter(player -> !player.getId().toString().equals(playerId)).collect(toList());
 	}
 
 	public boolean playerHasAlreadyPlayed(String playerId) {
@@ -455,13 +459,8 @@ public class Match {
 		return isNotEmpty(turns) && turns.stream().anyMatch(turn -> turn.getPlayer().getId().toString().equals(playerId));
 	}
 
-	public void publicMatchReady(String playerId, Match match) {
-		pushUtil.publicMatchReady(match.playerIdsExcept(playerId),match);
-	}
-
-
-	public void privateMatchReady(List<String> players, Match match) {
-		pushUtil.privateMatchReady(players, match);
+	public void privateMatchReady(Match match, List<Player> players) {
+		pushUtil.privateMatchReady(match, players);
 	}
 }
 

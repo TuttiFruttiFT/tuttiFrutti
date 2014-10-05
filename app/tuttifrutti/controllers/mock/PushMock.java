@@ -10,19 +10,7 @@ import play.mvc.Result;
 @org.springframework.stereotype.Controller
 public class PushMock extends Controller {
 
-	public Result createTargetedMessage(){
-		return ok(Json.parse("{\"status_code\":200,\"status_message\":\"OK\",\"response\":{\"skipped\":[]}}"));
-	}
-	
-	public Result registerDevice(){
-		return ok(Json.parse("{\"status_code\":200,\"status_message\":\"OK\",\"response\":{\"skipped\":[]}}"));
-	}
-	
-	public Result setTags(){
-		return ok(Json.parse("{\"status_code\":200,\"status_message\":\"OK\",\"response\":{\"skipped\":[]}}"));
-	}
-	
-	public Result unregisterDevice(){
-		return ok(Json.parse("{\"status_code\":200,\"status_message\":\"OK\",\"response\":{\"skipped\":[]}}"));
+	public Result sendGCMMessage(){
+		return ok(Json.parse("{ \"multicast_id\": 108, \"success\": 1, \"failure\": 0, \"canonical_ids\": 0, \"results\": [{ \"message_id\": \"1:08\" } ] }"));
 	}
 }

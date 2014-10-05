@@ -94,7 +94,7 @@ public class Matches extends Controller {
 		
 		mongoDatastore.save(match);
 		
-		matchService.privateMatchReady(playerIds, match);
+		matchService.privateMatchReady(match, match.playersExcept(playerId));
 		
         return ok(Json.toJson(match));
     }

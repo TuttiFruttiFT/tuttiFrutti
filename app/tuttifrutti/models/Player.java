@@ -14,6 +14,7 @@ import org.mongodb.morphia.annotations.Property;
 
 import tuttifrutti.serializers.ObjectIdSerializer;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -57,6 +58,9 @@ public class Player {
 	private String image;
 
 	private List<String> friends;
+	
+	@JsonIgnore
+	private List<Device> devices;
 	
 	@JsonSerialize(using = DateSerializer.class)
 	@JsonDeserialize(using = DateDeserializer.class)

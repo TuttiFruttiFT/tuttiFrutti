@@ -50,10 +50,4 @@ GET		/category/list/:language					@tuttifrutti.controllers.Categories.availableC
 
 PUT		/category/loader							@tuttifrutti.controllers.CategoryLoader.load94secondsCategories()
 
-POST	/mock/push/createTargetedMessage			@tuttifrutti.controllers.mock.PushMock.createTargetedMessage()
-
-POST	/mock/push/registerDevice					@tuttifrutti.controllers.mock.PushMock.registerDevice()
-
-POST	/mock/push/setTags							@tuttifrutti.controllers.mock.PushMock.setTags()
-
-POST	/mock/push/unregisterDevice					@tuttifrutti.controllers.mock.PushMock.unregisterDevice()
+POST	/mock/gcm/send								@tuttifrutti.controllers.mock.PushMock.sendGCMMessage()
