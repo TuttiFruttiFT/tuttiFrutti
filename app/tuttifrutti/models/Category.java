@@ -46,6 +46,8 @@ public class Category {
 	
 	private String image;
 	
+	private String bgcolor;
+	
 	@Transient
 	@Autowired
 	private Datastore mongoDatastore;
