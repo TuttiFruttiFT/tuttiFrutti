@@ -37,7 +37,9 @@ public class CategoryLoader extends Controller {
 	public Result load94secondsCategories(){
 		InputStream inJson = CategoryLoader.class.getResourceAsStream("/categorias/ninetyfour_seconds_es.json");
 		InputStream verbsFile = CategoryLoader.class.getResourceAsStream("/categorias/verbs.txt");
+		InputStream bandsFile = CategoryLoader.class.getResourceAsStream("/categorias/bandas_def.txt");
 		BufferedReader br = null;
+		String line;
 		try {
 			JsonNode jsonArray = new ObjectMapper().readTree(inJson);
 			
@@ -59,13 +61,21 @@ public class CategoryLoader extends Controller {
 			}
 			
 			br = new BufferedReader(new InputStreamReader(verbsFile, Charset.forName("UTF-8")));
-			String line;
 			while ((line = br.readLine()) != null) {
 				String trimmedLine = line.trim();
-				if(hasText(trimmedLine)){					
+				if(hasText(trimmedLine)){
 					indexWord("verbs", trimmedLine);
 				}
 			}
+			
+			br = new BufferedReader(new InputStreamReader(bandsFile, Charset.forName("UTF-8")));
+			while ((line = br.readLine()) != null) {
+				String trimmedLine = line.trim();
+				if(hasText(trimmedLine)){
+					indexWord("bands", trimmedLine);
+				}
+			}
+			
 			return ok();
 		} catch (IOException e) {
 			Logger.error("Processing categories json",e);
@@ -88,11 +98,12 @@ public class CategoryLoader extends Controller {
 	}
 
 	private void index94JsonWord(JsonNode jsonWord, String categoryName) {
-		String word = processWord(Json.stringify(jsonWord.get("m")));
+		String word = process94Word(Json.stringify(jsonWord.get("m")));
 		indexWord(categoryName, word);
 	}
 
-	private void indexWord(String categoryName, String word) {
+	private void indexWord(String categoryName, String unprocessedWord) {
+		String word = processWord(unprocessedWord);
 		String json = Json.newObject().put("value", word).put("letter", getLetter(word)).put("language", "ES").toString();
 		IndexResponse response = elasticSearchClient.prepareIndex(s("elasticsearch.updater.index"), categoryName).setSource(json).execute().actionGet();
 		response.getIndex();
@@ -102,8 +113,11 @@ public class CategoryLoader extends Controller {
 		return word.substring(0, 1);
 	}
 
+	private String process94Word(String unprocessedWord) {
+		return unprocessedWord.substring(1, unprocessedWord.length() - 1);
+	}
+	
 	private String processWord(String unprocessedWord) {
-		String word = unprocessedWord.substring(1, unprocessedWord.length() - 1);
-		return word.toLowerCase();
+		return unprocessedWord.toLowerCase();
 	}
 }
