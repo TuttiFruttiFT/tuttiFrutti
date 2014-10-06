@@ -22,10 +22,10 @@ public class PowerUpWordLoader implements Runnable{
 	
 	@Override
 	public void run() {
-		for(Category category : categoryService.categories("ES")){			
-			for(Letter letter : Letter.values()){
-				elasticUtil.searchWords(letter, category.getId(), NUMBER_WORDS_PER_CATEGORY);
-			}
-		}
+//		for(Category category : categoryService.categories("ES")){			
+//			for(Letter letter : Letter.values()){
+//				elasticUtil.searchWords(letter, category.getId(), NUMBER_WORDS_PER_CATEGORY);
+//			}
+//		}
 	}
 }

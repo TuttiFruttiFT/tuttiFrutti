@@ -105,7 +105,7 @@ public class CategoryLoader extends Controller {
 	private void indexWord(String categoryName, String unprocessedWord) {
 		String word = processWord(unprocessedWord);
 		String json = Json.newObject().put("value", word).put("letter", getLetter(word)).put("language", "ES").toString();
-		IndexResponse response = elasticSearchClient.prepareIndex(s("elasticsearch.updater.index"), categoryName).setSource(json).execute().actionGet();
+		IndexResponse response = elasticSearchClient.prepareIndex(s("elasticsearch.index"), categoryName).setSource(json).execute().actionGet();
 		response.getIndex();
 	}
 

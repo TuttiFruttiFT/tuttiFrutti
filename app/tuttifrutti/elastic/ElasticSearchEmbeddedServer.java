@@ -102,6 +102,6 @@ public class ElasticSearchEmbeddedServer {
 			inJson.close();
 		}
 		
-		client.prepareIndex(s("elasticsearch.updater.index"), categoryName).setSource(json).execute().actionGet();
+		client.prepareIndex(s("elasticsearch.index"), categoryName).setSource(json).execute().actionGet();
 	}
 }

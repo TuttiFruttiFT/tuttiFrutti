@@ -4,6 +4,7 @@ import static org.fest.assertions.Assertions.assertThat;
 import static play.test.Helpers.fakeApplication;
 import static play.test.Helpers.running;
 import static play.test.Helpers.testServer;
+import static tuttifrutti.models.Letter.R;
 import static tuttifrutti.models.enums.DuplaState.CORRECTED;
 import static tuttifrutti.models.enums.DuplaState.WRONG;
 
@@ -32,7 +33,7 @@ public class ElasticUtilTest extends ElasticSearchAwareTest {
 			saveDupla(new Category("meals"), duplas, "", 19);
 			saveDupla(new Category("countries"), duplas, null, 19);
 			
-			elasticUtil.validate(duplas, new LetterWrapper(Letter.R));
+			elasticUtil.validate(duplas, new LetterWrapper(R));
 			
 			for(Dupla dupla : duplas){
 				if(dupla.getCategory().getId().equals("bands")){
