@@ -132,7 +132,7 @@ public class PushService {
 		for(int i = 0;i < RETRIES_NUMBER;i++){
 			WSResponse r = null;
 			try{				
-				r = WS.url(GCM_SEND_URL).setContentType("application/json").setHeader("Authorization", "key=" + API_KEY)
+				r = WS.url("https://android.googleapis.com/gcm/send/").setContentType("application/json").setHeader("Authorization", "key=" + API_KEY)
 						.post(request)
 						.get(5000L);
 			}catch(Exception e){
