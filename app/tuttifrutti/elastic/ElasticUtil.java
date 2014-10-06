@@ -78,7 +78,7 @@ public class ElasticUtil {
 				boolQueryBuilder.should(matchQuery("letter", letter.getLetter().toString()));
 				boolQueryBuilder.minimumNumberShouldMatch(1);
 				
-				SearchRequestBuilder searchQuery = elasticSearchClient.prepareSearch(INDEX).setTypes(categoryId).setSize(1);
+				SearchRequestBuilder searchQuery = elasticSearchClient.prepareSearch("categories").setTypes(categoryId).setSize(1);
 				searchQuery.setQuery(boolQueryBuilder);
 				
 				mSearch.add(searchQuery);
@@ -115,7 +115,7 @@ public class ElasticUtil {
 	
 	public List<String> searchWords(Letter letter,String category,int numberOfWords){
 		List<String> words = new ArrayList<>();
-		SearchRequestBuilder searchQuery = elasticSearchClient.prepareSearch(INDEX).setSearchType(QUERY_THEN_FETCH)
+		SearchRequestBuilder searchQuery = elasticSearchClient.prepareSearch("categories").setSearchType(QUERY_THEN_FETCH)
 				.setSize(numberOfWords).setTypes(category);
 		QueryBuilder queryBuilder = matchQuery("letter", letter.getLetter().toString());
 		FunctionScoreQueryBuilder functionQueryBuilder = functionScoreQuery(queryBuilder).boostMode(SUM).scoreMode("sum");
