@@ -137,6 +137,7 @@ public class PushService {
 						.get(5000L);
 			}catch(Exception e){
 				Logger.error("sending gcm push",e);
+				return;
 			}
 			
 			if(r.getStatus() == Status.OK){
