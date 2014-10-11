@@ -20,6 +20,10 @@ import static tuttifrutti.models.enums.MatchState.PLAYER_TURN;
 import static tuttifrutti.models.enums.MatchState.TO_BE_APPROVED;
 import static tuttifrutti.models.enums.MatchType.PRIVATE;
 import static tuttifrutti.models.enums.MatchType.PUBLIC;
+import static tuttifrutti.models.enums.PowerUpType.autocomplete;
+import static tuttifrutti.models.enums.PowerUpType.buy_time;
+import static tuttifrutti.models.enums.PowerUpType.opponent_word;
+import static tuttifrutti.models.enums.PowerUpType.suggest;
 import static tuttifrutti.utils.TestUtils.createMatch;
 import static tuttifrutti.utils.TestUtils.createMatchConfig;
 import static tuttifrutti.utils.TestUtils.createRound;
@@ -50,6 +54,7 @@ import tuttifrutti.models.Match;
 import tuttifrutti.models.MatchConfig;
 import tuttifrutti.models.Player;
 import tuttifrutti.models.PlayerResult;
+import tuttifrutti.models.PowerUp;
 import tuttifrutti.models.Round;
 import tuttifrutti.models.Turn;
 import tuttifrutti.models.enums.DuplaScore;
@@ -66,7 +71,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
  */
 public class MatchesTest extends ElasticSearchAwareTest {
 
-	//@Test
+	@Test
 	public void searchPublicMatchReturnsExistingMatch() {
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
 			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
@@ -105,7 +110,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 		});
 	}
 	
-	//@Test
+	@Test
 	public void searchPublicMatchReturnsANewOneBecauseTheyAreAllStarted() {
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
 			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
@@ -155,7 +160,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 		});
 	}
 
-	//@Test
+	@Test
 	public void searchPublicMatchReturnsCreatedMatch() {
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
 			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
@@ -224,7 +229,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 		});
 	}
 	
-	//@Test
+	@Test
 	public void turnWithTwoPlayers() {
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
 			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
@@ -318,21 +323,22 @@ public class MatchesTest extends ElasticSearchAwareTest {
 		});
 	}
 
-	//@Test
-	public void turnWithThreePlayers() { //TODO
+	@Test
+	public void turnWithThreePlayersAndPowerUps() {
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
 			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
-			Round roundService = SpringApplicationContext.getBeanNamed("round", Round.class);
 			populateElastic(getJsonFilesFotCategories());
 			
 			String language = "ES";
 			int roundNumber = 1;
 			
-			Player player = savePlayer(dataStore, "sarasas@sarasa.com");
+			Player player1 = savePlayer(dataStore, "sarasas@sarasa.com");
 			Player player2 = savePlayer(dataStore, "sarasas2@sarasa.com");
+			Player player3 = savePlayer(dataStore, "sarasas3@sarasa.com");
 
-			PlayerResult playerResult1 = savePlayerResult(dataStore, player, 35);
+			PlayerResult playerResult1 = savePlayerResult(dataStore, player1, 35);
 			PlayerResult playerResult2 = savePlayerResult(dataStore, player2, 40);
+			PlayerResult playerResult3 = savePlayerResult(dataStore, player3, 50);
 			
 			saveCategories(dataStore, language);
 
@@ -350,48 +356,78 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			saveDupla(new Category("verbs"), duplas2, "sentir", "servir",8, CORRECTED);
 			saveDupla(new Category("sports"), duplas2, "softball", "softból",26, CORRECTED);
 			saveDupla(new Category("meals"), duplas2, "sandia", "savia de abedul",35, CORRECTED);
-			saveDupla(new Category("colors"), duplas2, "salmon", "salmón",40, CORRECTED);
+			saveDupla(new Category("colors"), duplas2, "sarlanga", "",40, WRONG);
 			
 			Turn turn = createTurn(player2.getId().toString(), 45, 0, duplas2);
 			
 			Round lastRound = createRound(turn, roundNumber, S);
 			
-			MatchConfig matchConfig = createMatchConfig(language, N, PUBLIC, 2, false, 25);
-			Match match = createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig,
+			MatchConfig matchConfig = createMatchConfig(language, N, PUBLIC, 3, true, 25);
+			Match match = createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2,playerResult3), matchConfig,
 									  getCategoriesFromDuplas(duplas, language), PLAYER_TURN);
 			
-			WSResponse r = WS.url("http://localhost:9000/match/turn").setContentType("application/json")
-					 .post("{\"player_id\" : \"" + player.getId().toString() + "\", \"match_id\":\"" + match.getId().toString() 
+			WSResponse turnResponse = WS.url("http://localhost:9000/match/turn").setContentType("application/json")
+					 .post("{\"player_id\" : \"" + player1.getId().toString() + "\", \"match_id\":\"" + match.getId().toString() 
 						   + "\", \"time\": 45" 
 						   + ", \"duplas\":" + JsonUtil.parseListToJson(duplas)
 						   + "}")
 					 .get(5000000L);
 			
-			assertThat(r).isNotNull();
-			assertThat(r.getStatus()).isEqualTo(OK);
+			assertThat(turnResponse).isNotNull();
+			assertThat(turnResponse.getStatus()).isEqualTo(OK);
 
-			JsonNode jsonNode = r.asJson();
+			JsonNode jsonNode = turnResponse.asJson();
 			JsonNode jsonWrongDupla = jsonNode.get(0);
 			
 			assertThat(jsonWrongDupla).isNotNull();
-		
 			
 			sleep(500L);
 			
-			Match modifiedMatch = dataStore.get(Match.class, match.getId());
-			Round modifiedRound = roundService.getRound(match.getId().toString(), roundNumber);
-			Round newRound = modifiedMatch.getLastRound();
+			WSResponse matchResponsePlayer3 = WS.url("http://localhost:9000/match/" + match.getId().toString())
+										 .setQueryParameter("player_id", player3.getId().toString()).get().get(50000000L);
 			
-			assertThat(newRound.getLetter()).isNotEqualTo(modifiedRound.getLetter());
-			assertThat(newRound.getLetter().getPreviousLetters()).contains(S.toString());
+			assertThat(matchResponsePlayer3).isNotNull();
+			assertThat(matchResponsePlayer3.getStatus()).isEqualTo(OK);
 			
+			Match resultMatchPlayer3 = Json.fromJson(matchResponsePlayer3.asJson(), Match.class);
 			
+			List<PowerUp> powerUps = resultMatchPlayer3.getPowerUps();
 			
-			assertThat(modifiedRound.getEndTime()).isEqualTo(45);
+			assertThat(powerUps).isNotNull();
+			assertThat(powerUps.size()).isEqualTo(4);
+			
+			for(PowerUp powerUp : powerUps){
+				if(powerUp.getName().equals(opponent_word)){
+					List<Dupla> opponentDuplas = powerUp.getDuplas();
+					
+					assertThat(opponentDuplas.size()).isEqualTo(6);
+					opponentDuplas.forEach(dupla -> assertThat(dupla.getWrittenWord()).isNotEmpty());
+				}
+				
+				if(powerUp.getName().equals(autocomplete)){
+					assertThat(powerUp.getDuplas().size()).isEqualTo(0);
+				}
+				
+				if(powerUp.getName().equals(suggest)){
+					assertThat(powerUp.getDuplas().size()).isEqualTo(0);
+				}
+				
+				if(powerUp.getName().equals(buy_time)){
+					assertThat(powerUp.getDuplas().size()).isEqualTo(0);
+				}
+			}
+			
+			WSResponse matchResponsePlayer1 = WS.url("http://localhost:9000/match/" + match.getId().toString())
+					 							.setQueryParameter("player_id", player1.getId().toString()).get().get(50000000L);
+			
+			assertThat(matchResponsePlayer1).isNotNull();
+			assertThat(matchResponsePlayer1.getStatus()).isEqualTo(OK);
+			
+			Match resultMatchPlayer1 = Json.fromJson(matchResponsePlayer1.asJson(), Match.class);
+			
+			assertThat(resultMatchPlayer1.getPowerUps()).isNull();
 		});
 	}
-	
-	
 	
 	private void assertPlayerScores(Match modifiedMatch, Player player,Player player2, int scorePlayer1, int scorePlayer2) {
 		for(PlayerResult playerResult : modifiedMatch.getPlayerResults()){

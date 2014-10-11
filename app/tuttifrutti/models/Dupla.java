@@ -62,4 +62,11 @@ public class Dupla implements Comparable<Dupla>{
 	public int compareTo(Dupla dupla) {
 		return this.category.getId().compareTo(dupla.getCategory().getId());
 	}
+
+	public Dupla simplified() {
+		Dupla dupla = new Dupla();
+		dupla.setWrittenWord(this.getWrittenWord());
+		dupla.setCategory(new Category(this.getCategory().getId()));
+		return dupla;
+	}
 }

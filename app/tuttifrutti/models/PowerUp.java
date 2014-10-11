@@ -4,8 +4,10 @@ import static java.util.Collections.shuffle;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static tuttifrutti.models.enums.DuplaState.WRONG;
+import static tuttifrutti.models.enums.PowerUpType.autocomplete;
 import static tuttifrutti.models.enums.PowerUpType.buy_time;
 import static tuttifrutti.models.enums.PowerUpType.opponent_word;
+import static tuttifrutti.models.enums.PowerUpType.suggest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,8 +19,6 @@ import lombok.Setter;
 
 import org.springframework.stereotype.Component;
 
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.Pipeline;
 import tuttifrutti.models.enums.PowerUpType;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -45,23 +45,21 @@ public class PowerUp {
 	public void generate(Match match, String playerId) {
 		if(match.getConfig().isPowerUpsEnabled() && !match.playerHasAlreadyPlayed(playerId)){
 			match.setPowerUps(new ArrayList<>());
-//			autoCompleteWords(match);
-//			suggestWords(match);
-//			opponentWords(match);
+			autoCompleteWords(match);
+			suggestWords(match);
+			opponentWords(match);
 			buyTime(match);
 		}
 	}
 
 	private void buyTime(Match match) {
-		match.getPowerUps().add(new PowerUp(buy_time));
+		match.getPowerUps().add(new PowerUp(buy_time,new ArrayList<>()));
 	}
 
 	private void opponentWords(Match match) {
 		PowerUp powerUp = new PowerUp(opponent_word,new ArrayList<>());
 		List<Turn> turns = match.getLastRound().getTurns();
-		if(isEmpty(turns)){
-			match.getPowerUps().add(powerUp);
-		}else{
+		if(!isEmpty(turns)){
 			List<Dupla> allDuplas = new ArrayList<>();
 			turns.forEach(turn -> allDuplas.addAll(turn.getDuplas()));
 			List<Dupla> validDuplas = allDuplas.stream().filter(dupla -> !dupla.getState().equals(WRONG)).collect(toList());
@@ -69,25 +67,25 @@ public class PowerUp {
 				List<Dupla> categoryDuplas = validDuplas.stream().filter(dupla -> dupla.getCategory().getId().equals(category.getId())).collect(toList());
 				if(!isEmpty(categoryDuplas)){
 					shuffle(categoryDuplas);
-					powerUp.getDuplas().add(categoryDuplas.get(0));
+					powerUp.getDuplas().add(categoryDuplas.get(0).simplified());
 				}else{
 					//TODO no devuelvo nada, ver si necesito agregar una dupla solo con categoría
 				}
 			}
 		}
+		match.getPowerUps().add(powerUp);
 	}
 
 	private void suggestWords(Match match) {
-//		Jedis j = null;
-//		Pipeline pipeline = j.pipelined();
-//		pipeline.rpoplpush("", "");
-//		List<Object> results = pipeline.syncAndReturnAll();
+		PowerUp powerUp = new PowerUp(suggest,new ArrayList<>());
 		// TODO implementar
-		
+		match.getPowerUps().add(powerUp);
 	}
 
 	private void autoCompleteWords(Match match) {
+		PowerUp powerUp = new PowerUp(autocomplete,new ArrayList<>());
 		// TODO implementar
+		match.getPowerUps().add(powerUp);
 		
 	}
 }
