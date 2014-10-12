@@ -15,7 +15,6 @@ import org.junit.Test;
 
 import tuttifrutti.models.Category;
 import tuttifrutti.models.Dupla;
-import tuttifrutti.models.Letter;
 import tuttifrutti.models.LetterWrapper;
 import tuttifrutti.utils.SpringApplicationContext;
 

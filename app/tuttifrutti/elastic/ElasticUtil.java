@@ -10,7 +10,6 @@ import static org.elasticsearch.index.query.QueryBuilders.functionScoreQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders.randomFunction;
 import static tuttifrutti.utils.ConfigurationAccessor.i;
-import static tuttifrutti.utils.ConfigurationAccessor.s;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,8 +48,6 @@ import tuttifrutti.models.ScoreCalculator;
 public class ElasticUtil {
 	private static final int TIMEOUT_IN_MILLIS = i("elasticsearch.timeout");
 
-	private static final String INDEX = s("elasticsearch.index");
-	
 	@Autowired
 	private Client elasticSearchClient;
 	

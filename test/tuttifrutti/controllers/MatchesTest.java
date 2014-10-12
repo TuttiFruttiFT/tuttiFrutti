@@ -394,37 +394,30 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			
 			Match resultMatchPlayer3 = Json.fromJson(matchResponsePlayer3.asJson(), Match.class);
 			
-			List<PowerUp> powerUps = resultMatchPlayer3.getPowerUps();
-			
-			assertThat(powerUps).isNotNull();
-			assertThat(powerUps.size()).isEqualTo(4);
-			
-			for(PowerUp powerUp : powerUps){
-				if(powerUp.getName().equals(opponent_word)){
-					List<Dupla> opponentDuplas = powerUp.getDuplas();
-					
-					assertThat(opponentDuplas.size()).isEqualTo(6);
-					opponentDuplas.forEach(dupla -> assertThat(dupla.getWrittenWord()).isNotEmpty());
-				}
+			resultMatchPlayer3.getCategories().forEach(category -> {				
+				List<PowerUp> powerUps = category.getPowerUps();
 				
-				if(powerUp.getName().equals(autocomplete)){
-					List<Dupla> autoCompleteDuplas = powerUp.getDuplas();
-					
-					assertThat(autoCompleteDuplas.size()).isEqualTo(6);
-					autoCompleteDuplas.forEach(dupla -> assertThat(dupla.getWrittenWord()).isNotEmpty());
-				}
+				assertThat(powerUps).isNotNull();
+				assertThat(powerUps.size()).isEqualTo(4);
 				
-				if(powerUp.getName().equals(suggest)){
-					List<Dupla> suggestDuplas = powerUp.getDuplas();
+				powerUps.forEach(powerUp -> {
+					if(powerUp.getName().equals(opponent_word)){
+						assertThat(powerUp.getValue()).isNotEmpty();
+					}
 					
-					assertThat(suggestDuplas.size()).isEqualTo(6);
-					suggestDuplas.forEach(dupla -> assertThat(dupla.getWrittenWord()).isNotEmpty());
-				}
-				
-				if(powerUp.getName().equals(buy_time)){
-					assertThat(powerUp.getDuplas().size()).isEqualTo(0);
-				}
-			}
+					if(powerUp.getName().equals(autocomplete)){
+						assertThat(powerUp.getValue()).isNotEmpty();
+					}
+					
+					if(powerUp.getName().equals(suggest)){
+						assertThat(powerUp.getValue()).isNotEmpty();
+					}
+					
+					if(powerUp.getName().equals(buy_time)){
+						assertThat(powerUp.getValue()).isEqualTo("3000");
+					}
+				});
+			});
 			
 			WSResponse matchResponsePlayer1 = WS.url("http://localhost:9000/match/" + match.getId().toString())
 					 							.setQueryParameter("player_id", player1.getId().toString()).get().get(50000000L);
@@ -434,7 +427,11 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			
 			Match resultMatchPlayer1 = Json.fromJson(matchResponsePlayer1.asJson(), Match.class);
 			
-			assertThat(resultMatchPlayer1.getPowerUps()).isNull();
+			resultMatchPlayer1.getCategories().forEach(category -> {
+				List<PowerUp> powerUps = category.getPowerUps();
+				
+				assertThat(powerUps).isNotNull();
+			});
 		});
 	}
 	

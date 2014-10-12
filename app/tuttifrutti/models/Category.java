@@ -3,6 +3,7 @@ package tuttifrutti.models;
 import static java.util.Collections.shuffle;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author rfanego
@@ -47,6 +49,10 @@ public class Category {
 	private String image;
 	
 	private String bgcolor;
+	
+	@Transient
+	@JsonProperty(value = "power_ups")
+	private List<PowerUp> powerUps = new ArrayList<>();
 	
 	@Transient
 	@Autowired

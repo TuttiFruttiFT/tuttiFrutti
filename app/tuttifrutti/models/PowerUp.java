@@ -39,7 +39,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public class PowerUp {
 	private PowerUpType name;
 	
-    private List<Dupla> duplas;
+	private String value;
     
     @JsonIgnore
     @Autowired
@@ -49,14 +49,13 @@ public class PowerUp {
     	this.name = name;
     }
     
-	public PowerUp(PowerUpType type, List<Dupla> duplas) {
-		this.name = type;
-		this.duplas = duplas;
+	public PowerUp(PowerUpType name, String value) {
+		this.name = name;
+		this.value = value;
 	}
     
 	public void generate(Match match, String playerId) {
 		if(match.getConfig().isPowerUpsEnabled() && !match.playerHasAlreadyPlayed(playerId)){
-			match.setPowerUps(new ArrayList<>());
 			autoCompleteWords(match);
 			suggestWords(match);
 			opponentWords(match);
@@ -65,11 +64,13 @@ public class PowerUp {
 	}
 
 	private void buyTime(Match match) {
-		match.getPowerUps().add(new PowerUp(buy_time,new ArrayList<>()));
+		match.getCategories().forEach(category -> {
+			PowerUp buyTimePowerUp = new PowerUp(buy_time, "3000");
+			category.getPowerUps().add(buyTimePowerUp);
+		});
 	}
 
 	private void opponentWords(Match match) {
-		PowerUp powerUp = new PowerUp(opponent_word,new ArrayList<>());
 		List<Turn> turns = match.getLastRound().getTurns();
 		if(!isEmpty(turns)){
 			List<Dupla> allDuplas = new ArrayList<>();
@@ -79,31 +80,25 @@ public class PowerUp {
 				List<Dupla> categoryDuplas = validDuplas.stream().filter(dupla -> dupla.getCategory().getId().equals(category.getId())).collect(toList());
 				if(!isEmpty(categoryDuplas)){
 					shuffle(categoryDuplas);
-					powerUp.getDuplas().add(categoryDuplas.get(0).simplified());
+					category.getPowerUps().add(new PowerUp(opponent_word,categoryDuplas.get(0).getWrittenWord()));
 				}else{
-					powerUp.getDuplas().add(new Dupla(category.getId()));
-					//TODO no devuelvo nada, ver si necesito agregar una dupla solo con categoría
+					category.getPowerUps().add(new PowerUp(opponent_word));
 				}
 			}
 		}
-		match.getPowerUps().add(powerUp);
 	}
 
 	private void suggestWords(Match match) {
-		PowerUp powerUp = new PowerUp(suggest,new ArrayList<>());
 		match.getCategories().forEach(category -> {
 			Letter letter = match.getLastRound().getLetter().getLetter();
-			powerUp.getDuplas().add(new Dupla(category.getId(),categoryCache.retrieveWord(category.getId(), letter)));
+			category.getPowerUps().add(new PowerUp(suggest,categoryCache.retrieveWord(category.getId(), letter)));
 		});
-		match.getPowerUps().add(powerUp);
 	}
 
 	private void autoCompleteWords(Match match) {
-		PowerUp powerUp = new PowerUp(autocomplete,new ArrayList<>());
 		match.getCategories().forEach(category -> {
 			Letter letter = match.getLastRound().getLetter().getLetter();
-			powerUp.getDuplas().add(new Dupla(category.getId(),categoryCache.retrieveWord(category.getId(), letter)));
+			category.getPowerUps().add(new PowerUp(autocomplete,categoryCache.retrieveWord(category.getId(), letter)));
 		});
-		match.getPowerUps().add(powerUp);
 	}
 }
