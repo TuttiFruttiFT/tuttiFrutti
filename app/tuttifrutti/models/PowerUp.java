@@ -17,10 +17,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import tuttifrutti.cache.CategoryCache;
 import tuttifrutti.models.enums.PowerUpType;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -37,10 +40,19 @@ public class PowerUp {
 	private PowerUpType name;
 	
     private List<Dupla> duplas;
+    
+    @JsonIgnore
+    @Autowired
+    private CategoryCache categoryCache;
 
     public PowerUp(PowerUpType name){
     	this.name = name;
     }
+    
+	public PowerUp(PowerUpType type, List<Dupla> duplas) {
+		this.name = type;
+		this.duplas = duplas;
+	}
     
 	public void generate(Match match, String playerId) {
 		if(match.getConfig().isPowerUpsEnabled() && !match.playerHasAlreadyPlayed(playerId)){
@@ -69,6 +81,7 @@ public class PowerUp {
 					shuffle(categoryDuplas);
 					powerUp.getDuplas().add(categoryDuplas.get(0).simplified());
 				}else{
+					powerUp.getDuplas().add(new Dupla(category.getId()));
 					//TODO no devuelvo nada, ver si necesito agregar una dupla solo con categoría
 				}
 			}
@@ -78,14 +91,19 @@ public class PowerUp {
 
 	private void suggestWords(Match match) {
 		PowerUp powerUp = new PowerUp(suggest,new ArrayList<>());
-		// TODO implementar
+		match.getCategories().forEach(category -> {
+			Letter letter = match.getLastRound().getLetter().getLetter();
+			powerUp.getDuplas().add(new Dupla(category.getId(),categoryCache.retrieveWord(category.getId(), letter)));
+		});
 		match.getPowerUps().add(powerUp);
 	}
 
 	private void autoCompleteWords(Match match) {
 		PowerUp powerUp = new PowerUp(autocomplete,new ArrayList<>());
-		// TODO implementar
+		match.getCategories().forEach(category -> {
+			Letter letter = match.getLastRound().getLetter().getLetter();
+			powerUp.getDuplas().add(new Dupla(category.getId(),categoryCache.retrieveWord(category.getId(), letter)));
+		});
 		match.getPowerUps().add(powerUp);
-		
 	}
 }

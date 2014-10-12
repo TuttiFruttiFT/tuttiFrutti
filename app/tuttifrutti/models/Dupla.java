@@ -4,6 +4,7 @@ import static tuttifrutti.models.enums.DuplaState.CORRECTED;
 import static tuttifrutti.models.enums.DuplaState.PERFECT;
 import static tuttifrutti.models.enums.DuplaState.WRONG;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import org.mongodb.morphia.annotations.Embedded;
@@ -20,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 @Embedded
 @Getter @Setter
+@NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Dupla implements Comparable<Dupla>{
@@ -38,6 +40,15 @@ public class Dupla implements Comparable<Dupla>{
 	private DuplaState state;
 	
 	private Integer score;
+	
+	public Dupla(String categoryId){
+		this.category = new Category(categoryId);
+	}
+	
+	public Dupla(String categoryId,String writtenWord){
+		this.category = new Category(categoryId);
+		this.writtenWord = writtenWord;
+	}
 	
 	public String getWrittenWord(){
 		return writtenWord != null ? writtenWord.toLowerCase() : writtenWord;

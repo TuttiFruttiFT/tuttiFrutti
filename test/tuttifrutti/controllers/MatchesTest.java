@@ -45,6 +45,7 @@ import play.Logger;
 import play.libs.Json;
 import play.libs.ws.WS;
 import play.libs.ws.WSResponse;
+import tuttifrutti.cache.CategoryCache;
 import tuttifrutti.elastic.ElasticSearchAwareTest;
 import tuttifrutti.models.Category;
 import tuttifrutti.models.Device;
@@ -327,7 +328,9 @@ public class MatchesTest extends ElasticSearchAwareTest {
 	public void turnWithThreePlayersAndPowerUps() {
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
 			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
+			CategoryCache categoryCache = SpringApplicationContext.getBeanNamed("categoryCache", CategoryCache.class);
 			populateElastic(getJsonFilesFotCategories());
+			populateCategoryCache(categoryCache);
 			
 			String language = "ES";
 			int roundNumber = 1;
@@ -405,11 +408,17 @@ public class MatchesTest extends ElasticSearchAwareTest {
 				}
 				
 				if(powerUp.getName().equals(autocomplete)){
-					assertThat(powerUp.getDuplas().size()).isEqualTo(0);
+					List<Dupla> autoCompleteDuplas = powerUp.getDuplas();
+					
+					assertThat(autoCompleteDuplas.size()).isEqualTo(6);
+					autoCompleteDuplas.forEach(dupla -> assertThat(dupla.getWrittenWord()).isNotEmpty());
 				}
 				
 				if(powerUp.getName().equals(suggest)){
-					assertThat(powerUp.getDuplas().size()).isEqualTo(0);
+					List<Dupla> suggestDuplas = powerUp.getDuplas();
+					
+					assertThat(suggestDuplas.size()).isEqualTo(6);
+					suggestDuplas.forEach(dupla -> assertThat(dupla.getWrittenWord()).isNotEmpty());
 				}
 				
 				if(powerUp.getName().equals(buy_time)){
@@ -429,6 +438,30 @@ public class MatchesTest extends ElasticSearchAwareTest {
 		});
 	}
 	
+	private void populateCategoryCache(CategoryCache categoryCache) {
+		categoryCache.saveWord("animals", S, "sapo");
+		categoryCache.saveWord("animals", S, "salame");
+		categoryCache.saveWord("animals", S, "sarawosi");
+		categoryCache.saveWord("animals", S, "serpiente");
+		
+		categoryCache.saveWord("musical_styles", S, "samba");
+		
+		categoryCache.saveWord("verbs", S, "salir");
+		categoryCache.saveWord("verbs", S, "sacar");
+		categoryCache.saveWord("verbs", S, "sumir");
+		
+		categoryCache.saveWord("sports", S, "subir escaleras");
+		categoryCache.saveWord("sports", S, "softwall aereo");
+		
+		categoryCache.saveWord("meals", S, "sanguche");
+		categoryCache.saveWord("meals", S, "sal");
+		categoryCache.saveWord("meals", S, "sillon de ensalada");
+		
+		categoryCache.saveWord("colors", S, "salmon");
+		categoryCache.saveWord("colors", S, "siena");
+		categoryCache.saveWord("colors", S, "sorete");
+	}
+
 	private void assertPlayerScores(Match modifiedMatch, Player player,Player player2, int scorePlayer1, int scorePlayer2) {
 		for(PlayerResult playerResult : modifiedMatch.getPlayerResults()){
 			if(playerResult.getPlayer().getId().toString().equals(player.getId().toString())){
@@ -465,12 +498,6 @@ public class MatchesTest extends ElasticSearchAwareTest {
 		assertThat(resultMatch.getCategories().size()).isEqualTo(numberOfCategories);
 		assertThat(resultMatch.getPlayerResults()).isNotNull();
 		resultMatch.getPlayerResults().forEach(playerResult -> assertThat(playerResult.getScore()).isEqualTo(0));
-//		for(PlayerResult playerResult : resultMatch.getPlayerResults()){
-//			Player player = playerResult.getPlayer();
-//			if(player.getNickname().equals("SARASA")){
-//				assertThat(playerResult.getScore()).isEqualTo(0);
-//			}
-//		}
 		Round round = resultMatch.getLastRound();
 		assertThat(round).isNotNull();
 		assertThat(round.getNumber()).isEqualTo(1);

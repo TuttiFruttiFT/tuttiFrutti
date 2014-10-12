@@ -298,8 +298,6 @@ public class Match {
 	private Match create(MatchConfig config, MatchType type,List<PlayerResult> playerResults,List<Category> categories) {
 		Match match = new Match();
 		config.setType(type);
-		config.setPowerUpsEnabled(true);
-		config.setRounds(25);
 		config.setCurrentTotalNumberOfPlayers(config.getNumberOfPlayers());
 		match.setConfig(config);
 		match.setName("Nombre Partida"); //TODO ver qué poner de nombre
