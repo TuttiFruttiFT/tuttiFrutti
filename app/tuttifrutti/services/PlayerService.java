@@ -103,7 +103,7 @@ public class PlayerService {
 
 	public List<PlayerResult> playerResultsFromIds(List<String> playerIds) {
 		List<PlayerResult> playerResults = new ArrayList<>();
-		this.playersFromIds(playerIds).stream().forEach(player -> playerResults.add(new PlayerResult(player,0)));
+		this.playersFromIds(playerIds).stream().forEach(player -> playerResults.add(new PlayerResult(player,0,false)));
 		return playerResults;
 	}
 	

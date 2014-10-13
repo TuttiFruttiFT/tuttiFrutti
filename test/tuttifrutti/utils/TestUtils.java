@@ -73,6 +73,7 @@ public class TestUtils {
 		PlayerResult playerResult = new PlayerResult();
 		playerResult.setPlayer(player);
 		playerResult.setScore(score);
+		playerResult.setAccepted(true);
 		datastore.save(playerResult);
 		return playerResult;
 	}

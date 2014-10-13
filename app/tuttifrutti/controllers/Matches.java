@@ -104,6 +104,22 @@ public class Matches extends Controller {
     }
 	
 	@BodyParser.Of(BodyParser.Json.class)
+	public Result acceptMatch(){
+		JsonNode json = request().body().asJson();
+		String playerId = json.get("player_id").asText();
+		String matchId = json.get("match_id").asText();
+		
+		Match match = matchService.match(matchId, playerId);
+		
+		match.getPlayerResults().stream().filter(playerResult -> playerResult.getPlayer().getId().toString().equals(playerId))
+										 .forEach(playerResult -> playerResult.setAccepted(true));
+		
+		mongoDatastore.save(match);
+		
+		return ok();
+	}
+	
+	@BodyParser.Of(BodyParser.Json.class)
 	public Result rejectedMatch(){
 		JsonNode json = request().body().asJson();
 		String playerId = json.get("player_id").asText();
@@ -127,6 +143,10 @@ public class Matches extends Controller {
 		List<Dupla> duplas = new ArrayList<>();
 		
 		Match match = matchService.match(matchId, playerId);
+		
+		if(!match.playerHasAccepted(playerId)){
+			return badRequest("Player " + playerId + " has not accepted the match.");
+		}
 		
 		if(match.playerHasAlreadyPlayed(playerId)){
 			return badRequest("Player " + playerId + " has already played.");

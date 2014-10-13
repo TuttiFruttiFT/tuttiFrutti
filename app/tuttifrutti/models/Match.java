@@ -172,19 +172,30 @@ public class Match {
 	}
 
 	public Match endedMatch(String matchId){
-		Query<Match> query = mongoDatastore.find(Match.class,"state =",MatchState.FINISHED.toString());
+		Query<Match> query = mongoDatastore.find(Match.class,"state =",FINISHED.toString());
 		query.and(query.criteria("id").equal(new ObjectId(matchId)));
 		return query.get();
 	}
 	
 	private void changeMatchStateDependingOnPlayersGame(String playerId,Match match) {
 		boolean playerHasAlreadyPlayed = playerHasAlreadyPlayed(match, playerId);
+		PlayerResult player = match.getPlayerResults().stream().filter(playerResult -> playerResult.getPlayer().getId().toString().equals(playerId))
+																	 .findFirst().get();
 		MatchState matchState = match.getState();
-		if(matchState.equals(TO_BE_APPROVED) && playerHasAlreadyPlayed){
-			match.setState(WAITING_FOR_OPPONENTS);
+		if(matchState.equals(TO_BE_APPROVED)){
+			if(player.isAccepted() && !playerHasAlreadyPlayed){
+				match.setState(PLAYER_TURN);
+			}
+			
+			if(player.isAccepted() && playerHasAlreadyPlayed){
+				match.setState(WAITING_FOR_OPPONENTS);
+			}
 		}
-		if(!matchState.equals(TO_BE_APPROVED) && playerHasAlreadyPlayed){
-			match.setState(OPPONENT_TURN);
+		
+		if(matchState.equals(PLAYER_TURN)){
+			if(playerHasAlreadyPlayed){
+				match.setState(OPPONENT_TURN);
+			}
 		}
 	}
 
@@ -215,12 +226,15 @@ public class Match {
 		}
 		playerResult.setPlayer(player);
 		playerResult.setScore(0);
+		playerResult.setAccepted(true);
 		match.getPlayerResults().add(playerResult);
 		match.getMatchName().incrementPlayers();
 	}
 
 	public Match createPrivate(String playerId, String name, MatchConfig config, List<String> playerIds, List<String> categoryIds) {
 		List<PlayerResult> playerResults = playerService.playerResultsFromIds(playerIds);
+		playerResults.stream().filter(playerResult -> playerResult.getPlayer().getId().toString().equals(playerId))
+							  .forEach(playerResult -> playerResult.setAccepted(true));
 		return create(config, PRIVATE,new MatchName(name,playerIds.size()),playerResults, categoryService.categoriesFromIds(categoryIds));
 	}
 
@@ -476,6 +490,11 @@ public class Match {
 
 	public void privateMatchReady(Match match, List<Player> players) {
 		pushUtil.privateMatchReady(match, players);
+	}
+
+	public boolean playerHasAccepted(String playerId) {
+		return this.getPlayerResults().stream().filter(playerResult -> playerResult.getPlayer().getId().toString().equals(playerId))
+											   .findFirst().get().isAccepted();
 	}
 }
 
