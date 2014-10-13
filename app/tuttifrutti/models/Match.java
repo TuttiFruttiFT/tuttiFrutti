@@ -3,7 +3,6 @@ package tuttifrutti.models;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
-import static org.apache.commons.lang3.StringUtils.join;
 import static org.joda.time.DateTime.now;
 import static org.springframework.util.StringUtils.isEmpty;
 import static play.libs.F.Promise.promise;
@@ -22,6 +21,7 @@ import static tuttifrutti.models.enums.MatchType.PRIVATE;
 import static tuttifrutti.models.enums.MatchType.PUBLIC;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
@@ -161,7 +161,12 @@ public class Match {
 			match.getPlayerResults().stream()
 			.filter(playerResult -> !playerResult.getPlayer().getId().toString().equals(playerId))
 			.forEach(playerResult -> nicknames.add(playerResult.getPlayer().getNickname()));
-			match.getMatchName().setValue(join(nicknames, ","));
+			if(nicknames.size() > 0){
+				Collections.sort(nicknames);
+				match.getMatchName().setValue(nicknames.get(0));
+			}else{
+				match.getMatchName().setValue("");
+			}
 			match.setName(match.getMatchName().getValue());
 		}
 	}
