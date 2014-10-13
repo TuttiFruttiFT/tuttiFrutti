@@ -22,13 +22,13 @@ public class MatchName {
 	
 	public MatchName(Integer numberOfPlayers){
 		this.numberOfOtherPlayers = numberOfPlayers - 1;
-		this.calculated = value == null ? true : false;
+		this.calculated = true;
 	}
 	
 	public MatchName(String value,Integer numberOfPlayers){
 		this.value = value;
 		this.numberOfOtherPlayers = numberOfPlayers - 1;
-		this.calculated = false;
+		this.calculated = value == null ? true : false;
 	}
 
 	public void incrementPlayers() {

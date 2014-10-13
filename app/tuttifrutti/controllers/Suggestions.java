@@ -8,6 +8,7 @@ import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 import tuttifrutti.models.Suggestion;
+import tuttifrutti.utils.JsonUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -44,8 +45,6 @@ public class Suggestions extends Controller {
 	public static Result getWords(String playerId) {		
 		List<Suggestion> suggestions = Suggestion.getSuggestions(playerId);
 		
-		//TODO ver como crear un json desde una lista
-		
-        return ok(Json.toJson(suggestions));
+		return ok(Json.parse(JsonUtil.parseListToJson(suggestions)));
     }
 }
