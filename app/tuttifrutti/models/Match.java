@@ -3,6 +3,7 @@ package tuttifrutti.models;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.join;
 import static org.joda.time.DateTime.now;
 import static org.springframework.util.StringUtils.isEmpty;
 import static play.libs.F.Promise.promise;
@@ -72,6 +73,10 @@ public class Match {
 	private String name;
 	
 	@Embedded
+	@JsonProperty(value = "match_name")
+	private MatchName matchName;
+	
+	@Embedded
 	private MatchConfig config;
 	
 	@Property("winner_id")
@@ -130,22 +135,37 @@ public class Match {
 			activeMatch.setCurrentRound(round);
 			activeMatch.setId(match.getId().toString());
 			activeMatch.setName(match.getName());
-			changeMatchStateDependingOnPlayersGame(playerId, match);
+			changeMatchDependingOnPlayer(playerId,match);
 			activeMatch.setState(match.getState().toString());
 			activeMatches.add(activeMatch);
 		}
 		return activeMatches;
 	}
 
-
+	public void changeMatchDependingOnPlayer(String playerId, Match match){
+		changeMatchNameDependingOnPlayer(playerId, match);
+		changeMatchStateDependingOnPlayersGame(playerId, match);
+	}
+	
 	public Match match(String matchId, String playerId) {
 		Match match = mongoDatastore.get(Match.class,new ObjectId(matchId));
 		if(playerId != null){
-			changeMatchStateDependingOnPlayersGame(playerId, match);
+			changeMatchDependingOnPlayer(playerId,match);
 		}
 		return match;
 	}
 	
+	private void changeMatchNameDependingOnPlayer(String playerId, Match match) {
+		if(match.getMatchName().isCalculated()){
+			List<String> nicknames = new ArrayList<>();
+			match.getPlayerResults().stream()
+			.filter(playerResult -> !playerResult.getPlayer().getId().toString().equals(playerId))
+			.forEach(playerResult -> nicknames.add(playerResult.getPlayer().getNickname()));
+			match.getMatchName().setValue(join(nicknames, ","));
+			match.setName(match.getMatchName().getValue());
+		}
+	}
+
 	public Match endedMatch(String matchId){
 		Query<Match> query = mongoDatastore.find(Match.class,"state =",MatchState.FINISHED.toString());
 		query.and(query.criteria("id").equal(new ObjectId(matchId)));
@@ -191,22 +211,21 @@ public class Match {
 		playerResult.setPlayer(player);
 		playerResult.setScore(0);
 		match.getPlayerResults().add(playerResult);
+		match.getMatchName().incrementPlayers();
 	}
 
-	public Match createPrivate(String playerId, MatchConfig config, List<String> playerIds, List<String> categoryIds) {
-		return create(config, PRIVATE,playerService.playerResultsFromIds(playerIds),categoryService.categoriesFromIds(categoryIds));
+	public Match createPrivate(String playerId, String name, MatchConfig config, List<String> playerIds, List<String> categoryIds) {
+		List<PlayerResult> playerResults = playerService.playerResultsFromIds(playerIds);
+		return create(config, PRIVATE,new MatchName(name,playerIds.size()),playerResults, categoryService.categoriesFromIds(categoryIds));
 	}
 
 	public List<Dupla> play(Match match, String playerId, List<Dupla> duplas, int time) {		
 		Round round = match.getLastRound();
+		
 		elasticUtil.validate(duplas,round.getLetter());
-		
 		this.createTurn(match,playerId, duplas, time);
-		
 		mongoDatastore.save(match);
-		
 		calculateResult(match);
-		
 		return getWrongDuplas(duplas);
 	}
 
@@ -219,17 +238,12 @@ public class Match {
 			promise(() -> {				
 				Round round = match.getLastRound();
 				List<Turn> turns = round.getTurns();
-				
 				Integer minTime = getMinimumTime(turns);
-				
 				List<Dupla> allDuplas = flatDuplasFromTurns(turns);
-				
 				List<Dupla> validDuplas = processInvalidDuplas(minTime,allDuplas);
 				
 				processValidDuplas(match, validDuplas);
-				
 				calculateTurnScores(turns, match);
-				
 				saveOldRound(match, round, minTime);
 				
 				if(matchIsFinished(match, round)){
@@ -291,12 +305,13 @@ public class Match {
 		return playerResults.stream().map(playerResult -> playerResult.getPlayer().getId().toString()).collect(toList());
 	}
 
-	private Match create(MatchConfig config, MatchType type,List<PlayerResult> playerResults,List<Category> categories) {
+	private Match create(MatchConfig config, MatchType type,MatchName matchName,List<PlayerResult> playerResults, List<Category> categories) {
 		Match match = new Match();
 		config.setType(type);
 		config.setCurrentTotalNumberOfPlayers(config.getNumberOfPlayers());
 		match.setConfig(config);
-		match.setName("Nombre Partida"); //TODO ver qué poner de nombre
+		match.setMatchName(matchName);
+		match.setName(matchName.getValue());
 		match.setState(TO_BE_APPROVED);
 		match.setStartDate(now().toDate());
 		match.setCategories(categories);
@@ -306,7 +321,7 @@ public class Match {
 	}
 
 	private Match create(MatchConfig config, MatchType type) {
-		return create(config, type, new ArrayList<PlayerResult>(), categoryService.getPublicMatchCategories(config.getLanguage()));
+		return create(config, type, new MatchName(1), new ArrayList<PlayerResult>(), categoryService.getPublicMatchCategories(config.getLanguage()));
 	}
 	
 	private void calculateTurnScores(List<Turn> turns, Match match) {
@@ -406,6 +421,7 @@ public class Match {
 				pushUtil.rejected(playerIds,match);
 			}else{
 				match.getConfig().setCurrentTotalNumberOfPlayers(match.getConfig().getCurrentTotalNumberOfPlayers() - 1);
+				match.getMatchName().decrementPlayers();
 				if(match.getLastRound().getTurns().size() == match.getConfig().getCurrentTotalNumberOfPlayers()){
 					this.calculateResult(match);
 				}

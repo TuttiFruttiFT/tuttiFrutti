@@ -53,6 +53,7 @@ import tuttifrutti.models.Dupla;
 import tuttifrutti.models.LetterWrapper;
 import tuttifrutti.models.Match;
 import tuttifrutti.models.MatchConfig;
+import tuttifrutti.models.MatchName;
 import tuttifrutti.models.Player;
 import tuttifrutti.models.PlayerResult;
 import tuttifrutti.models.PowerUp;
@@ -91,7 +92,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			saveCategories(dataStore, language);
 
 			MatchConfig matchConfig = createMatchConfig(language, N, PUBLIC, 2, false, 25);
-			Match match = createMatch(dataStore, language, lastRound,Arrays.asList(playerResult2), matchConfig);
+			Match match = createMatch(dataStore, language, lastRound,Arrays.asList(playerResult2), matchConfig, new MatchName(2));
 			
 			String playerId = player.getId().toString();
 			WSResponse r = WS.url("http://localhost:9000/match/public").setContentType("application/json")
@@ -146,7 +147,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			
 			MatchConfig matchConfig = createMatchConfig(language, N, PUBLIC, 2, false, 25);
 			Match match = createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig,
-									  getCategoriesFromDuplas(duplas, language), PLAYER_TURN);
+									  getCategoriesFromDuplas(duplas, language), PLAYER_TURN, new MatchName(2));
 			
 			WSResponse r = WS.url("http://localhost:9000/match/public").setContentType("application/json")
 					 .post("{\"player_id\" : \"" + otherPlayer.getId().toString() + "\", \"config\":" 
@@ -204,7 +205,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			
 			saveCategories(dataStore, language);
 			
-			ArrayNode playersArray = Json.newObject().arrayNode().add(player1.getId().toString()).add(player2.getId().toString())
+			ArrayNode playersArray = Json.newObject().arrayNode().add(player2.getId().toString())
 			.add(player3.getId().toString()).add(player4.getId().toString());
 			
 			ArrayNode categoriesArray = Json.newObject().arrayNode().add("colors").add("countries").add("animals")
@@ -212,7 +213,8 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			
 			MatchConfig matchConfig = createMatchConfig(language, N, PRIVATE, 4, false, 25);
 			WSResponse r = WS.url("http://localhost:9000/match/private").setContentType("application/json")
-					 .post("{\"player_id\" : \"" + player1.getId().toString() + "\", \"config\":" 
+					 .post("{\"match_name\" : \"" + "La partida de la hostia" + "\","
+					 		+ "\"player_id\" : \"" + player1.getId().toString() + "\", \"config\":" 
 						   + Json.toJson(matchConfig).toString() + ",\"players\":" + playersArray.toString() 
 						   + ",\"categories\":" + categoriesArray.toString() + "}")
 					 .get(50000000L);
@@ -226,6 +228,10 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			assertThat(resultMatch).isNotNull();
 			assertThat(resultMatch.getId()).isNotNull();
 			commonMatchAssertions(language, resultMatch, TO_BE_APPROVED, PRIVATE, 4, 6);
+			MatchName matchName = resultMatch.getMatchName();
+			assertThat(matchName).isNotNull();
+			assertThat(matchName.getValue()).isEqualTo("La partida de la hostia");
+			assertThat(matchName.getNumberOfOtherPlayers()).isEqualTo(3);
 			assertThat(resultMatch.getPlayerResults().size()).isEqualTo(4);
 		});
 	}
@@ -265,7 +271,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			
 			MatchConfig matchConfig = createMatchConfig(language, N, PUBLIC, 2, false, 25);
 			Match match = createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig,
-									  getCategoriesFromDuplas(duplas, language), PLAYER_TURN);
+									  getCategoriesFromDuplas(duplas, language), PLAYER_TURN, new MatchName(2));
 			
 			WSResponse r = WS.url("http://localhost:9000/match/turn").setContentType("application/json")
 					 .post("{\"player_id\" : \"" + player.getId().toString() + "\", \"match_id\":\"" + match.getId().toString() 
@@ -367,7 +373,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			
 			MatchConfig matchConfig = createMatchConfig(language, N, PUBLIC, 3, true, 25);
 			Match match = createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2,playerResult3), matchConfig,
-									  getCategoriesFromDuplas(duplas, language), PLAYER_TURN);
+									  getCategoriesFromDuplas(duplas, language), PLAYER_TURN, new MatchName(3));
 			
 			WSResponse turnResponse = WS.url("http://localhost:9000/match/turn").setContentType("application/json")
 					 .post("{\"player_id\" : \"" + player1.getId().toString() + "\", \"match_id\":\"" + match.getId().toString() 

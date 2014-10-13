@@ -25,6 +25,7 @@ import tuttifrutti.models.Letter;
 import tuttifrutti.models.LetterWrapper;
 import tuttifrutti.models.Match;
 import tuttifrutti.models.MatchConfig;
+import tuttifrutti.models.MatchName;
 import tuttifrutti.models.Player;
 import tuttifrutti.models.PlayerResult;
 import tuttifrutti.models.Round;
@@ -59,13 +60,13 @@ public class PlayersTest {
 
 			MatchConfig matchConfig = createMatchConfig(language, N, PUBLIC, 2, true, 25);
 			
-			createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig);
-			createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig);
-			createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig);
-			Match match4 = createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig);
+			createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig, new MatchName(2));
+			createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig, new MatchName(2));
+			createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig, new MatchName(2));
+			Match match4 = createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig, new MatchName(2));
 			match4.setState(FINISHED);
 			dataStore.save(match4);
-			Match match5 = createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig);
+			Match match5 = createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig, new MatchName(2));
 			match5.setState(FINISHED);
 			dataStore.save(match5);
 			

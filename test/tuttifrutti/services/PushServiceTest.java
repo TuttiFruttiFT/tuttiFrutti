@@ -27,6 +27,7 @@ import tuttifrutti.models.Device;
 import tuttifrutti.models.LetterWrapper;
 import tuttifrutti.models.Match;
 import tuttifrutti.models.MatchConfig;
+import tuttifrutti.models.MatchName;
 import tuttifrutti.models.Player;
 import tuttifrutti.models.PlayerResult;
 import tuttifrutti.models.Round;
@@ -34,7 +35,7 @@ import tuttifrutti.utils.SpringApplicationContext;
 
 public class PushServiceTest {
 
-//	@Test
+	@Test
 	public void registerDevice() {
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
 			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
@@ -77,17 +78,9 @@ public class PushServiceTest {
 			saveCategories(dataStore, language);
 
 			MatchConfig matchConfig = createMatchConfig(language, N, PUBLIC, 2, false, 25);
-			Match match = createMatch(dataStore, language, lastRound,Arrays.asList(playerResult), matchConfig);
+			Match match = createMatch(dataStore, language, lastRound,Arrays.asList(playerResult), matchConfig, new MatchName(2));
 
 			pushService.roundResult(match, 1);
-			System.out.println("SALIO");
-			
-//			try {
-//				Thread.sleep(5000L);
-//			} catch (Exception e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
 		});
 	}
 }

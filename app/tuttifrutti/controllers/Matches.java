@@ -76,6 +76,7 @@ public class Matches extends Controller {
 	public Result privateMatch(){
 		JsonNode json = request().body().asJson();
 		String playerId = json.get("player_id").asText();
+		String matchName = json.get("match_name") != null ? json.get("match_name").asText() : null;
 		JsonNode jsonConfig = json.get("config");
 		JsonNode jsonPlayers = json.get("players");
 		JsonNode jsonCategories = json.get("categories");
@@ -93,7 +94,7 @@ public class Matches extends Controller {
 			categoryIds.add(jsonCategory.asText());
 		}
 		
-		Match match = matchService.createPrivate(playerId, config,playerIds, categoryIds);
+		Match match = matchService.createPrivate(playerId, matchName,config, playerIds, categoryIds);
 		
 		mongoDatastore.save(match);
 		

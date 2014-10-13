@@ -1,12 +1,12 @@
 package tuttifrutti.utils;
 
 import static java.util.stream.Collectors.toList;
+import static org.joda.time.DateTime.now;
 import static tuttifrutti.models.enums.MatchState.TO_BE_APPROVED;
 
 import java.util.List;
 
 import org.bson.types.ObjectId;
-import org.joda.time.DateTime;
 import org.mongodb.morphia.Datastore;
 
 import tuttifrutti.models.Category;
@@ -15,6 +15,7 @@ import tuttifrutti.models.Letter;
 import tuttifrutti.models.LetterWrapper;
 import tuttifrutti.models.Match;
 import tuttifrutti.models.MatchConfig;
+import tuttifrutti.models.MatchName;
 import tuttifrutti.models.Player;
 import tuttifrutti.models.PlayerResult;
 import tuttifrutti.models.Round;
@@ -48,18 +49,19 @@ public class TestUtils {
 		return dupla;
 	}
 
-	public static Match createMatch(Datastore dataStore, String language,Round lastRound, List<PlayerResult> playerResults, MatchConfig matchConfig) {
+	public static Match createMatch(Datastore dataStore, String language,Round lastRound, List<PlayerResult> playerResults, MatchConfig matchConfig, MatchName matchName) {
 		Category categoryService = SpringApplicationContext.getBeanNamed("category", Category.class);
-		return createMatch(dataStore, language,lastRound, playerResults, matchConfig,categoryService.getPublicMatchCategories(language), TO_BE_APPROVED);
+		return createMatch(dataStore, language,lastRound, playerResults, matchConfig,categoryService.getPublicMatchCategories(language), TO_BE_APPROVED, matchName);
 	}
 	
 	public static Match createMatch(Datastore dataStore, String language,Round lastRound, List<PlayerResult> playerResults, MatchConfig matchConfig,
-							  List<Category> categories, MatchState matchState) {
+							  List<Category> categories, MatchState matchState, MatchName matchName) {
 		Match match = new Match();
 		match.setConfig(matchConfig);
-		match.setName("Una Partida"); // TODO ver qué poner de nombre
+		match.setMatchName(matchName);
+		match.setName(matchName.getValue());
 		match.setState(matchState);
-		match.setStartDate(DateTime.now().toDate());
+		match.setStartDate(now().toDate());
 		match.setCategories(categories);
 		match.setPlayerResults(playerResults);
 		match.setLastRound(lastRound);
