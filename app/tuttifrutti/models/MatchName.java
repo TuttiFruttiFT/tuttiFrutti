@@ -22,7 +22,7 @@ public class MatchName {
 	
 	public MatchName(Integer numberOfPlayers){
 		this.numberOfOtherPlayers = numberOfPlayers - 1;
-		this.calculated = true;
+		this.calculated = value == null ? true : false;
 	}
 	
 	public MatchName(String value,Integer numberOfPlayers){
