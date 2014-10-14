@@ -125,7 +125,7 @@ public class Matches extends Controller {
 		String playerId = json.get("player_id").asText();
 		String matchId = json.get("match_id").asText();
 		
-		boolean isPlayerRejected = matchService.playerReject(playerId, matchService.match(matchId, playerId));
+		boolean isPlayerRejected = matchService.playerReject(playerId, matchService.match(matchId, null));
 		
 		if(isPlayerRejected){
 			return ok();
@@ -142,7 +142,7 @@ public class Matches extends Controller {
 		JsonNode jsonDuplas = json.get("duplas");
 		List<Dupla> duplas = new ArrayList<>();
 		
-		Match match = matchService.match(matchId, playerId);
+		Match match = matchService.match(matchId, null);
 		
 		if(!match.playerHasAccepted(playerId)){
 			return badRequest("Player " + playerId + " has not accepted the match.");
