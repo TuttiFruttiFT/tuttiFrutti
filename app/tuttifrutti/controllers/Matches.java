@@ -109,7 +109,7 @@ public class Matches extends Controller {
 		String playerId = json.get("player_id").asText();
 		String matchId = json.get("match_id").asText();
 		
-		Match match = matchService.match(matchId, playerId);
+		Match match = matchService.match(matchId, null);
 		
 		match.getPlayerResults().stream().filter(playerResult -> playerResult.getPlayer().getId().toString().equals(playerId))
 										 .forEach(playerResult -> playerResult.setAccepted(true));
