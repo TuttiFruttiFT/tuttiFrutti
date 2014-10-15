@@ -134,8 +134,8 @@ public class Match {
 			round.setLetter(match.getLastRound().getLetter());
 			activeMatch.setCurrentRound(round);
 			activeMatch.setId(match.getId().toString());
-			activeMatch.setName(match.getName());
 			changeMatchDependingOnPlayer(playerId,match);
+			activeMatch.setMatchName(match.getMatchName());
 			activeMatch.setState(match.getState().toString());
 			activeMatches.add(activeMatch);
 		}

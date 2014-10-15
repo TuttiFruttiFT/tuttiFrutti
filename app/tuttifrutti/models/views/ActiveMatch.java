@@ -2,6 +2,7 @@ package tuttifrutti.models.views;
 
 import lombok.Getter;
 import lombok.Setter;
+import tuttifrutti.models.MatchName;
 import tuttifrutti.models.Round;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -20,8 +21,15 @@ public class ActiveMatch {
 	
 	private String name;
 	
+	private MatchName matchName;
+	
 	@JsonProperty(value = "current_round")
 	private Round currentRound;
 	
 	private String state;
+	
+	public void setMatchName(MatchName matchName){
+		this.matchName = matchName;
+		this.name = matchName.getValue();
+	}
 }
