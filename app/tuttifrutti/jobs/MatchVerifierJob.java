@@ -1,6 +1,6 @@
 package tuttifrutti.jobs;
 
-public class VerificadorPartidaJob implements Runnable{
+public class MatchVerifierJob implements Runnable{
 
 	@Override
 	public void run() {
