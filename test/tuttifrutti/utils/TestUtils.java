@@ -9,6 +9,7 @@ import java.util.List;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.Datastore;
 
+import play.Logger;
 import tuttifrutti.models.Category;
 import tuttifrutti.models.Dupla;
 import tuttifrutti.models.Letter;
@@ -147,5 +148,13 @@ public class TestUtils {
 		turn.setScore(score);
 		turn.setDuplas(duplas2);
 		return turn;
+	}
+	
+	public static void sleep(long timeInMillis) {
+		try {
+			Thread.sleep(timeInMillis);
+		} catch (Exception e) {
+			Logger.error("In Sleep",e);
+		}
 	}
 }

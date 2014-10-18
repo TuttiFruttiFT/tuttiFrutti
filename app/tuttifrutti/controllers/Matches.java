@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.mongodb.morphia.Datastore;
-import org.mongodb.morphia.annotations.Transient;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import play.libs.Json;
@@ -39,7 +38,6 @@ public class Matches extends Controller {
 	@Autowired
 	private PowerUp powerUpService;
 	
-	@Transient
 	@Autowired
 	private Datastore mongoDatastore;
 	

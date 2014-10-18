@@ -38,11 +38,11 @@ POST	/rus/purchase								@tuttifrutti.controllers.Rus.buy()
 
 GET		/rus/packs									@tuttifrutti.controllers.Rus.packs()
 
-PUT		/word/suggest								tuttifrutti.controllers.Suggestions.suggest()
+POST	/word/suggest								@tuttifrutti.controllers.Suggestions.suggest()
 
-PUT		/word/judgement								tuttifrutti.controllers.Suggestions.judge()
+POST	/word/judgement								@tuttifrutti.controllers.Suggestions.judge()
 
-GET		/word/:playerId								tuttifrutti.controllers.Suggestions.getWords(playerId)
+GET		/word/:playerId								@tuttifrutti.controllers.Suggestions.getWords(playerId)
 
 GET		/search/:playerId							@tuttifrutti.controllers.Searches.searchPlayers(playerId,searchedTerm ?= null)
 
