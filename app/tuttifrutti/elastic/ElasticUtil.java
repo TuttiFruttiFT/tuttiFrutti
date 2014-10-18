@@ -2,6 +2,7 @@ package tuttifrutti.elastic;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.elasticsearch.action.search.SearchType.QUERY_THEN_FETCH;
 import static org.elasticsearch.common.lucene.search.function.CombineFunction.SUM;
 import static org.elasticsearch.common.unit.Fuzziness.AUTO;
@@ -19,7 +20,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 
-import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.search.MultiSearchRequest;
 import org.elasticsearch.action.search.MultiSearchResponse;
 import org.elasticsearch.action.search.MultiSearchResponse.Item;
@@ -62,9 +62,9 @@ public class ElasticUtil {
 			BoolQueryBuilder boolQueryBuilder = boolQuery();
 			String categoryId = dupla.getCategory().getId();
 			
-			String writtenWord = dupla.getWrittenWord();
+			String writtenWord = dupla.getWrittenWord().trim();
 			
-			if(StringUtils.isNotEmpty(writtenWord)){
+			if(isNotEmpty(writtenWord)){
 				MatchQueryBuilder matchQueryBuilder = matchQuery("value", writtenWord);
 				matchQueryBuilder.fuzziness(AUTO);
 				matchQueryBuilder.prefixLength(1);
