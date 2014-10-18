@@ -143,11 +143,7 @@ public class Matches extends Controller {
 		List<Dupla> duplas = new ArrayList<>();
 		
 		Match match = matchService.match(matchId, null);
-		
-		if(!match.playerHasAccepted(playerId)){
-			return badRequest("Player " + playerId + " has not accepted the match.");
-		}
-		
+
 		if(match.playerHasAlreadyPlayed(playerId)){
 			return badRequest("Player " + playerId + " has already played.");
 		}
