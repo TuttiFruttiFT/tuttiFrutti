@@ -62,7 +62,7 @@ public class ElasticUtil {
 			BoolQueryBuilder boolQueryBuilder = boolQuery();
 			String categoryId = dupla.getCategory().getId();
 			
-			String writtenWord = dupla.getWrittenWord().trim();
+			String writtenWord = dupla.getWrittenWord() != null ? dupla.getWrittenWord().trim() : null;
 			
 			if(isNotEmpty(writtenWord)){
 				MatchQueryBuilder matchQueryBuilder = matchQuery("value", writtenWord);
