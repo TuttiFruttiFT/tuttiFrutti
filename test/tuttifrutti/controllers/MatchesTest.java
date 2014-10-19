@@ -24,6 +24,7 @@ import static tuttifrutti.models.enums.PowerUpType.autocomplete;
 import static tuttifrutti.models.enums.PowerUpType.buy_time;
 import static tuttifrutti.models.enums.PowerUpType.opponent_word;
 import static tuttifrutti.models.enums.PowerUpType.suggest;
+import static tuttifrutti.utils.JsonUtil.parseListToJson;
 import static tuttifrutti.utils.TestUtils.createMatch;
 import static tuttifrutti.utils.TestUtils.createMatchConfig;
 import static tuttifrutti.utils.TestUtils.createRound;
@@ -236,11 +237,12 @@ public class MatchesTest extends ElasticSearchAwareTest {
 		});
 	}
 	
-	@Test
+//	@Test
 	public void turnWithTwoPlayers() {
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
 			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
 			Round roundService = SpringApplicationContext.getBeanNamed("round", Round.class);
+			populateElastic(getJsonFilesFotCategories());
 			
 			String language = "ES";
 			int roundNumber = 1;
@@ -276,7 +278,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			WSResponse r = WS.url("http://localhost:9000/match/turn").setContentType("application/json")
 					 .post("{\"player_id\" : \"" + player.getId().toString() + "\", \"match_id\":\"" + match.getId().toString() 
 						   + "\", \"time\": 41" 
-						   + ", \"duplas\":" + JsonUtil.parseListToJson(duplas)
+						   + ", \"duplas\":" + parseListToJson(duplas)
 						   + "}")
 					 .get(5000000L);
 			
@@ -437,6 +439,82 @@ public class MatchesTest extends ElasticSearchAwareTest {
 				List<PowerUp> powerUps = category.getPowerUps();
 				
 				assertThat(powerUps).isNotNull();
+			});
+		});
+	}
+
+	@Test
+	public void finishedGameResult() {
+		running(testServer(9000, fakeApplication()), (Runnable) () -> {
+			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
+			populateElastic(getJsonFilesFotCategories());
+			
+			String language = "ES";
+			int roundNumber = 1;
+			
+			Player player = savePlayer(dataStore, "sarasas@sarasa.com");
+			Player player2 = savePlayer(dataStore, "sarasas2@sarasa.com");
+
+			PlayerResult playerResult1 = savePlayerResult(dataStore, player, 35);
+			PlayerResult playerResult2 = savePlayerResult(dataStore, player2, 40);
+			
+			saveCategories(dataStore, language);
+
+			List<Dupla> duplas = new ArrayList<>();
+			saveDupla(new Category("bands"), duplas, "Radiohead", 15);
+			saveDupla(new Category("colors"), duplas, "Marron", 24);
+			saveDupla(new Category("meals"), duplas, "Risotto", 35);
+			saveDupla(new Category("countries"), duplas, "Rumania", 39);
+			
+			List<Dupla> duplas2 = new ArrayList<>();
+			saveDupla(new Category("bands"), duplas2, "Rolling Stone", "rolling stones",15, CORRECTED);
+			saveDupla(new Category("colors"), duplas2, "Rojo", "rojo",24, PERFECT);
+			saveDupla(new Category("meals"), duplas2, "", null,35, WRONG);
+			saveDupla(new Category("countries"), duplas2, null, null,39, WRONG);
+			
+			Turn turn = createTurn(player2.getId().toString(), 45, 0, duplas2);
+			
+			Round lastRound = createRound(turn, roundNumber, R);
+			
+			MatchConfig matchConfig = createMatchConfig(language, N, PUBLIC, 2, false, 1);
+			Match match = createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig,
+									  getCategoriesFromDuplas(duplas, language), PLAYER_TURN, new MatchName(2));
+			
+			WSResponse turnResult = WS.url("http://localhost:9000/match/turn").setContentType("application/json")
+					 .post("{\"player_id\" : \"" + player.getId().toString() + "\", \"match_id\":\"" + match.getId().toString() 
+						   + "\", \"time\": 41" 
+						   + ", \"duplas\":" + JsonUtil.parseListToJson(duplas)
+						   + "}")
+					 .get(5000000L);
+			
+			assertThat(turnResult).isNotNull();
+			assertThat(turnResult.getStatus()).isEqualTo(OK);
+			
+			sleep(500L);
+			
+			Match modifiedMatch = dataStore.get(Match.class, match.getId());
+			
+			assertPlayerScores(modifiedMatch, player, player2, 85, 70);
+			
+			WSResponse matchResult = WS.url("http://localhost:9000/match/result/" + match.getId().toString()).get().get(5000000L);
+			
+			assertThat(matchResult).isNotNull();
+			assertThat(matchResult.getStatus()).isEqualTo(OK);
+			
+			Match resultMatch = Json.fromJson(matchResult.asJson(), Match.class);
+			
+			assertThat(resultMatch.getWinner()).isNotNull();
+			assertThat(resultMatch.getWinner().getId()).isEqualTo(player.getId());
+			assertThat(resultMatch.getWinner().getNickname()).isEqualTo("sarasas");
+			assertThat(resultMatch.getPlayerResults()).isNotNull();
+			assertThat(resultMatch.getPlayerResults().size()).isEqualTo(2);
+			
+			resultMatch.getPlayerResults().forEach(playerResult -> {
+				if(playerResult.getPlayer().getId().toString().equals(player.getId().toString())){
+					assertThat(playerResult.getScore()).isEqualTo(85);
+				}else{
+					assertThat(playerResult.getScore()).isEqualTo(70);
+				}
 			});
 		});
 	}
