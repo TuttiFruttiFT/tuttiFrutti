@@ -48,7 +48,7 @@ public class SuggestionsTest {
 											 .add(Json.newObject().put("category", "bands").put("word", "  The Rolling Stones  "))
 											 .add(Json.newObject().put("category", "colors").put("word", "Marrón Sucio   "));
 			
-			WSResponse r = WS.url("http://localhost:9000/word/suggest").setContentType("application/json")
+			WSResponse r = WS.url("http://localhost:9000/word/suggestion").setContentType("application/json")
 					.post(Json.newObject().put("player_id", playerId).set("duplas", suggestionsArray))
 							.get(5000000L);
 			

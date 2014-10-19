@@ -38,7 +38,7 @@ POST	/rus/purchase								@tuttifrutti.controllers.Rus.buy()
 
 GET		/rus/packs									@tuttifrutti.controllers.Rus.packs()
 
-POST	/word/suggest								@tuttifrutti.controllers.Suggestions.suggest()
+POST	/word/suggestion							@tuttifrutti.controllers.Suggestions.suggest()
 
 POST	/word/judgement								@tuttifrutti.controllers.Suggestions.judge()
 
