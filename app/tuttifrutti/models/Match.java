@@ -79,8 +79,8 @@ public class Match {
 	@Embedded
 	private MatchConfig config;
 	
-	@Property("winner_id")
-	private String winnerId;
+	@Embedded
+	private Player winner;
 	
 	@Property("start_date")
 	@JsonProperty(value = "start_date")
@@ -286,7 +286,8 @@ public class Match {
 
 
 	private void calculateWinner() {
-		this.winnerId = playerResults.stream().max(new PlayerResultComparator()::compare).get().getPlayer().getId().toString();
+		Player winnerPlayer = playerResults.stream().max(new PlayerResultComparator()::compare).get().getPlayer();
+		this.winner = new Player(winnerPlayer.getId(),winnerPlayer.getNickname());
 	}
 
 	private boolean matchIsFinished(Match match, Round round) {

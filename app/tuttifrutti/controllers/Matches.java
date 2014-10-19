@@ -172,7 +172,7 @@ public class Matches extends Controller {
 		
 		if(match != null){
 			Match matchResult = new Match();
-			matchResult.setWinnerId(match.getWinnerId());
+			matchResult.setWinner(match.getWinner());
 			matchResult.setPlayerResults(match.getPlayerResults());
 			return ok(toJson(matchResult));
 		}
