@@ -1,6 +1,7 @@
 package tuttifrutti.controllers;
 
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static play.libs.Json.parse;
 import static tuttifrutti.utils.JsonUtil.parseListToJson;
@@ -92,6 +93,10 @@ public class Suggestions extends Controller {
 	public Result getWords(String playerId){
 		List<Suggestion> suggestions = suggestionService.getSuggestions(playerId);
 
-		return ok(parse(parseListToJson(suggestions)));
+		if(isNotEmpty(suggestions)){			
+			return ok(parse(parseListToJson(suggestions)));
+		}
+		
+		return noContent();
     }
 }
