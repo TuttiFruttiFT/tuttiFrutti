@@ -43,7 +43,10 @@ public class Suggestions extends Controller {
 				Category category = Json.fromJson(suggestionJson.get("category"),Category.class);
 				String word = suggestionJson.get("written_word").asText();
 				
+				Logger.info("written_word " + word);
+				
 				if(category != null || !isEmpty(word)){
+					Logger.info("Category: " + category.getId());
 					suggestions.add(suggestionService.suggest(category,word, playerId));
 				}
 			});
