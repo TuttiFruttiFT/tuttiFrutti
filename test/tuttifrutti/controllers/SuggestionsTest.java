@@ -21,6 +21,7 @@ import org.mongodb.morphia.query.Query;
 import play.libs.Json;
 import play.libs.ws.WS;
 import play.libs.ws.WSResponse;
+import tuttifrutti.models.Category;
 import tuttifrutti.models.Player;
 import tuttifrutti.models.Suggestion;
 import tuttifrutti.services.SuggestionService;
@@ -89,9 +90,9 @@ public class SuggestionsTest {
 			Player player = savePlayer(dataStore, "sarasa@sarasa.com");
 			String playerId = player.getId().toString();
 			List<Suggestion> suggestions = new ArrayList<>();
-			Suggestion bandSuggestion = suggestionService.suggest("bands", "  The Rolling Stones  ", playerId);
-			Suggestion colorSuggestion = suggestionService.suggest("colors", "  Marrón Sucio  ", playerId);
-			Suggestion animalSuggestion1 = suggestionService.suggest("animals", "  Martín Pescador  ", playerId);
+			Suggestion bandSuggestion = suggestionService.suggest(new Category("bands"), "  The Rolling Stones  ", playerId);
+			Suggestion colorSuggestion = suggestionService.suggest(new Category("colors"), "  Marrón Sucio  ", playerId);
+			Suggestion animalSuggestion1 = suggestionService.suggest(new Category("animals"), "  Martín Pescador  ", playerId);
 			suggestions.add(bandSuggestion);
 			suggestions.add(colorSuggestion);
 			suggestions.add(animalSuggestion1);
@@ -99,25 +100,25 @@ public class SuggestionsTest {
 			dataStore.save(suggestions);
 			
 			suggestions = new ArrayList<>();
-			Suggestion animalSuggestion2 = suggestionService.suggest("animals", "  Martín Pescador  ", playerId);
+			Suggestion animalSuggestion2 = suggestionService.suggest(new Category("animals"), "  Martín Pescador  ", playerId);
 			suggestions.add(animalSuggestion2);
 			
 			dataStore.save(suggestions);
 			
 			suggestions = new ArrayList<>();
-			Suggestion animalSuggestion3 = suggestionService.suggest("animals", "  Martín Pescador  ", playerId);
+			Suggestion animalSuggestion3 = suggestionService.suggest(new Category("animals"), "  Martín Pescador  ", playerId);
 			suggestions.add(animalSuggestion3);
 			
 			dataStore.save(suggestions);
 			
 			suggestions = new ArrayList<>();
-			Suggestion animalSuggestion4 = suggestionService.suggest("animals", "  Martín Pescador  ", playerId);
+			Suggestion animalSuggestion4 = suggestionService.suggest(new Category("animals"), "  Martín Pescador  ", playerId);
 			suggestions.add(animalSuggestion4);
 			
 			dataStore.save(suggestions);
 			
 			suggestions = new ArrayList<>();
-			Suggestion animalSuggestion5 = suggestionService.suggest("animals", "  Martín Pescador  ", playerId);
+			Suggestion animalSuggestion5 = suggestionService.suggest(new Category("animals"), "  Martín Pescador  ", playerId);
 			suggestions.add(animalSuggestion5);
 			
 			dataStore.save(suggestions);
@@ -160,7 +161,7 @@ public class SuggestionsTest {
 			Query<Suggestion> queryAccepted = dataStore.find(Suggestion.class, "state =", ACCEPTED.toString());
 			Suggestion suggestionsAccepted = queryAccepted.get();
 			
-			assertThat(suggestionsAccepted.getCategory()).isEqualTo("animals");
+			assertThat(suggestionsAccepted.getCategory().getId()).isEqualTo("animals");
 			assertThat(suggestionsAccepted.getWrittenWord()).isEqualTo("martín pescador");
 			assertThat(suggestionsAccepted.getPositiveVotes()).isEqualTo(5);
 			assertThat(suggestionsAccepted.getNegativeVotes()).isEqualTo(0);
@@ -179,13 +180,13 @@ public class SuggestionsTest {
 			String playerId1 = player1.getId().toString();
 			String playerId2 = player2.getId().toString();
 			
-			Suggestion bandSuggestion = suggestionService.suggest("bands", "  The Rolling Stones  ", playerId1);
-			Suggestion colorSuggestion = suggestionService.suggest("colors", "  Marrón Sucio  ", playerId2);
+			Suggestion bandSuggestion = suggestionService.suggest(new Category("bands"), "  The Rolling Stones  ", playerId1);
+			Suggestion colorSuggestion = suggestionService.suggest(new Category("colors"), "  Marrón Sucio  ", playerId2);
 			
 			dataStore.save(bandSuggestion);
 			dataStore.save(colorSuggestion);
 			
-			createAcceptedSuggestion(dataStore,playerId2, "animals", "Ay");
+			createAcceptedSuggestion(dataStore,playerId2, new Category("animals"), "Ay");
 			
 			WSResponse r = WS.url("http://localhost:9000/word/" + playerId1).setContentType("application/json").get().get(5000000L);
 			
@@ -194,13 +195,13 @@ public class SuggestionsTest {
 			
 			JsonNode suggestionJson = r.asJson().get(0);
 			
-			assertThat(suggestionJson.get("category").textValue()).isEqualTo(colorSuggestion.getCategory());
+			assertThat(suggestionJson.get("category").get("id").textValue()).isEqualTo(colorSuggestion.getCategory().getId());
 			assertThat(suggestionJson.get("written_word").textValue()).isEqualTo(colorSuggestion.getWrittenWord());
 			assertThat(suggestionJson.get("id").textValue()).isEqualTo(colorSuggestion.getId().toString());
 		});
 	}
 	
-	private void createAcceptedSuggestion(Datastore dataStore,String playerId, String category, String word){
+	private void createAcceptedSuggestion(Datastore dataStore,String playerId, Category category, String word){
 		Suggestion suggestion = new Suggestion();
 		suggestion.setCategory(category);
 		suggestion.setWrittenWord(word);

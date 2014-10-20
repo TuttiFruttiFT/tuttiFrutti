@@ -37,7 +37,7 @@ public class Suggestion {
 	@JsonSerialize(using = ObjectIdSerializer.class)
 	private ObjectId id;
 	
-	private String category;
+	private Category category;
 	
 	@JsonProperty("written_word")
 	@Property("written_word")

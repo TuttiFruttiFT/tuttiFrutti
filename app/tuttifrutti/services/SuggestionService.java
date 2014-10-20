@@ -16,6 +16,7 @@ import org.mongodb.morphia.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import tuttifrutti.models.Category;
 import tuttifrutti.models.Suggestion;
 
 /**
@@ -26,7 +27,7 @@ public class SuggestionService {
 	@Autowired
 	private Datastore mongoDatastore;
 	
-	public Suggestion suggest(String category, String word, String playerId) {
+	public Suggestion suggest(Category category, String word, String playerId) {
 		word = word.toLowerCase().trim();
 		Suggestion suggestion = search(category,word);
 		if(suggestion != null){
@@ -69,8 +70,8 @@ public class SuggestionService {
 		return query.batchSize(BATCH_SIZE).asList();
 	}
 	
-	private Suggestion search(String category,String word){
-		Query<Suggestion> query = mongoDatastore.find(Suggestion.class, "category =", category);
+	private Suggestion search(Category category,String word){
+		Query<Suggestion> query = mongoDatastore.find(Suggestion.class, "category.id =", category.getId());
 		query.and(query.criteria("written_word").equal(word));
 		return query.get();
 	}

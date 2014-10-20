@@ -14,9 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import play.Logger;
 import play.libs.F.Function;
 import play.libs.F.Promise;
+import play.libs.Json;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
+import tuttifrutti.models.Category;
 import tuttifrutti.models.Suggestion;
 import tuttifrutti.services.SuggestionService;
 
@@ -38,10 +40,10 @@ public class Suggestions extends Controller {
 		Promise.promise(() -> {
 			List<Suggestion> suggestions = new ArrayList<>();
 			suggestionsJson.forEach(suggestionJson -> {
-				String category = suggestionJson.get("category").asText();
+				Category category = Json.fromJson(suggestionJson.get("category"),Category.class);
 				String word = suggestionJson.get("written_word").asText();
 				
-				if(!isEmpty(category) || !isEmpty(word)){
+				if(category != null || !isEmpty(word)){
 					suggestions.add(suggestionService.suggest(category,word, playerId));
 				}
 			});
