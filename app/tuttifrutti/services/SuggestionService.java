@@ -35,7 +35,7 @@ public class SuggestionService {
 		}else{
 			suggestion = new Suggestion();
 			suggestion.setCategory(category);
-			suggestion.setWord(word);
+			suggestion.setWrittenWord(word);
 			suggestion.setNegativeVotes(0);
 			suggestion.setPositiveVotes(0);
 			suggestion.setPlayerIds(singletonList(playerId));
@@ -71,7 +71,7 @@ public class SuggestionService {
 	
 	private Suggestion search(String category,String word){
 		Query<Suggestion> query = mongoDatastore.find(Suggestion.class, "category =", category);
-		query.and(query.criteria("word").equal(word));
+		query.and(query.criteria("written_word").equal(word));
 		return query.get();
 	}
 

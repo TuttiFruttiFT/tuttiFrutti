@@ -17,6 +17,7 @@ import tuttifrutti.serializers.ObjectIdSerializer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
@@ -38,7 +39,9 @@ public class Suggestion {
 	
 	private String category;
 	
-	private String word;
+	@JsonProperty("written_word")
+	@Property("written_word")
+	private String writtenWord;
 	
 	@JsonIgnore
 	private SuggestionState state;

@@ -45,8 +45,8 @@ public class SuggestionsTest {
 			String playerId = player.getId().toString();
 			
 			ArrayNode suggestionsArray = Json.newObject().arrayNode()
-											 .add(Json.newObject().put("category", "bands").put("word", "  The Rolling Stones  "))
-											 .add(Json.newObject().put("category", "colors").put("word", "Marrón Sucio   "));
+											 .add(Json.newObject().put("category", "bands").put("written_word", "  The Rolling Stones  "))
+											 .add(Json.newObject().put("category", "colors").put("written_word", "Marrón Sucio   "));
 			
 			WSResponse r = WS.url("http://localhost:9000/word/suggestion").setContentType("application/json")
 					.post(Json.newObject().put("player_id", playerId).set("duplas", suggestionsArray))
@@ -64,14 +64,14 @@ public class SuggestionsTest {
 			
 			suggestions.forEach(suggestion -> {
 				if(suggestion.getCategory().equals("bands")){
-					assertThat(suggestion.getWord()).isEqualTo("the rolling stones");
+					assertThat(suggestion.getWrittenWord()).isEqualTo("the rolling stones");
 					assertThat(suggestion.getPositiveVotes()).isEqualTo(0);
 					assertThat(suggestion.getNegativeVotes()).isEqualTo(0);
 					assertThat(suggestion.getState()).isEqualTo(SUGGESTED);
 				}
 				
 				if(suggestion.getCategory().equals("colors")){
-					assertThat(suggestion.getWord()).isEqualTo("marrón sucio");
+					assertThat(suggestion.getWrittenWord()).isEqualTo("marrón sucio");
 					assertThat(suggestion.getPositiveVotes()).isEqualTo(0);
 					assertThat(suggestion.getNegativeVotes()).isEqualTo(0);
 					assertThat(suggestion.getState()).isEqualTo(SUGGESTED);
@@ -143,14 +143,14 @@ public class SuggestionsTest {
 			
 			suggestionsSuggestedResult.forEach(suggestion -> {
 				if(suggestion.getCategory().equals("bands")){
-					assertThat(suggestion.getWord()).isEqualTo("the rolling stones");
+					assertThat(suggestion.getWrittenWord()).isEqualTo("the rolling stones");
 					assertThat(suggestion.getPositiveVotes()).isEqualTo(1);
 					assertThat(suggestion.getNegativeVotes()).isEqualTo(0);
 					assertThat(suggestion.getState()).isEqualTo(SUGGESTED);
 				}
 				
 				if(suggestion.getCategory().equals("colors")){
-					assertThat(suggestion.getWord()).isEqualTo("marrón sucio");
+					assertThat(suggestion.getWrittenWord()).isEqualTo("marrón sucio");
 					assertThat(suggestion.getPositiveVotes()).isEqualTo(1);
 					assertThat(suggestion.getNegativeVotes()).isEqualTo(0);
 					assertThat(suggestion.getState()).isEqualTo(SUGGESTED);
@@ -161,7 +161,7 @@ public class SuggestionsTest {
 			Suggestion suggestionsAccepted = queryAccepted.get();
 			
 			assertThat(suggestionsAccepted.getCategory()).isEqualTo("animals");
-			assertThat(suggestionsAccepted.getWord()).isEqualTo("martín pescador");
+			assertThat(suggestionsAccepted.getWrittenWord()).isEqualTo("martín pescador");
 			assertThat(suggestionsAccepted.getPositiveVotes()).isEqualTo(5);
 			assertThat(suggestionsAccepted.getNegativeVotes()).isEqualTo(0);
 			assertThat(suggestionsAccepted.getState()).isEqualTo(ACCEPTED);
@@ -195,7 +195,7 @@ public class SuggestionsTest {
 			JsonNode suggestionJson = r.asJson().get(0);
 			
 			assertThat(suggestionJson.get("category").textValue()).isEqualTo(colorSuggestion.getCategory());
-			assertThat(suggestionJson.get("word").textValue()).isEqualTo(colorSuggestion.getWord());
+			assertThat(suggestionJson.get("written_word").textValue()).isEqualTo(colorSuggestion.getWrittenWord());
 			assertThat(suggestionJson.get("id").textValue()).isEqualTo(colorSuggestion.getId().toString());
 		});
 	}
@@ -203,7 +203,7 @@ public class SuggestionsTest {
 	private void createAcceptedSuggestion(Datastore dataStore,String playerId, String category, String word){
 		Suggestion suggestion = new Suggestion();
 		suggestion.setCategory(category);
-		suggestion.setWord(word);
+		suggestion.setWrittenWord(word);
 		suggestion.setNegativeVotes(2);
 		suggestion.setPositiveVotes(5);
 		suggestion.setPlayerIds(singletonList(playerId));

@@ -39,7 +39,7 @@ public class Suggestions extends Controller {
 			List<Suggestion> suggestions = new ArrayList<>();
 			suggestionsJson.forEach(suggestionJson -> {
 				String category = suggestionJson.get("category").asText();
-				String word = suggestionJson.get("word").asText();
+				String word = suggestionJson.get("written_word").asText();
 				
 				if(!isEmpty(category) || !isEmpty(word)){
 					suggestions.add(suggestionService.suggest(category,word, playerId));
