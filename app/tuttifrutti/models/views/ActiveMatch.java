@@ -21,6 +21,7 @@ public class ActiveMatch {
 	
 	private String name;
 	
+	@JsonProperty(value = "match_name")
 	private MatchName matchName;
 	
 	@JsonProperty(value = "current_round")
