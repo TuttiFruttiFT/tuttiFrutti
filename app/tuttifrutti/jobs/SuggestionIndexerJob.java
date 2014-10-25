@@ -32,21 +32,25 @@ public class SuggestionIndexerJob implements Runnable {
 	@Override
 	public void run() {
 		Logger.info("Starting SuggestionIndexerJob");
-		List<Suggestion> acceptedSuggestions = suggestionService.acceptedSuggestions();
-		acceptedSuggestions.forEach(suggestion -> {
-			elasticUtil.indexWord(suggestion.getCategory().getId(), suggestion.getWrittenWord());
-			suggestion.setState(CONSOLIDATED);
-			Logger.info(String.format("Indexed %s in category %s", suggestion.getWrittenWord(),suggestion.getCategory().getId()));
-		});
-		
-		mongoDatastore.save(acceptedSuggestions);
-		
-		List<Suggestion> rejectedSuggestions = suggestionService.rejectedSuggestions();
-		rejectedSuggestions.forEach(suggestion -> {
-			suggestion.setState(TO_BE_ELIMINATED);
-		});
-		
-		mongoDatastore.save(rejectedSuggestions);
+		try{			
+			List<Suggestion> acceptedSuggestions = suggestionService.acceptedSuggestions();
+			acceptedSuggestions.forEach(suggestion -> {
+				elasticUtil.indexWord(suggestion.getCategory().getId(), suggestion.getWrittenWord());
+				suggestion.setState(CONSOLIDATED);
+				Logger.info(String.format("Indexed %s in category %s", suggestion.getWrittenWord(),suggestion.getCategory().getId()));
+			});
+			
+			mongoDatastore.save(acceptedSuggestions);
+			
+			List<Suggestion> rejectedSuggestions = suggestionService.rejectedSuggestions();
+			rejectedSuggestions.forEach(suggestion -> {
+				suggestion.setState(TO_BE_ELIMINATED);
+			});
+			
+			mongoDatastore.save(rejectedSuggestions);
+		}catch(Exception e){
+			Logger.error("job SuggestionIndexerJob",e);
+		}
 		Logger.info("Finishing SuggestionIndexerJob");
 	}
 
