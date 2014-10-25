@@ -2,7 +2,9 @@ package tuttifrutti.models.views;
 
 import lombok.Getter;
 import lombok.Setter;
+import tuttifrutti.models.MatchConfig;
 import tuttifrutti.models.MatchName;
+import tuttifrutti.models.Player;
 import tuttifrutti.models.Round;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -28,6 +30,10 @@ public class ActiveMatch {
 	private Round currentRound;
 	
 	private String state;
+	
+	private Player winner;
+	
+	private MatchConfig config;
 	
 	public void setMatchName(MatchName matchName){
 		this.matchName = matchName;

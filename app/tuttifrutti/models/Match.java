@@ -121,12 +121,12 @@ public class Match {
 	@Transient
 	@Autowired
 	private PushService pushUtil;
+	
+	private static final int PUBLIC_NUMBER_OF_ROUND = 10;
 
 	public List<ActiveMatch> activeMatches(String playerId) {
 		List<ActiveMatch> activeMatches = new ArrayList<>();
-		Query<Match> query = mongoDatastore.find(Match.class, "state <>", FINISHED.toString());
-		query.and(query.criteria("state").notEqual(REJECTED),
-				  query.criteria("playerResults.player.id").equal(new ObjectId(playerId)));
+		Query<Match> query = mongoDatastore.find(Match.class, "playerResults.player.id =", new ObjectId(playerId));
 		for(Match match : query.asList()){
 			ActiveMatch activeMatch = new ActiveMatch();
 			Round round = new Round();
@@ -137,6 +137,8 @@ public class Match {
 			changeMatchDependingOnPlayer(playerId,match);
 			activeMatch.setMatchName(match.getMatchName());
 			activeMatch.setState(match.getState().toString());
+			activeMatch.setWinner(match.getWinner());
+			activeMatch.setConfig(match.getConfig());
 			activeMatches.add(activeMatch);
 		}
 		return activeMatches;
@@ -215,6 +217,7 @@ public class Match {
 	}
 
 	public Match createPublic(MatchConfig config) {
+		config.setRounds(PUBLIC_NUMBER_OF_ROUND);
 		return create(config, PUBLIC);
 	}
 
