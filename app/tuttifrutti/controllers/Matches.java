@@ -21,6 +21,7 @@ import tuttifrutti.models.MatchConfig;
 import tuttifrutti.models.PowerUp;
 import tuttifrutti.models.Round;
 import tuttifrutti.models.enums.MatchState;
+import tuttifrutti.services.MatchService;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -30,7 +31,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 @org.springframework.stereotype.Controller
 public class Matches extends Controller {
 	@Autowired
-	private Match matchService;
+	private MatchService matchService;
 	
 	@Autowired
 	private Round roundService;

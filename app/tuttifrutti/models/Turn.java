@@ -1,5 +1,7 @@
 package tuttifrutti.models;
 
+import static tuttifrutti.models.enums.DuplaState.WRONG;
+
 import java.util.List;
 
 import lombok.Getter;
@@ -28,6 +30,13 @@ public class Turn {
 	
 	private Integer score;
 	
+	private boolean bpmbpt;
+	
 	@Embedded
 	private List<Dupla> duplas;
+	
+	public void setDuplas(List<Dupla> duplas){
+		this.duplas = duplas;
+		this.bpmbpt = !duplas.stream().anyMatch(dupla -> dupla.getState().equals(WRONG));
+	}
 }

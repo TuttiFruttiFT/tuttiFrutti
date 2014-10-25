@@ -15,9 +15,9 @@ import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
 import tuttifrutti.models.Device;
-import tuttifrutti.models.Match;
 import tuttifrutti.models.Player;
 import tuttifrutti.models.views.ActiveMatch;
+import tuttifrutti.services.MatchService;
 import tuttifrutti.services.PlayerService;
 import tuttifrutti.services.PushService;
 import tuttifrutti.utils.FacebookUtil;
@@ -34,7 +34,7 @@ public class Players extends Controller {
 	private PlayerService playerService;
 	
 	@Autowired
-	private Match matchService;
+	private MatchService matchService;
 	
 	@Autowired
 	private Datastore mongoDatastore;
