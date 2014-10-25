@@ -7,6 +7,7 @@ import static play.test.Helpers.running;
 import static play.test.Helpers.testServer;
 import static tuttifrutti.models.enums.MatchMode.N;
 import static tuttifrutti.models.enums.MatchState.FINISHED;
+import static tuttifrutti.models.enums.MatchState.REJECTED;
 import static tuttifrutti.models.enums.MatchType.PUBLIC;
 import static tuttifrutti.utils.TestUtils.createMatch;
 import static tuttifrutti.utils.TestUtils.createMatchConfig;
@@ -67,7 +68,7 @@ public class PlayersTest {
 			match4.setState(FINISHED);
 			dataStore.save(match4);
 			Match match5 = createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig, new MatchName(2));
-			match5.setState(FINISHED);
+			match5.setState(REJECTED);
 			dataStore.save(match5);
 			
 			WSResponse r = WS.url("http://localhost:9000/player/matches/" + player.getId().toString()).get().get(5000000L);
@@ -77,7 +78,7 @@ public class PlayersTest {
 			
 			ArrayNode jsonNode = (ArrayNode) r.asJson();
 			
-			assertThat(jsonNode.size()).isEqualTo(3);
+			assertThat(jsonNode.size()).isEqualTo(5);
 		});
 	}
 	

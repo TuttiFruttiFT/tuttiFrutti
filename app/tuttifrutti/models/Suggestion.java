@@ -57,4 +57,13 @@ public class Suggestion {
 	@Property("player_ids")
 	@JsonIgnore
 	private List<String> playerIds;
+	
+	public Suggestion(Category category, String writtenWord, Integer positiveVotes, Integer negativeVotes, List<String> playerIds,SuggestionState state){
+		this.category = category;
+		this.writtenWord = writtenWord;
+		this.positiveVotes = positiveVotes;
+		this.negativeVotes = negativeVotes;
+		this.playerIds = playerIds;
+		this.state = state;
+	}
 }

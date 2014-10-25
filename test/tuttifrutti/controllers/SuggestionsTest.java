@@ -10,6 +10,7 @@ import static tuttifrutti.models.enums.SuggestionState.ACCEPTED;
 import static tuttifrutti.models.enums.SuggestionState.SUGGESTED;
 import static tuttifrutti.utils.SpringApplicationContext.getBeanNamed;
 import static tuttifrutti.utils.TestUtils.savePlayer;
+import static tuttifrutti.utils.TestUtils.sleep;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +22,7 @@ import org.mongodb.morphia.query.Query;
 import play.libs.Json;
 import play.libs.ws.WS;
 import play.libs.ws.WSResponse;
+import tuttifrutti.elastic.ElasticSearchAwareTest;
 import tuttifrutti.models.Category;
 import tuttifrutti.models.Player;
 import tuttifrutti.models.Suggestion;
@@ -34,26 +36,27 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
  * @author rfanego
  *
  */
-public class SuggestionsTest {
+public class SuggestionsTest extends ElasticSearchAwareTest{
 
 	@Test
 	public void suggestWords() {
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {			
 			Datastore dataStore = getBeanNamed("mongoDatastore", Datastore.class);
 			SuggestionService suggestionService = getBeanNamed("suggestionService", SuggestionService.class);
+			populateElastic(getJsonFilesFotCategories());
 			
 			Player player = savePlayer(dataStore, "sarasa@sarasa.com");
 			String playerId = player.getId().toString();
 			
 			ArrayNode suggestionsArray = Json.newObject().arrayNode()
-											 .add(Json.newObject().put("category", "bands").put("written_word", "  The Rolling Stones  "))
+											 .add(Json.newObject().put("category", "bands").put("written_word", "  David Bowie  "))
 											 .add(Json.newObject().put("category", "colors").put("written_word", "Marrón Sucio   "));
 			
 			WSResponse r = WS.url("http://localhost:9000/word/suggestion").setContentType("application/json")
 					.post(Json.newObject().put("player_id", playerId).set("duplas", suggestionsArray))
 							.get(5000000L);
 			
-			TestUtils.sleep(500L);
+			sleep(500L);
 			
 			assertThat(r).isNotNull();
 			assertThat(r.getStatus()).isEqualTo(OK);
@@ -65,7 +68,7 @@ public class SuggestionsTest {
 			
 			suggestions.forEach(suggestion -> {
 				if(suggestion.getCategory().equals("bands")){
-					assertThat(suggestion.getWrittenWord()).isEqualTo("the rolling stones");
+					assertThat(suggestion.getWrittenWord()).isEqualTo("david bowie");
 					assertThat(suggestion.getPositiveVotes()).isEqualTo(0);
 					assertThat(suggestion.getNegativeVotes()).isEqualTo(0);
 					assertThat(suggestion.getState()).isEqualTo(SUGGESTED);
@@ -86,11 +89,12 @@ public class SuggestionsTest {
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {			
 			Datastore dataStore = getBeanNamed("mongoDatastore", Datastore.class);
 			SuggestionService suggestionService = getBeanNamed("suggestionService", SuggestionService.class);
+			populateElastic(getJsonFilesFotCategories());
 			
 			Player player = savePlayer(dataStore, "sarasa@sarasa.com");
 			String playerId = player.getId().toString();
 			List<Suggestion> suggestions = new ArrayList<>();
-			Suggestion bandSuggestion = suggestionService.suggest(new Category("bands"), "  The Rolling Stones  ", playerId);
+			Suggestion bandSuggestion = suggestionService.suggest(new Category("bands"), "  David Bowie  ", playerId);
 			Suggestion colorSuggestion = suggestionService.suggest(new Category("colors"), "  Marrón Sucio  ", playerId);
 			Suggestion animalSuggestion1 = suggestionService.suggest(new Category("animals"), "  Martín Pescador  ", playerId);
 			suggestions.add(bandSuggestion);
@@ -100,25 +104,25 @@ public class SuggestionsTest {
 			dataStore.save(suggestions);
 			
 			suggestions = new ArrayList<>();
-			Suggestion animalSuggestion2 = suggestionService.suggest(new Category("animals"), "  Martín Pescador  ", playerId);
+			Suggestion animalSuggestion2 = suggestionService.suggest(new Category("animals"), "  Martín Pescador  ", "1234");
 			suggestions.add(animalSuggestion2);
 			
 			dataStore.save(suggestions);
 			
 			suggestions = new ArrayList<>();
-			Suggestion animalSuggestion3 = suggestionService.suggest(new Category("animals"), "  Martín Pescador  ", playerId);
+			Suggestion animalSuggestion3 = suggestionService.suggest(new Category("animals"), "  Martín Pescador  ", "2345");
 			suggestions.add(animalSuggestion3);
 			
 			dataStore.save(suggestions);
 			
 			suggestions = new ArrayList<>();
-			Suggestion animalSuggestion4 = suggestionService.suggest(new Category("animals"), "  Martín Pescador  ", playerId);
+			Suggestion animalSuggestion4 = suggestionService.suggest(new Category("animals"), "  Martín Pescador  ", "3456");
 			suggestions.add(animalSuggestion4);
 			
 			dataStore.save(suggestions);
 			
 			suggestions = new ArrayList<>();
-			Suggestion animalSuggestion5 = suggestionService.suggest(new Category("animals"), "  Martín Pescador  ", playerId);
+			Suggestion animalSuggestion5 = suggestionService.suggest(new Category("animals"), "  Martín Pescador  ", "4567");
 			suggestions.add(animalSuggestion5);
 			
 			dataStore.save(suggestions);
@@ -144,7 +148,7 @@ public class SuggestionsTest {
 			
 			suggestionsSuggestedResult.forEach(suggestion -> {
 				if(suggestion.getCategory().equals("bands")){
-					assertThat(suggestion.getWrittenWord()).isEqualTo("the rolling stones");
+					assertThat(suggestion.getWrittenWord()).isEqualTo("david bowie");
 					assertThat(suggestion.getPositiveVotes()).isEqualTo(1);
 					assertThat(suggestion.getNegativeVotes()).isEqualTo(0);
 					assertThat(suggestion.getState()).isEqualTo(SUGGESTED);
@@ -170,17 +174,18 @@ public class SuggestionsTest {
 	}
 	
 	@Test
-	public void test() {
+	public void obtainSuggestionsForAParticularPlayer() {
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {			
 			Datastore dataStore = getBeanNamed("mongoDatastore", Datastore.class);
 			SuggestionService suggestionService = getBeanNamed("suggestionService", SuggestionService.class);
+			populateElastic(getJsonFilesFotCategories());
 			
 			Player player1 = savePlayer(dataStore, "sarasa@sarasa.com");
 			Player player2 = savePlayer(dataStore, "sarasa@sarasa.com");
 			String playerId1 = player1.getId().toString();
 			String playerId2 = player2.getId().toString();
 			
-			Suggestion bandSuggestion = suggestionService.suggest(new Category("bands"), "  The Rolling Stones  ", playerId1);
+			Suggestion bandSuggestion = suggestionService.suggest(new Category("bands"), "  David Bowie  ", playerId1);
 			Suggestion colorSuggestion = suggestionService.suggest(new Category("colors"), "  Marrón Sucio  ", playerId2);
 			
 			dataStore.save(bandSuggestion);

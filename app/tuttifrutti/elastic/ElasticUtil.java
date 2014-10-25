@@ -68,14 +68,8 @@ public class ElasticUtil {
 			String writtenWord = dupla.getWrittenWord() != null ? dupla.getWrittenWord().trim() : null;
 			
 			if(isNotEmpty(writtenWord)){
-				MatchQueryBuilder matchQueryBuilder = matchQuery("value", writtenWord);
-				matchQueryBuilder.fuzziness(AUTO);
-				matchQueryBuilder.prefixLength(1);
-				matchQueryBuilder.maxExpansions(1);
-				matchQueryBuilder.minimumShouldMatch("100%");
-				
-				boolQueryBuilder.must(matchQueryBuilder);
-				boolQueryBuilder.should(matchQuery("letter", letter.getLetter().toString()));
+				boolQueryBuilder.must(matchQueryForWord(writtenWord));
+				boolQueryBuilder.should(matchQueryForLetter(letter.getLetter().toString()));
 				boolQueryBuilder.minimumNumberShouldMatch(1);
 				
 				SearchRequestBuilder searchQuery = elasticSearchClient.prepareSearch("categories").setTypes(categoryId).setSize(1);
@@ -112,7 +106,11 @@ public class ElasticUtil {
 			}
 		}
 	}
-	
+
+	private MatchQueryBuilder matchQueryForLetter(String letter) {
+		return matchQuery("letter", letter);
+	}
+
 	public List<String> searchWords(Letter letter,String category,int numberOfWords){
 		List<String> words = new ArrayList<>();
 		SearchRequestBuilder searchQuery = elasticSearchClient.prepareSearch("categories").setSearchType(QUERY_THEN_FETCH)
@@ -132,11 +130,35 @@ public class ElasticUtil {
 		return words;
 	}
 	
+	public boolean existWord(String category,String word){
+		SearchRequestBuilder searchQuery = elasticSearchClient.prepareSearch("categories").setSearchType(QUERY_THEN_FETCH)
+				.setSize(1).setTypes(category);
+		
+		BoolQueryBuilder boolQueryBuilder = boolQuery();
+		boolQueryBuilder.must(matchQueryForWord(word));
+		boolQueryBuilder.must(matchQueryForLetter(getLetter(word)));
+		
+		searchQuery.setQuery(boolQueryBuilder);
+		SearchResponse searchResponse =  searchQuery.execute().actionGet(TIMEOUT_IN_MILLIS, MILLISECONDS);
+		SearchHits hits = searchResponse.getHits();
+		Iterator<SearchHit> it = hits.iterator();
+		return it.hasNext();
+	}
+	
 	public void indexWord(String categoryName, String unprocessedWord) {
 		String word = processWord(unprocessedWord);
 		String json = Json.newObject().put("value", word).put("letter", getLetter(word)).put("language", "ES").toString();
 		IndexResponse response = elasticSearchClient.prepareIndex(s("elasticsearch.index"), categoryName).setSource(json).execute().actionGet();
 		response.getIndex();
+	}
+	
+	private MatchQueryBuilder matchQueryForWord(String word) {
+		MatchQueryBuilder matchQueryBuilder = matchQuery("value", word);
+		matchQueryBuilder.fuzziness(AUTO);
+		matchQueryBuilder.prefixLength(1);
+		matchQueryBuilder.maxExpansions(1);
+		matchQueryBuilder.minimumShouldMatch("100%");
+		return matchQueryBuilder;
 	}
 
 	private String getLetter(String word) {

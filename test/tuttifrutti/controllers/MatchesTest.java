@@ -1,5 +1,6 @@
 package tuttifrutti.controllers;
 
+import static java.util.Arrays.asList;
 import static org.fest.assertions.Assertions.assertThat;
 import static play.mvc.Http.Status.OK;
 import static play.test.Helpers.fakeApplication;
@@ -237,7 +238,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 		});
 	}
 	
-//	@Test
+	@Test
 	public void turnWithTwoPlayers() {
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
 			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
@@ -272,7 +273,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			Round lastRound = createRound(turn, roundNumber, R);
 			
 			MatchConfig matchConfig = createMatchConfig(language, N, PUBLIC, 2, false, 25);
-			Match match = createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig,
+			Match match = createMatch(dataStore, language, lastRound,asList(playerResult1,playerResult2), matchConfig,
 									  getCategoriesFromDuplas(duplas, language), PLAYER_TURN, new MatchName(2));
 			
 			WSResponse r = WS.url("http://localhost:9000/match/turn").setContentType("application/json")

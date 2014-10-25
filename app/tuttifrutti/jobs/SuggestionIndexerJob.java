@@ -9,6 +9,7 @@ import org.mongodb.morphia.Datastore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import play.Logger;
 import tuttifrutti.elastic.ElasticUtil;
 import tuttifrutti.models.Suggestion;
 import tuttifrutti.services.SuggestionService;
@@ -30,10 +31,12 @@ public class SuggestionIndexerJob implements Runnable {
 	
 	@Override
 	public void run() {
+		Logger.info("Starting SuggestionIndexerJob");
 		List<Suggestion> acceptedSuggestions = suggestionService.acceptedSuggestions();
 		acceptedSuggestions.forEach(suggestion -> {
 			elasticUtil.indexWord(suggestion.getCategory().getId(), suggestion.getWrittenWord());
 			suggestion.setState(CONSOLIDATED);
+			Logger.info(String.format("Indexed %s in category %s", suggestion.getCategory().getId(),suggestion.getWrittenWord()));
 		});
 		
 		mongoDatastore.save(acceptedSuggestions);
@@ -44,6 +47,7 @@ public class SuggestionIndexerJob implements Runnable {
 		});
 		
 		mongoDatastore.save(rejectedSuggestions);
+		Logger.info("Finishing SuggestionIndexerJob");
 	}
 
 }

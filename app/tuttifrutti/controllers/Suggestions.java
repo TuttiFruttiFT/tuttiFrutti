@@ -47,7 +47,10 @@ public class Suggestions extends Controller {
 				
 				if(category != null || !isEmpty(word)){
 					Logger.info("Category: " + category.getId());
-					suggestions.add(suggestionService.suggest(category,word, playerId));
+					Suggestion suggestion = suggestionService.suggest(category,word, playerId);
+					if(suggestion != null){						
+						suggestions.add(suggestion);
+					}
 				}
 			});
 			
