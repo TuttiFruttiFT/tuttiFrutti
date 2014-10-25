@@ -82,6 +82,9 @@ public class Match {
 	@Embedded
 	private Player winner;
 	
+	@Property("winner_id")
+	private String winnerId;
+	
 	@Property("start_date")
 	@JsonProperty(value = "start_date")
 	@JsonSerialize(using = DateSerializer.class)
