@@ -36,7 +36,7 @@ public class SuggestionIndexerJob implements Runnable {
 		acceptedSuggestions.forEach(suggestion -> {
 			elasticUtil.indexWord(suggestion.getCategory().getId(), suggestion.getWrittenWord());
 			suggestion.setState(CONSOLIDATED);
-			Logger.info(String.format("Indexed %s in category %s", suggestion.getCategory().getId(),suggestion.getWrittenWord()));
+			Logger.info(String.format("Indexed %s in category %s", suggestion.getWrittenWord(),suggestion.getCategory().getId()));
 		});
 		
 		mongoDatastore.save(acceptedSuggestions);
