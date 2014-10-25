@@ -11,6 +11,7 @@ import static org.elasticsearch.index.query.QueryBuilders.functionScoreQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders.randomFunction;
 import static tuttifrutti.utils.ConfigurationAccessor.i;
+import static tuttifrutti.utils.ConfigurationAccessor.s;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,6 +21,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 
+import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.MultiSearchRequest;
 import org.elasticsearch.action.search.MultiSearchResponse;
 import org.elasticsearch.action.search.MultiSearchResponse.Item;
@@ -36,6 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import play.Logger;
+import play.libs.Json;
 import tuttifrutti.models.Dupla;
 import tuttifrutti.models.Letter;
 import tuttifrutti.models.LetterWrapper;
@@ -127,5 +130,20 @@ public class ElasticUtil {
 			words.add(hit.sourceAsMap().get("value").toString());
 		}
 		return words;
+	}
+	
+	public void indexWord(String categoryName, String unprocessedWord) {
+		String word = processWord(unprocessedWord);
+		String json = Json.newObject().put("value", word).put("letter", getLetter(word)).put("language", "ES").toString();
+		IndexResponse response = elasticSearchClient.prepareIndex(s("elasticsearch.index"), categoryName).setSource(json).execute().actionGet();
+		response.getIndex();
+	}
+
+	private String getLetter(String word) {
+		return word.substring(0, 1);
+	}
+	
+	private String processWord(String unprocessedWord) {
+		return unprocessedWord.toLowerCase();
 	}
 }

@@ -8,5 +8,5 @@ package tuttifrutti.models.enums;
  *
  */
 public enum SuggestionState {
-	SUGGESTED,ACCEPTED,REJECTED;
+	SUGGESTED,ACCEPTED,REJECTED,CONSOLIDATED,TO_BE_ELIMINATED;
 }

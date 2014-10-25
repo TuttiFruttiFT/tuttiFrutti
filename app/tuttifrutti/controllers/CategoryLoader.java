@@ -1,7 +1,6 @@
 package tuttifrutti.controllers;
 
 import static org.springframework.util.StringUtils.hasText;
-import static tuttifrutti.utils.ConfigurationAccessor.s;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,27 +10,25 @@ import java.nio.charset.Charset;
 
 import lombok.SneakyThrows;
 
-import org.elasticsearch.action.index.IndexResponse;
-import org.elasticsearch.client.Client;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import play.Logger;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
+import tuttifrutti.elastic.ElasticUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author rfanego
- *
  */
 @org.springframework.stereotype.Controller
 public class CategoryLoader extends Controller {
 	
 	@Autowired
-	private Client elasticSearchClient;
+	private ElasticUtil elasticUtil;
 	
 	@SneakyThrows
 	public Result load94secondsCategories(){
@@ -64,7 +61,7 @@ public class CategoryLoader extends Controller {
 			while ((line = br.readLine()) != null) {
 				String trimmedLine = line.trim();
 				if(hasText(trimmedLine)){
-					indexWord("verbs", trimmedLine);
+					elasticUtil.indexWord("verbs", trimmedLine);
 				}
 			}
 			
@@ -72,7 +69,7 @@ public class CategoryLoader extends Controller {
 			while ((line = br.readLine()) != null) {
 				String trimmedLine = line.trim();
 				if(hasText(trimmedLine)){
-					indexWord("bands", trimmedLine);
+					elasticUtil.indexWord("bands", trimmedLine);
 				}
 			}
 			
@@ -99,25 +96,10 @@ public class CategoryLoader extends Controller {
 
 	private void index94JsonWord(JsonNode jsonWord, String categoryName) {
 		String word = process94Word(Json.stringify(jsonWord.get("m")));
-		indexWord(categoryName, word);
-	}
-
-	private void indexWord(String categoryName, String unprocessedWord) {
-		String word = processWord(unprocessedWord);
-		String json = Json.newObject().put("value", word).put("letter", getLetter(word)).put("language", "ES").toString();
-		IndexResponse response = elasticSearchClient.prepareIndex(s("elasticsearch.index"), categoryName).setSource(json).execute().actionGet();
-		response.getIndex();
-	}
-
-	private String getLetter(String word) {
-		return word.substring(0, 1);
+		elasticUtil.indexWord(categoryName, word);
 	}
 
 	private String process94Word(String unprocessedWord) {
 		return unprocessedWord.substring(1, unprocessedWord.length() - 1);
-	}
-	
-	private String processWord(String unprocessedWord) {
-		return unprocessedWord.toLowerCase();
 	}
 }

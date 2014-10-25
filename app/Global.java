@@ -1,4 +1,5 @@
 import static tuttifrutti.utils.FiniteDurationUtils.ONE_DAY;
+import static tuttifrutti.utils.FiniteDurationUtils.ONE_HOUR;
 import static tuttifrutti.utils.FiniteDurationUtils.nextExecutionInSeconds;
 
 import java.util.ArrayList;
@@ -12,12 +13,15 @@ import play.libs.Akka;
 import scala.concurrent.duration.Duration;
 import tuttifrutti.elastic.ElasticSearchEmbeddedServer;
 import tuttifrutti.jobs.PowerUpWordLoader;
+import tuttifrutti.jobs.SuggestionIndexerJob;
 import tuttifrutti.mongo.MongoEmbeddedServer;
 import tuttifrutti.utils.SpringApplicationContext;
 import akka.actor.Cancellable;
 
 public class Global extends GlobalSettings {
 	private PowerUpWordLoader powerUpWordLoaderJob;
+	
+	private SuggestionIndexerJob suggestionIndexerJob;
 	
 	private List<Cancellable> jobs = new ArrayList<Cancellable>();
 	
@@ -28,8 +32,10 @@ public class Global extends GlobalSettings {
 		SpringApplicationContext.initialize();
 		Logger.info("Corre los jobs");
 		powerUpWordLoaderJob = SpringApplicationContext.getBean(PowerUpWordLoader.class);
+		suggestionIndexerJob = SpringApplicationContext.getBean(SuggestionIndexerJob.class);
 		Akka.system().scheduler().scheduleOnce(Duration.Zero(), powerUpWordLoaderJob, Akka.system().dispatcher());
 		jobs.add(Akka.system().scheduler().schedule(nextExecutionInSeconds(00, 00), ONE_DAY, powerUpWordLoaderJob, Akka.system().dispatcher()));
+		jobs.add(Akka.system().scheduler().schedule(Duration.Zero(),ONE_HOUR,suggestionIndexerJob, Akka.system().dispatcher()));
 	}
 	
 	@Override

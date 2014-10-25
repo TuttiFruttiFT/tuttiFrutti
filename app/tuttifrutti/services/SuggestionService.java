@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import tuttifrutti.models.Category;
 import tuttifrutti.models.Suggestion;
+import tuttifrutti.models.enums.SuggestionState;
 
 /**
  * @author rfanego
@@ -68,6 +69,19 @@ public class SuggestionService {
 		Query<Suggestion> query = mongoDatastore.find(Suggestion.class, "state =", SUGGESTED.toString());
 		query.and(query.criteria("player_ids").not().contains(playerId));
 		return query.batchSize(BATCH_SIZE).asList();
+	}
+	
+	public List<Suggestion> acceptedSuggestions(){
+		return getSuggestionsWithState(ACCEPTED);
+	}
+	
+	public List<Suggestion> rejectedSuggestions(){
+		return getSuggestionsWithState(REJECTED);
+	}
+	
+	private List<Suggestion> getSuggestionsWithState(SuggestionState state) {
+		Query<Suggestion> query = mongoDatastore.find(Suggestion.class, "state =", state.toString());
+		return query.asList();
 	}
 	
 	private Suggestion search(Category category,String word){
