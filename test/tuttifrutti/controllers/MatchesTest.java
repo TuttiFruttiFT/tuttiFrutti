@@ -445,6 +445,60 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			});
 		});
 	}
+	
+	@Test
+	public void emptyDuplas() {
+		running(testServer(9000, fakeApplication()), (Runnable) () -> {
+			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
+			Round roundService = SpringApplicationContext.getBeanNamed("round", Round.class);
+			populateElastic(getJsonFilesFotCategories());
+			
+			String language = "ES";
+			int roundNumber = 1;
+			
+			Player player = savePlayer(dataStore, "sarasas@sarasa.com");
+			Player player2 = savePlayer(dataStore, "sarasas2@sarasa.com");
+
+			PlayerResult playerResult1 = savePlayerResult(dataStore, player, 35);
+			PlayerResult playerResult2 = savePlayerResult(dataStore, player2, 40);
+			
+			saveCategories(dataStore, language);
+
+			List<Dupla> duplas = new ArrayList<>();
+			saveDupla(new Category("bands"), duplas, "", 15);
+			saveDupla(new Category("colors"), duplas, "", 24);
+			saveDupla(new Category("meals"), duplas, "", 35);
+			saveDupla(new Category("countries"), duplas, "", 39);
+			
+			List<Dupla> duplas2 = new ArrayList<>();
+			saveDupla(new Category("bands"), duplas2, "Rolling Stone", "rolling stones",15, CORRECTED);
+			saveDupla(new Category("colors"), duplas2, "Rojo", "rojo",24, PERFECT);
+			saveDupla(new Category("meals"), duplas2, "", null,35, WRONG);
+			saveDupla(new Category("countries"), duplas2, null, null,39, WRONG);
+			
+			Turn turn = createTurn(player2.getId().toString(), 45, 0, duplas2);
+			
+			Round lastRound = createRound(turn, roundNumber, R);
+			
+			MatchConfig matchConfig = createMatchConfig(language, N, PUBLIC, 2, false, 25);
+			Match match = createMatch(dataStore, language, lastRound,asList(playerResult1,playerResult2), matchConfig,
+									  getCategoriesFromDuplas(duplas, language), PLAYER_TURN, new MatchName(2));
+			
+			WSResponse r = WS.url("http://localhost:9000/match/turn").setContentType("application/json")
+					 .post("{\"player_id\" : \"" + player.getId().toString() + "\", \"match_id\":\"" + match.getId().toString() 
+						   + "\", \"time\": 41" 
+						   + ", \"duplas\":" + parseListToJson(duplas)
+						   + "}")
+					 .get(5000000L);
+			
+			assertThat(r).isNotNull();
+			assertThat(r.getStatus()).isEqualTo(OK);
+			
+			JsonNode jsonNode = r.asJson();
+			assertThat(jsonNode.size()).isEqualTo(4);
+			jsonNode.forEach(json -> assertThat(json).isNotNull());
+		});
+	}
 
 	@Test
 	public void finishedGameResult() {
