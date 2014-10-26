@@ -276,7 +276,8 @@ public class MatchService {
 			}else{
 				match.getConfig().setCurrentTotalNumberOfPlayers(match.getConfig().getCurrentTotalNumberOfPlayers() - 1);
 				match.getMatchName().decrementPlayers();
-				if(match.getLastRound().getTurns().size() == match.getConfig().getCurrentTotalNumberOfPlayers()){
+				List<Turn> turns = match.getLastRound().getTurns();
+				if(turns.size() == match.getConfig().getCurrentTotalNumberOfPlayers()){
 					this.calculateResult(match, null);
 				}
 				pushUtil.rejectedByPlayer(rejectorPlayer,match);
