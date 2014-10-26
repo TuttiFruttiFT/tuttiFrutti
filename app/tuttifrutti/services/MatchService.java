@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.OptionalInt;
 import java.util.function.Predicate;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
@@ -277,7 +278,7 @@ public class MatchService {
 				match.getConfig().setCurrentTotalNumberOfPlayers(match.getConfig().getCurrentTotalNumberOfPlayers() - 1);
 				match.getMatchName().decrementPlayers();
 				List<Turn> turns = match.getLastRound().getTurns();
-				if(turns.size() == match.getConfig().getCurrentTotalNumberOfPlayers()){
+				if(CollectionUtils.isNotEmpty(turns) && (turns.size() == match.getConfig().getCurrentTotalNumberOfPlayers())){
 					this.calculateResult(match, null);
 				}
 				pushUtil.rejectedByPlayer(rejectorPlayer,match);
