@@ -65,6 +65,9 @@ public class MatchService {
 	@Autowired
 	private PushService pushUtil;
 	
+	@Autowired
+	private AlphabetService alphabetService;
+	
 	private static final int PUBLIC_NUMBER_OF_ROUND = 10;
 	
 	public List<ActiveMatch> activeMatches(String playerId) {

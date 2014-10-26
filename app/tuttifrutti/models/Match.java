@@ -80,6 +80,10 @@ public class Match {
 	@JsonProperty(value = "current_round")
 	private Round lastRound;
 	
+	@JsonIgnore
+	@Embedded
+	private Alphabet alphabet;
+	
 	public void changeMatchDependingOnPlayer(String playerId){
 		this.changeMatchNameDependingOnPlayer(playerId);
 		this.changeMatchStateDependingOnPlayersGame(playerId);

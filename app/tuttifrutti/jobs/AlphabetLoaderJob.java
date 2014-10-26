@@ -2,13 +2,13 @@ package tuttifrutti.jobs;
 
 import static tuttifrutti.models.enums.LanguageType.ES;
 
-import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import play.Logger;
-import tuttifrutti.cache.CategoryCache;
+import tuttifrutti.cache.AlphabetCache;
 import tuttifrutti.elastic.ElasticUtil;
 import tuttifrutti.models.Category;
 import tuttifrutti.models.Letter;
@@ -17,27 +17,29 @@ import tuttifrutti.models.Letter;
  * @author rfanego
  */
 @Component
-public class PowerUpWordLoader implements Runnable{
+public class AlphabetLoaderJob implements Runnable {
 	@Autowired
-	private CategoryCache categoryCache;
+	private Category categoryService;
 	
 	@Autowired
 	private ElasticUtil elasticUtil;
 	
 	@Autowired
-	private Category categoryService;
+	private AlphabetCache alphabetCache;
 	
 	@Override
 	public void run() {
-		Logger.info("Starting PowerUpWordLoader");
+		Logger.info("Starting AlphabetLoaderJob");
 		for(Category category : categoryService.categories(ES.toString())){
+			String categoryId = category.getId();
+			Map<String,Boolean> availableLetters = elasticUtil.availableLettersForCategory(categoryId);
 			for(Letter letter : Letter.values()){
-				List<String> words = elasticUtil.searchWords(letter, category.getId(), 100);
-				for(String word : words){
-					categoryCache.saveWord(category.getId(),letter,word);
+				if(availableLetters.get(letter.getLetter()) == null){
+					alphabetCache.addUnavailableLetter(categoryId,letter.getLetter());
 				}
 			}
 		}
-		Logger.info("Finishing PowerUpWordLoader");
+		Logger.info("Finishing AlphabetLoaderJob");
 	}
+
 }

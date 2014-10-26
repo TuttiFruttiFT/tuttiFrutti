@@ -450,7 +450,6 @@ public class MatchesTest extends ElasticSearchAwareTest {
 	public void emptyDuplas() {
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
 			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
-			Round roundService = SpringApplicationContext.getBeanNamed("round", Round.class);
 			populateElastic(getJsonFilesFotCategories());
 			
 			String language = "ES";
