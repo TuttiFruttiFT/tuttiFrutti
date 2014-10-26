@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -156,7 +157,11 @@ public class Match {
 	}
 
 	public Player getStopPlayer(List<Turn> turns, Integer minTime) {
-		return turns.stream().filter(turn -> turn.getEndTime() == minTime).findFirst().get().getPlayer();
+		Optional<Turn> optionalPlayer = turns.stream().filter(turn -> turn.getEndTime() == minTime).findFirst();
+		if(optionalPlayer.isPresent()){			
+			return optionalPlayer.get().getPlayer();
+		}
+		return null;
 	}
 
 	private List<Dupla> getDuplasByCategory(List<Dupla> allDuplas,Category category) {
@@ -187,7 +192,7 @@ public class Match {
 		comparingAndScoring(validDuplas);
 	}
 
-	public void createTurn(Match match, String playerId, List<Dupla> duplas, int time) {
+	public Turn createTurn(Match match, String playerId, List<Dupla> duplas, int time) {
 		Turn turn = new Turn();
 		turn.setDuplas(duplas);
 		Player player = new Player();
@@ -197,6 +202,7 @@ public class Match {
 		turn.setEndTime(time);
 		Round round = match.getLastRound();
 		round.addTurn(turn);
+		return turn;
 	}
 
 	private String nicknameFrom(String playerId, Match match) {
@@ -229,11 +235,6 @@ public class Match {
 		}
 		return turns.stream().anyMatch(turn -> turn.getPlayer().getId().toString().equals(playerId));
 	}
-	
-//	private boolean playerHasAlreadyPlayed(Match match, String playerId) {
-//		List<Turn> turns = match.getLastRound().getTurns();
-//		return isNotEmpty(turns) && turns.stream().anyMatch(turn -> turn.getPlayer().getId().toString().equals(playerId));
-//	}
 
 	public boolean playerHasAccepted(String playerId) {
 		return this.getPlayerResults().stream().filter(playerResult -> playerResult.getPlayer().getId().toString().equals(playerId))

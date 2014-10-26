@@ -35,6 +35,8 @@ public class Turn {
 	@Embedded
 	private List<Dupla> duplas;
 	
+	public static final int TURN_DURATION_IN_MINUTES = 10;
+	
 	public void setDuplas(List<Dupla> duplas){
 		this.duplas = duplas;
 		this.bpmbpt = !duplas.stream().anyMatch(dupla -> dupla.getState().equals(WRONG));

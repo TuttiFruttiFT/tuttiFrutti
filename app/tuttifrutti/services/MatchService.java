@@ -1,9 +1,11 @@
 package tuttifrutti.services;
 
+import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.stream.Collectors.toList;
 import static org.joda.time.DateTime.now;
 import static org.springframework.util.StringUtils.isEmpty;
 import static play.libs.F.Promise.promise;
+import static tuttifrutti.models.Turn.TURN_DURATION_IN_MINUTES;
 import static tuttifrutti.models.enums.DuplaScore.ZERO_SCORE;
 import static tuttifrutti.models.enums.DuplaState.WRONG;
 import static tuttifrutti.models.enums.MatchState.FINISHED;
@@ -16,6 +18,7 @@ import static tuttifrutti.models.enums.MatchType.PUBLIC;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.OptionalInt;
 import java.util.function.Predicate;
 
 import org.bson.types.ObjectId;
@@ -141,13 +144,13 @@ public class MatchService {
 		Round round = match.getLastRound();
 		
 		elasticUtil.validate(duplas,round.getLetter());
-		match.createTurn(match,playerId, duplas, time);
+		Turn turn = match.createTurn(match,playerId, duplas, time);
 		mongoDatastore.save(match);
-		calculateResult(match);
+		calculateResult(match, turn);
 		return getWrongDuplas(duplas);
 	}
 	
-	private void calculateResult(Match match) {
+	private void calculateResult(Match match, Turn turn) {
 		if(match.isRoundOver()){
 			promise(() -> {				
 				Round round = match.getLastRound();
@@ -172,6 +175,10 @@ public class MatchService {
 				mongoDatastore.save(match);
 				return null;
 			});
+		}else{
+			if(turn.isBpmbpt()){
+				pushUtil.bpmbpt(match, turn.getPlayer().getId().toString());
+			}
 		}
 	}
 	
@@ -203,7 +210,11 @@ public class MatchService {
 	}
 	
 	private Integer getMinimumTime(List<Turn> turns) {
-		return turns.stream().mapToInt(turn -> turn.getEndTime()).min().getAsInt();
+		OptionalInt optionalInt = turns.stream().filter(turn -> turn.isBpmbpt()).mapToInt(turn -> turn.getEndTime()).min();
+		if(!optionalInt.isPresent()){
+			return (int) MINUTES.toSeconds(TURN_DURATION_IN_MINUTES);
+		}
+		return optionalInt.getAsInt();
 	}
 
 	private List<Dupla> flatDuplasFromTurns(List<Turn> turns) {
@@ -266,7 +277,7 @@ public class MatchService {
 				match.getConfig().setCurrentTotalNumberOfPlayers(match.getConfig().getCurrentTotalNumberOfPlayers() - 1);
 				match.getMatchName().decrementPlayers();
 				if(match.getLastRound().getTurns().size() == match.getConfig().getCurrentTotalNumberOfPlayers()){
-					this.calculateResult(match);
+					this.calculateResult(match, null);
 				}
 				pushUtil.rejectedByPlayer(rejectorPlayer,match);
 			}

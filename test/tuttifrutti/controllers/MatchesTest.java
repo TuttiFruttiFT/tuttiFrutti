@@ -1,6 +1,7 @@
 package tuttifrutti.controllers;
 
 import static java.util.Arrays.asList;
+import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.fest.assertions.Assertions.assertThat;
 import static play.mvc.Http.Status.OK;
 import static play.test.Helpers.fakeApplication;
@@ -10,6 +11,7 @@ import static tuttifrutti.models.Category.DEFAULT_CATEGORIES_NUMBER;
 import static tuttifrutti.models.Letter.A;
 import static tuttifrutti.models.Letter.R;
 import static tuttifrutti.models.Letter.S;
+import static tuttifrutti.models.Turn.TURN_DURATION_IN_MINUTES;
 import static tuttifrutti.models.enums.DuplaScore.ALONE_SCORE;
 import static tuttifrutti.models.enums.DuplaScore.UNIQUE_SCORE;
 import static tuttifrutti.models.enums.DuplaScore.ZERO_SCORE;
@@ -305,7 +307,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			
 			assertPlayerScores(modifiedMatch, player, player2, 85, 70);
 			
-			assertThat(modifiedRound.getEndTime()).isEqualTo(41);
+			assertThat(modifiedRound.getEndTime()).isEqualTo((int)MINUTES.toSeconds(TURN_DURATION_IN_MINUTES));
 			for(Turn modifiedTurn : modifiedRound.getTurns()){
 				if(modifiedTurn.getPlayer().getId().toString().equals(player.getId().toString())){
 					assertThat(modifiedTurn.getEndTime()).isEqualTo(41);
@@ -391,7 +393,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			JsonNode jsonNode = turnResponse.asJson();
 			JsonNode jsonWrongDupla = jsonNode.get(0);
 			
-			assertThat(jsonWrongDupla).isNotNull();
+			assertThat(jsonWrongDupla).isNull();
 			
 			sleep(500L);
 			
@@ -448,6 +450,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 	public void finishedGameResult() {
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
 			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
+			Round roundService = SpringApplicationContext.getBeanNamed("round", Round.class);
 			populateElastic(getJsonFilesFotCategories());
 			
 			String language = "ES";
@@ -463,7 +466,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 
 			List<Dupla> duplas = new ArrayList<>();
 			saveDupla(new Category("bands"), duplas, "Radiohead", 15);
-			saveDupla(new Category("colors"), duplas, "Marron", 24);
+			saveDupla(new Category("colors"), duplas, "Rojo", 24);
 			saveDupla(new Category("meals"), duplas, "Risotto", 35);
 			saveDupla(new Category("countries"), duplas, "Rumania", 39);
 			
@@ -495,12 +498,15 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			
 			Match modifiedMatch = dataStore.get(Match.class, match.getId());
 			
-			assertPlayerScores(modifiedMatch, player, player2, 85, 70);
+			assertPlayerScores(modifiedMatch, player, player2, 90, 55);
 			
 			WSResponse matchResult = WS.url("http://localhost:9000/match/result/" + match.getId().toString()).get().get(5000000L);
 			
 			assertThat(matchResult).isNotNull();
 			assertThat(matchResult.getStatus()).isEqualTo(OK);
+			
+			Round modifiedRound = roundService.getRound(match.getId().toString(), roundNumber);
+			assertThat(modifiedRound.getEndTime()).isEqualTo(41);
 			
 			Match resultMatch = Json.fromJson(matchResult.asJson(), Match.class);
 			
@@ -512,9 +518,9 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			
 			resultMatch.getPlayerResults().forEach(playerResult -> {
 				if(playerResult.getPlayer().getId().toString().equals(player.getId().toString())){
-					assertThat(playerResult.getScore()).isEqualTo(85);
+					assertThat(playerResult.getScore()).isEqualTo(90);
 				}else{
-					assertThat(playerResult.getScore()).isEqualTo(70);
+					assertThat(playerResult.getScore()).isEqualTo(55);
 				}
 			});
 		});

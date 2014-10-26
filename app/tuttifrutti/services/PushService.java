@@ -3,6 +3,7 @@ package tuttifrutti.services;
 import static play.libs.F.Promise.promise;
 import static play.libs.Json.newObject;
 import static tuttifrutti.utils.ConfigurationAccessor.s;
+import static tuttifrutti.utils.PushType.BPMBPT;
 import static tuttifrutti.utils.PushType.MATCH_REJECTED;
 import static tuttifrutti.utils.PushType.MATCH_REJECTED_BY_PLAYER;
 import static tuttifrutti.utils.PushType.MATCH_RESULT;
@@ -114,6 +115,20 @@ public class PushService {
 			@Override
 			public Object apply(Throwable arg0) throws Throwable {
 				Logger.error("recover matchResult",arg0);
+				return null;
+			}
+		});
+	}
+	
+	public void bpmbpt(Match match, String playerId){
+		promise(() -> {
+			sendMessageTo(match.playersExcept(playerId), match,BPMBPT);
+			return null;
+		}).recover(new Function<Throwable, Object>() {
+			
+			@Override
+			public Object apply(Throwable arg0) throws Throwable {
+				Logger.error("recover bpmbpt",arg0);
 				return null;
 			}
 		});
