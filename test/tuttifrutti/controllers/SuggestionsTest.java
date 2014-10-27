@@ -128,9 +128,9 @@ public class SuggestionsTest extends ElasticSearchAwareTest{
 			dataStore.save(suggestions);
 			
 			ArrayNode suggestionsArray = Json.newObject().arrayNode()
-					 .add(Json.newObject().put("suggestion_id", bandSuggestion.getId().toString()).put("valid", true))
-					 .add(Json.newObject().put("suggestion_id", colorSuggestion.getId().toString()).put("valid", true))
-					 .add(Json.newObject().put("suggestion_id", animalSuggestion1.getId().toString()).put("valid", true));
+					 .add(Json.newObject().put("id", bandSuggestion.getId().toString()).put("valid", true))
+					 .add(Json.newObject().put("id", colorSuggestion.getId().toString()).put("valid", true))
+					 .add(Json.newObject().put("id", animalSuggestion1.getId().toString()).put("valid", true));
 			
 			WSResponse r = WS.url("http://localhost:9000/word/judgement").setContentType("application/json")
 							 .post(Json.newObject().put("player_id", playerId).set("duplas", suggestionsArray)).get(5000000L);

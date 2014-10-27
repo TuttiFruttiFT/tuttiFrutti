@@ -78,7 +78,7 @@ public class Suggestions extends Controller {
 		Promise.promise(() -> {
 			List<Suggestion> suggestions = new ArrayList<>();
 			judgements.forEach(judgement -> {
-				String suggestionId = judgement.get("suggestion_id").asText();
+				String suggestionId = judgement.get("id").asText();
 				Boolean valid = judgement.get("valid").asBoolean();
 				suggestions.add(suggestionService.judge(suggestionId,valid, playerId));
 			});
