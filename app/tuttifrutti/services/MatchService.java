@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.OptionalInt;
 import java.util.function.Predicate;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;

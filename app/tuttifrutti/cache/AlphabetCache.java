@@ -1,7 +1,8 @@
 package tuttifrutti.cache;
 
+import static java.util.Arrays.asList;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -29,9 +30,9 @@ public class AlphabetCache {
 	public List<String> unavailableLetters(String categoryId){
 		String unavailableLetters = (String)Cache.get(PREFIX + categoryId);
 		if(unavailableLetters != null){
-			return new ArrayList<String>(Arrays.asList(unavailableLetters.split(SEPARATOR)));
+			return new ArrayList<String>(asList(unavailableLetters.split(SEPARATOR)));
 		}
-		return null;
+		return new ArrayList<>();
 	}
 	
 }

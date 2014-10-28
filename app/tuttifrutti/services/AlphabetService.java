@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import lombok.Setter;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -27,6 +29,7 @@ import tuttifrutti.models.Letter;
  * @author rfanego
  */
 @Component
+@Setter
 public class AlphabetService {
 	@Autowired
 	private AlphabetCache alphabetCache;

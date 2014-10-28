@@ -32,6 +32,7 @@ public class AlphabetLoaderJob implements Runnable {
 		Logger.info("Starting AlphabetLoaderJob");
 		for(Category category : categoryService.categories(ES.toString())){
 			String categoryId = category.getId();
+			System.out.println("category: " + categoryId);
 			Map<String,Boolean> availableLetters = elasticUtil.availableLettersForCategory(categoryId);
 			for(Letter letter : Letter.values()){
 				if(availableLetters.get(letter.getLetter()) == null){

@@ -1,3 +1,4 @@
+import static scala.concurrent.duration.Duration.Zero;
 import static tuttifrutti.utils.FiniteDurationUtils.ONE_DAY;
 import static tuttifrutti.utils.FiniteDurationUtils.ONE_HOUR;
 import static tuttifrutti.utils.FiniteDurationUtils.nextExecutionInSeconds;
@@ -10,8 +11,8 @@ import play.Application;
 import play.GlobalSettings;
 import play.Logger;
 import play.libs.Akka;
-import scala.concurrent.duration.Duration;
 import tuttifrutti.elastic.ElasticSearchEmbeddedServer;
+import tuttifrutti.jobs.AlphabetLoaderJob;
 import tuttifrutti.jobs.PowerUpWordLoader;
 import tuttifrutti.jobs.SuggestionIndexerJob;
 import tuttifrutti.mongo.MongoEmbeddedServer;
@@ -23,20 +24,24 @@ public class Global extends GlobalSettings {
 	
 	private SuggestionIndexerJob suggestionIndexerJob;
 	
+	private AlphabetLoaderJob alphabetLoaderJob; 
+	
 	private List<Cancellable> jobs = new ArrayList<Cancellable>();
 	
 	@Override
 	public void onStart(Application app) {
 		super.onStart(app);
 		Logger.info("Starting up the application...");
-		SpringApplicationContext.initialize();
+		SpringApplicationContext.initialize();		
 		if (app.isProd()) {			
 			Logger.info("Corre los jobs");
 			powerUpWordLoaderJob = SpringApplicationContext.getBean(PowerUpWordLoader.class);
 			suggestionIndexerJob = SpringApplicationContext.getBean(SuggestionIndexerJob.class);
-			Akka.system().scheduler().scheduleOnce(Duration.Zero(), powerUpWordLoaderJob, Akka.system().dispatcher());
+			alphabetLoaderJob = SpringApplicationContext.getBean(AlphabetLoaderJob.class);
+			Akka.system().scheduler().scheduleOnce(Zero(), alphabetLoaderJob, Akka.system().dispatcher());
+			Akka.system().scheduler().scheduleOnce(Zero(), powerUpWordLoaderJob, Akka.system().dispatcher());
 			jobs.add(Akka.system().scheduler().schedule(nextExecutionInSeconds(00, 00), ONE_DAY, powerUpWordLoaderJob, Akka.system().dispatcher()));
-			jobs.add(Akka.system().scheduler().schedule(Duration.Zero(),ONE_HOUR,suggestionIndexerJob, Akka.system().dispatcher()));
+			jobs.add(Akka.system().scheduler().schedule(Zero(),ONE_HOUR,suggestionIndexerJob, Akka.system().dispatcher()));
 		}
 	}
 	

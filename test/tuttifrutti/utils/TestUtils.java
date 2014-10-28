@@ -1,7 +1,9 @@
 package tuttifrutti.utils;
 
+import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static org.joda.time.DateTime.now;
+import static tuttifrutti.models.enums.LanguageType.ES;
 import static tuttifrutti.models.enums.MatchState.TO_BE_APPROVED;
 
 import java.util.List;
@@ -10,6 +12,7 @@ import org.bson.types.ObjectId;
 import org.mongodb.morphia.Datastore;
 
 import play.Logger;
+import tuttifrutti.models.Alphabet;
 import tuttifrutti.models.Category;
 import tuttifrutti.models.Dupla;
 import tuttifrutti.models.Letter;
@@ -66,6 +69,7 @@ public class TestUtils {
 		match.setCategories(categories);
 		match.setPlayerResults(playerResults);
 		match.setLastRound(lastRound);
+		match.setAlphabet(new Alphabet(ES.toString(),asList(Letter.values())));
 		dataStore.save(match);
 		return match;
 	}
