@@ -1,10 +1,7 @@
 package tuttifrutti.models;
 
 import static java.util.stream.Collectors.toList;
-import static tuttifrutti.models.Letter.values;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -28,8 +25,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public class LetterWrapper {
 	private static final int PREVIOUS_LETTERS_SIZE = 5;
 	
-	private static final List<Letter> VALUES = Collections.unmodifiableList(Arrays.asList(values()));
-	private static final int SIZE = VALUES.size();
+//	private static final List<Letter> VALUES = Collections.unmodifiableList(Arrays.asList(values()));
+//	private static final int SIZE = VALUES.size();
 	private static final Random RANDOM = new Random();
 	
 	@Getter @Setter
@@ -51,22 +48,22 @@ public class LetterWrapper {
 		this.previousLetters = new LinkedList<>();
 	}
 	
-	public static LetterWrapper random() {
-		return new LetterWrapper(VALUES.get(RANDOM.nextInt(SIZE)));
+	public static LetterWrapper random(Alphabet alphabet) {
+		return new LetterWrapper(alphabet.getLetters().get(RANDOM.nextInt(alphabet.getSize())));
 	}
 
-	public LetterWrapper next() {
+	public LetterWrapper next(Alphabet alphabet) {
 		this.previousLetters.addFirst(this.letter.toString());
 		if(this.previousLetters.size() > PREVIOUS_LETTERS_SIZE){
 			this.previousLetters.removeLast();
 		}
-		List<Letter> availableLetters = getAvailableLetters();
+		List<Letter> availableLetters = getAvailableLetters(alphabet);
 		LetterWrapper newLetter = new LetterWrapper(availableLetters.get(RANDOM.nextInt(availableLetters.size())));
 		newLetter.previousLetters = this.previousLetters;
 		return newLetter;
 	}
 
-	private List<Letter> getAvailableLetters() {
-		return VALUES.stream().filter(letter -> !this.previousLetters.stream().anyMatch(usedLetter -> usedLetter.equals(letter.getLetter()))).collect(toList());
+	private List<Letter> getAvailableLetters(Alphabet alphabet) {
+		return alphabet.getLetters().stream().filter(letter -> !this.previousLetters.stream().anyMatch(usedLetter -> usedLetter.equals(letter.getLetter()))).collect(toList());
 	}
 }

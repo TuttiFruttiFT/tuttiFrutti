@@ -78,11 +78,12 @@ public class Round {
 
 	private LetterWrapper getLetter(Match match) {
 		Round round = match.getLastRound();
+		Alphabet alphabet = match.getAlphabet();
 		if(round == null){
-			return LetterWrapper.random();
+			return LetterWrapper.random(alphabet);
 		}
 		LetterWrapper roundLetter = round.getLetter();
-		return roundLetter.next();
+		return roundLetter.next(alphabet);
 	}
 
 	private Integer getRoundNumber(Match match) {

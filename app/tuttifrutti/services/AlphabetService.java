@@ -10,11 +10,15 @@ import static tuttifrutti.models.enums.LanguageType.ES;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import tuttifrutti.cache.AlphabetCache;
 import tuttifrutti.models.Alphabet;
 import tuttifrutti.models.Category;
 import tuttifrutti.models.Letter;
@@ -24,6 +28,9 @@ import tuttifrutti.models.Letter;
  */
 @Component
 public class AlphabetService {
+	@Autowired
+	private AlphabetCache alphabetCache;
+	
 	private Map<String,List<Letter>> BANNED_LETTERS;
 	private static final List<Letter> VALUES = unmodifiableList(Arrays.asList(values()));
 	
@@ -37,13 +44,15 @@ public class AlphabetService {
 	
 	public Alphabet alphabetForCategoriesAndLanguage(String language,List<Category> categories){
 		Alphabet alphabet = this.alphabetForLanguage(language);
-		
+		Set<String> lettersToRemove = new HashSet<>();
+		categories.forEach(category -> lettersToRemove.addAll(alphabetCache.unavailableLetters(category.getId())));
+		alphabet.remove(lettersToRemove);
 		return alphabet;
 	}
 	
 	private Alphabet alphabetForLanguage(String language){
 		List<Letter> bannedLetters = BANNED_LETTERS.get(language);
 		List<Letter> letters = VALUES.stream().filter(letter -> !bannedLetters.stream().anyMatch(bannedLetter -> bannedLetter.equals(letter.getLetter()))).collect(toList());
-		return new Alphabet(letters,language);
+		return new Alphabet(language,letters);
 	}
 }

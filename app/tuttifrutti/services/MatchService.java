@@ -2,6 +2,7 @@ package tuttifrutti.services;
 
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.joda.time.DateTime.now;
 import static org.springframework.util.StringUtils.isEmpty;
 import static play.libs.F.Promise.promise;
@@ -63,7 +64,7 @@ public class MatchService {
 	private ElasticUtil elasticUtil;
 	
 	@Autowired
-	private PushService pushUtil;
+	private PushService pushService;
 	
 	@Autowired
 	private AlphabetService alphabetService;
@@ -170,18 +171,18 @@ public class MatchService {
 				if(match.isFinished(round)){
 					match.calculateWinner();
 					match.setState(FINISHED);
-					pushUtil.matchResult(match);
+					pushService.matchResult(match);
 				}else{				
 					match.setState(PLAYER_TURN);
 					roundService.create(match);
-					pushUtil.roundResult(match,round.getNumber());
+					pushService.roundResult(match,round.getNumber());
 				}
 				mongoDatastore.save(match);
 				return null;
 			});
 		}else{
 			if(turn.isBpmbpt()){
-				pushUtil.bpmbpt(match, turn.getPlayer().getId().toString());
+				pushService.bpmbpt(match, turn.getPlayer().getId().toString());
 			}
 		}
 	}
@@ -245,6 +246,7 @@ public class MatchService {
 		match.setStartDate(now().toDate());
 		match.setCategories(categories);
 		match.setPlayerResults(playerResults);
+		match.setAlphabet(alphabetService.alphabetForCategoriesAndLanguage(config.getLanguage(), categories));
 		roundService.create(match);
 		return match;
 	}
@@ -272,19 +274,19 @@ public class MatchService {
 		}
 		
 		if(rejectorPlayer != null){			
-			List<Player> playerIds = match.players();
+			List<Player> players = match.players();
 			
-			if(playerIds.size() == 1){
+			if(players.size() == 1){
 				match.setState(REJECTED);
-				pushUtil.rejected(playerIds,match);
+				pushService.rejected(players,match);
 			}else{
 				match.getConfig().setCurrentTotalNumberOfPlayers(match.getConfig().getCurrentTotalNumberOfPlayers() - 1);
 				match.getMatchName().decrementPlayers();
 				List<Turn> turns = match.getLastRound().getTurns();
-				if(CollectionUtils.isNotEmpty(turns) && (turns.size() == match.getConfig().getCurrentTotalNumberOfPlayers())){
+				if(isNotEmpty(turns) && (turns.size() == match.getConfig().getCurrentTotalNumberOfPlayers())){
 					this.calculateResult(match, null);
 				}
-				pushUtil.rejectedByPlayer(rejectorPlayer,match);
+				pushService.rejectedByPlayer(rejectorPlayer,match);
 			}
 			mongoDatastore.save(match);
 			return true;
@@ -293,6 +295,6 @@ public class MatchService {
 	}
 	
 	public void privateMatchReady(Match match, List<Player> players) {
-		pushUtil.privateMatchReady(match, players);
+		pushService.privateMatchReady(match, players);
 	}
 }
