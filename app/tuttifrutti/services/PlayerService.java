@@ -1,17 +1,18 @@
-/**
- * 
- */
 package tuttifrutti.services;
+
+import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import tuttifrutti.models.Match;
 import tuttifrutti.models.Pack;
 import tuttifrutti.models.Player;
 import tuttifrutti.models.PlayerResult;
@@ -30,9 +31,12 @@ public class PlayerService {
 		return mongoDatastore.get(Player.class,new ObjectId(playerId));
 	}
 	
-	public Boolean validateMail(String mail,String clave){
-		//TODO implementar
-		return true;
+	public Player player(ObjectId playerId){
+		return mongoDatastore.get(Player.class,playerId);
+	}
+	
+	public Boolean validatePassword(String password,String writtenPassword){
+		return StringUtils.equals(password, writtenPassword);
 	}
 	
 	public Player validateFacebook(String facebookId){
@@ -46,13 +50,11 @@ public class PlayerService {
 	}
 
 	public Player registerMail(String mail, String clave) {
-		// TODO implementar
 		Player player = new Player();
 		String[] splittedMail = mail.split("@");
 		player.setNickname((splittedMail.length > 0) ? splittedMail[0] : mail);
 		player.setMail(mail);
 		player.setPassword(clave);
-		
 		mongoDatastore.save(player);
 		
 		return player;
@@ -103,7 +105,7 @@ public class PlayerService {
 
 	public List<PlayerResult> playerResultsFromIds(List<String> playerIds) {
 		List<PlayerResult> playerResults = new ArrayList<>();
-		this.playersFromIds(playerIds).stream().forEach(player -> playerResults.add(new PlayerResult(player,0,false)));
+		this.playersFromIds(playerIds).stream().forEach(player -> playerResults.add(new PlayerResult(player,0,0,false)));
 		return playerResults;
 	}
 	
@@ -111,5 +113,27 @@ public class PlayerService {
 		List<ObjectId> playersObjectIds = new ArrayList<>();
 		playerIds.forEach(playerId -> playersObjectIds.add(new ObjectId(playerId)));
 		return mongoDatastore.find(Player.class).field("_id").in(playersObjectIds).asList();
+	}
+
+	public void updateStatistics(Match match) {
+		Player winner = match.getWinner();
+		List<PlayerResult> losers = match.getPlayerResults().stream()
+										 .filter(playerResult -> !playerResult.getPlayer().getId().toString().equals(winner.getId().toString()))
+										 .collect(toList());
+		
+		updateWinnerStatistics(winner.getId());
+		
+		for(PlayerResult loser : losers){
+			updateLoserStatistics(loser.getPlayer().getId());
+		}
+	}
+
+	private void updateLoserStatistics(ObjectId id) {
+		// TODO implementar
+	}
+
+	private void updateWinnerStatistics(ObjectId id) {
+		Player winner = this.player(id);
+		winner.setWon(winner.getWon() + 1);
 	}
 }

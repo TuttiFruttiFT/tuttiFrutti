@@ -22,5 +22,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public class PlayerResult {
 	private Player player;
 	private int score;
+	private int playedTime;
 	private boolean accepted;
 }

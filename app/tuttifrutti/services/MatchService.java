@@ -125,15 +125,11 @@ public class MatchService {
 	}
 
 	public void addPlayer(Match match, String playerId) {
-		PlayerResult playerResult = new PlayerResult();
 		Player player = playerService.player(playerId);
 		if(player == null){
 			throw new RuntimeException("Player " + playerId + " does not exist");
 		}
-		playerResult.setPlayer(player);
-		playerResult.setScore(0);
-		playerResult.setAccepted(true);
-		match.getPlayerResults().add(playerResult);
+		match.getPlayerResults().add(new PlayerResult(player,0,0,true));
 		match.getMatchName().incrementPlayers();
 	}
 
@@ -169,6 +165,7 @@ public class MatchService {
 				
 				if(match.isFinished(round)){
 					match.calculateWinner();
+					playerService.updateStatistics(match);
 					match.setState(FINISHED);
 					pushService.matchResult(match);
 				}else{				
@@ -192,6 +189,7 @@ public class MatchService {
 			turn.setScore(turnScore);
 			PlayerResult playerResult = match.getPlayerResults().stream().filter(player -> player.getPlayer().getId().toString().equals(turn.getPlayer().getId().toString())).findFirst().get();
 			playerResult.setScore(playerResult.getScore() + turnScore);
+			playerResult.setPlayedTime(playerResult.getPlayedTime() + turn.getEndTime());
 		}
 	}
 	

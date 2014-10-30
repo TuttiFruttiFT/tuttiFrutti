@@ -5,7 +5,6 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.annotations.Transient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,13 +60,13 @@ public class Players extends Controller {
 				if(player == null){					
 					player = playerService.registerMail(mail,password);
 				}else{
-					if(!playerService.validateMail(mail, password)){
+					if(!playerService.validatePassword(player.getPassword(), password)){
 						return unauthorized();
 					}
 				}
-			}else if(StringUtils.isNotEmpty(facebookId)){
+			}else if(isNotEmpty(facebookId)){
 				player = playerService.registerFacebook(facebookId);
-			}else if(StringUtils.isNotEmpty(twitterId)){
+			}else if(isNotEmpty(twitterId)){
 				player = playerService.registerTwitter(twitterId);
 			}
 			

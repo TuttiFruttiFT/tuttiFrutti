@@ -17,6 +17,7 @@ import tuttifrutti.serializers.ObjectIdSerializer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.deser.std.DateDeserializers.DateDeserializer;
@@ -40,13 +41,16 @@ public class Player {
 	private String mail;
 	
 	@Property("facebook_id")
+	@JsonProperty("facebook_id")
 	private String facebookId;
 	
 	@Property("twitter_id")
+	@JsonProperty("twitter_id")
 	private String twitterId;
 	
 	private Integer balance;
 	
+	@JsonIgnore
 	private String password;
 	
 	private Integer won;

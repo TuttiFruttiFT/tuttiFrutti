@@ -134,8 +134,14 @@ public class Match {
 
 
 	public void calculateWinner() {
-		Player winnerPlayer = playerResults.stream().max(new PlayerResultComparator()::compare).get().getPlayer();
-		this.winner = new Player(winnerPlayer.getId(),winnerPlayer.getNickname());
+		PlayerResult winnerPlayer = playerResults.stream().max(new PlayerResultScoreComparator()::compare).get();
+		int winnerScore = winnerPlayer.getScore();
+		List<PlayerResult> playersWithMaxScore = playerResults.stream().filter(playerResult -> playerResult.getScore() == winnerScore)
+																	   .collect(toList());
+		if(playersWithMaxScore.size() > 1){
+			winnerPlayer = playerResults.stream().min(new PlayerResultTimeComparator()::compare).get();
+		}
+		this.winner = new Player(winnerPlayer.getPlayer().getId(),winnerPlayer.getPlayer().getNickname());
 	}
 
 	public boolean isFinished(Round round) {
@@ -246,7 +252,7 @@ public class Match {
 	}
 }
 
-class PlayerResultComparator implements Comparator<PlayerResult>{
+class PlayerResultScoreComparator implements Comparator<PlayerResult>{
 
 	@Override
 	public int compare(PlayerResult p1, PlayerResult p2) {
@@ -254,6 +260,22 @@ class PlayerResultComparator implements Comparator<PlayerResult>{
 			return 1;
 		}else{
 			if(p1.getScore() < p2.getScore()){
+				return -1;
+			}
+		}
+		return 0;
+	}
+	
+}
+
+class PlayerResultTimeComparator implements Comparator<PlayerResult>{
+
+	@Override
+	public int compare(PlayerResult p1, PlayerResult p2) {
+		if(p1.getPlayedTime() > p2.getPlayedTime()){
+			return 1;
+		}else{
+			if(p1.getPlayedTime() < p2.getPlayedTime()){
 				return -1;
 			}
 		}

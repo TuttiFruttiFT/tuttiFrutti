@@ -24,7 +24,7 @@ public class Global extends GlobalSettings {
 	
 	private SuggestionIndexerJob suggestionIndexerJob;
 	
-	private AlphabetLoaderJob alphabetLoaderJob; 
+	private AlphabetLoaderJob alphabetLoaderJob;
 	
 	private List<Cancellable> jobs = new ArrayList<Cancellable>();
 	
@@ -32,8 +32,8 @@ public class Global extends GlobalSettings {
 	public void onStart(Application app) {
 		super.onStart(app);
 		Logger.info("Starting up the application...");
-		SpringApplicationContext.initialize();		
-		if (app.isProd()) {			
+		SpringApplicationContext.initialize();
+		if (app.isProd()) {
 			Logger.info("Corre los jobs");
 			powerUpWordLoaderJob = SpringApplicationContext.getBean(PowerUpWordLoader.class);
 			suggestionIndexerJob = SpringApplicationContext.getBean(SuggestionIndexerJob.class);
