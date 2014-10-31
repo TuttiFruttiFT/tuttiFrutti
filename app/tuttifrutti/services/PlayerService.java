@@ -1,5 +1,6 @@
 package tuttifrutti.services;
 
+import static java.lang.Math.max;
 import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
@@ -24,6 +25,9 @@ import com.fasterxml.jackson.databind.JsonNode;
  */
 @Component
 public class PlayerService {
+	private static final Integer AMOUNT_OF_RUS_FOR_WINNING = 20;
+	private static final Integer AMOUNT_OF_RUS_FOR_LOSING = 0;
+	
 	@Autowired
 	private Datastore mongoDatastore;
 
@@ -121,19 +125,32 @@ public class PlayerService {
 										 .filter(playerResult -> !playerResult.getPlayer().getId().toString().equals(winner.getId().toString()))
 										 .collect(toList());
 		
-		updateWinnerStatistics(winner.getId());
+		PlayerResult winnerResult = match.getPlayerResults().stream()
+										 .filter(playerResult -> playerResult.getPlayer().getId().toString().equals(winner.getId().toString()))
+										 .findFirst().get();
+		
+		List<Player> playersToUpdate = new ArrayList<>();
+		playersToUpdate.add(updateWinnerStatistics(winnerResult));
 		
 		for(PlayerResult loser : losers){
-			updateLoserStatistics(loser.getPlayer().getId());
+			playersToUpdate.add(updateLoserStatistics(loser));
 		}
+		mongoDatastore.save(playersToUpdate);
 	}
 
-	private void updateLoserStatistics(ObjectId id) {
-		// TODO implementar
+	private Player updateLoserStatistics(PlayerResult loserResult) {
+		Player loser = this.player(loserResult.getPlayer().getId());
+		loser.setLost(loser.getLost() + 1);
+		loser.setBest(max(loser.getBest() != null ? loser.getBest() : 0, loserResult.getScore()));
+		loser.setBalance(loser.getBalance() + AMOUNT_OF_RUS_FOR_LOSING);
+		return loser;
 	}
 
-	private void updateWinnerStatistics(ObjectId id) {
-		Player winner = this.player(id);
+	private Player updateWinnerStatistics(PlayerResult winnerResult) {
+		Player winner = this.player(winnerResult.getPlayer().getId());
 		winner.setWon(winner.getWon() + 1);
+		winner.setBest(max(winner.getBest() != null ? winner.getBest() : 0, winnerResult.getScore()));
+		winner.setBalance(winner.getBalance() + AMOUNT_OF_RUS_FOR_WINNING);
+		return winner;
 	}
 }
