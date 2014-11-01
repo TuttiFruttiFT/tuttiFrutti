@@ -46,7 +46,6 @@ public class PushService {
 			sendMessageTo(players, match,PRIVATE_MATCH_READY);
 			return null;
 		}).recover(new Function<Throwable, Object>() {
-			
 			@Override
 			public Object apply(Throwable arg0) throws Throwable {
 				Logger.error("recover privateMatchReady",arg0);
@@ -60,7 +59,6 @@ public class PushService {
 			sendMessageTo(players, match,MATCH_REJECTED);
 			return null;
 		}).recover(new Function<Throwable, Object>() {
-			
 			@Override
 			public Object apply(Throwable arg0) throws Throwable {
 				Logger.error("recover rejected",arg0);
@@ -78,7 +76,6 @@ public class PushService {
 			}
 			return null;
 		}).recover(new Function<Throwable, Object>() {
-			
 			@Override
 			public Object apply(Throwable arg0) throws Throwable {
 				Logger.error("recover rejectedByPlayer",arg0);
@@ -96,7 +93,6 @@ public class PushService {
 			}
 			return null;
 		}).recover(new Function<Throwable, Object>() {
-			
 			@Override
 			public Object apply(Throwable arg0) throws Throwable {
 				Logger.error("recover roundResult",arg0);
@@ -111,7 +107,6 @@ public class PushService {
 			sendMessageTo(match.players(), match,MATCH_RESULT);
 			return null;
 		}).recover(new Function<Throwable, Object>() {
-			
 			@Override
 			public Object apply(Throwable arg0) throws Throwable {
 				Logger.error("recover matchResult",arg0);
@@ -120,12 +115,15 @@ public class PushService {
 		});
 	}
 	
-	public void bpmbpt(Match match, String playerId){
+	public void bpmbpt(Match match, int bpmbptTime, Player player, int roundNumber){
 		promise(() -> {
-			sendMessageTo(match.playersExcept(playerId), match,BPMBPT);
+			ObjectNode json = newObject().put("type", BPMBPT.toString()).put("match_id", match.getId().toString())
+					  .put("round_number", roundNumber).put("bpmbpt_time", bpmbptTime).put("bpmbpt_name", player.getNickname());
+			for(Player otherPlayer : match.playersExcept(player.getId().toString())){
+				sendGCMMessage(json.put("player_id", otherPlayer.getId().toString()),player.getDevices());
+			}
 			return null;
 		}).recover(new Function<Throwable, Object>() {
-			
 			@Override
 			public Object apply(Throwable arg0) throws Throwable {
 				Logger.error("recover bpmbpt",arg0);
@@ -144,6 +142,7 @@ public class PushService {
 		attributes.put("data", jsonData);
 		JsonNode request = Json.newObject().setAll(attributes);
 		Logger.info(request.toString());
+		System.out.println(request.toString());
 		for(int i = 0;i < RETRIES_NUMBER;i++){
 			WSResponse r = null;
 			try{				

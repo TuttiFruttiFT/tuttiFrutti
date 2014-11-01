@@ -178,7 +178,7 @@ public class MatchService {
 			});
 		}else{
 			if(turn.isBpmbpt()){
-				pushService.bpmbpt(match, turn.getPlayer().getId().toString());
+				pushService.bpmbpt(match, turn.getEndTime(), turn.getPlayer(), match.getLastRound().getNumber());
 			}
 		}
 	}
