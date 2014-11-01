@@ -18,21 +18,31 @@ public class AlphabetCache {
 	private static final String PREFIX = "ALPHABET_";
 	
 	public void addUnavailableLetter(String categoryId, String letter) {
-		String unavailableLetters = (String)Cache.get(categoryId);
+		String unavailableLetters = (String)Cache.get(getKey(categoryId));
 		if(unavailableLetters == null){
 			unavailableLetters = letter;
 		}else{
-			unavailableLetters = unavailableLetters + SEPARATOR + letter;
+			if(!unavailableLettersList(unavailableLetters).contains(letter)){				
+				unavailableLetters = unavailableLetters + SEPARATOR + letter;
+				Cache.set(getKey(categoryId), unavailableLetters);
+			}
 		}
-		Cache.set(PREFIX + categoryId, unavailableLetters);
+		return;
 	}
-	
+
 	public List<String> unavailableLetters(String categoryId){
-		String unavailableLetters = (String)Cache.get(PREFIX + categoryId);
+		String unavailableLetters = (String)Cache.get(getKey(categoryId));
 		if(unavailableLetters != null){
-			return new ArrayList<String>(asList(unavailableLetters.split(SEPARATOR)));
+			return unavailableLettersList(unavailableLetters);
 		}
 		return new ArrayList<>();
 	}
+
+	private ArrayList<String> unavailableLettersList(String unavailableLetters) {
+		return new ArrayList<String>(asList(unavailableLetters.split(SEPARATOR)));
+	}
 	
+	private String getKey(String categoryId) {
+		return PREFIX + categoryId;
+	}
 }

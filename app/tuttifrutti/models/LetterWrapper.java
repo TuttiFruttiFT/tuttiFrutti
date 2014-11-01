@@ -25,8 +25,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public class LetterWrapper {
 	private static final int PREVIOUS_LETTERS_SIZE = 5;
 	
-//	private static final List<Letter> VALUES = Collections.unmodifiableList(Arrays.asList(values()));
-//	private static final int SIZE = VALUES.size();
 	private static final Random RANDOM = new Random();
 	
 	@Getter @Setter

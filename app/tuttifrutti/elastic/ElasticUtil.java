@@ -47,7 +47,6 @@ import tuttifrutti.models.Dupla;
 import tuttifrutti.models.Letter;
 import tuttifrutti.models.LetterWrapper;
 import tuttifrutti.models.ScoreCalculator;
-import tuttifrutti.models.enums.LanguageType;
 
 /**
  * @author rfanego
@@ -183,9 +182,9 @@ public class ElasticUtil {
 	public Map<String, Boolean> availableLettersForCategory(String categoryName) {
 		Map<String,Boolean> availableLetters = new HashMap<String, Boolean>(); 
 		TermsBuilder termsBuilder = AggregationBuilders.terms("group_by_letter").field(LETTER_FIELD);
-		SearchResponse searchResponse = elasticSearchClient.prepareSearch(CATEGORIES_INDEX,categoryName).addAggregation(termsBuilder).setSize(0).execute().actionGet();
+		SearchResponse searchResponse = elasticSearchClient.prepareSearch(CATEGORIES_INDEX).setTypes(categoryName).addAggregation(termsBuilder).setSize(0).execute().actionGet();
 		Aggregations aggregations = searchResponse.getAggregations();
-		Terms terms = aggregations.get("");
+		Terms terms = aggregations.get("group_by_letter");
 		terms.getBuckets().forEach(bucket -> {
 			availableLetters.put(bucket.getKey().toUpperCase(), true);
 		});
