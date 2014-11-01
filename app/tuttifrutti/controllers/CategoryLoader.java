@@ -47,7 +47,6 @@ public class CategoryLoader extends Controller {
 		InputStream musicalInstrumentsFile = CategoryLoader.class.getResourceAsStream("/categorias/musical_instruments.txt");
 		InputStream musicalStylesFile = CategoryLoader.class.getResourceAsStream("/categorias/musical_styles.txt");
 		InputStream sportsFile = CategoryLoader.class.getResourceAsStream("/categorias/sports.txt");
-		BufferedReader br = null;
 		try {
 			JsonNode jsonArray = new ObjectMapper().readTree(inJson);
 			
@@ -68,16 +67,16 @@ public class CategoryLoader extends Controller {
 //				process94Category(183,"verbs",categoryNumber,json);
 			}
 			
-			br = processWordFile(verbsFile, "verbs");
-			br = processWordFile(bandsFile, "bands");
-			br = processWordFile(animalsFile, "animals");
-			br = processWordFile(colorsFile, "colors");
-			br = processWordFile(countriesFile, "countries");
-			br = processWordFile(drinksFile, "drinks");
-			br = processWordFile(jobsFile, "jobs");
-			br = processWordFile(musicalInstrumentsFile, "musical_instruments");
-			br = processWordFile(musicalStylesFile, "musical_styles");
-			br = processWordFile(sportsFile, "sports");
+			processWordFile(verbsFile, "verbs");
+			processWordFile(bandsFile, "bands");
+			processWordFile(animalsFile, "animals");
+			processWordFile(colorsFile, "colors");
+			processWordFile(countriesFile, "countries");
+			processWordFile(drinksFile, "drinks");
+			processWordFile(jobsFile, "jobs");
+			processWordFile(musicalInstrumentsFile, "musical_instruments");
+			processWordFile(musicalStylesFile, "musical_styles");
+			processWordFile(sportsFile, "sports");
 			
 			suggestionService.consolidatedSuggestions().forEach(suggestion -> {
 				String trimmedLine = suggestion.getWrittenWord().trim();
@@ -90,7 +89,6 @@ public class CategoryLoader extends Controller {
 		} catch (IOException e) {
 			Logger.error("Processing categories json",e);
 		}finally{
-			br.close();
 			inJson.close();
 			verbsFile.close();
 		}
@@ -98,18 +96,16 @@ public class CategoryLoader extends Controller {
 		return internalServerError();
 	}
 
-	private BufferedReader processWordFile(InputStream verbsFile, String typeName)
-			throws IOException {
-		BufferedReader br;
+	private void processWordFile(InputStream file, String typeName) throws IOException {
 		String line;
-		br = new BufferedReader(new InputStreamReader(verbsFile, Charset.forName("UTF-8")));
+		BufferedReader br = new BufferedReader(new InputStreamReader(file, Charset.forName("UTF-8")));
 		while ((line = br.readLine()) != null) {
-			String trimmedLine = line.trim();
+			String trimmedLine = line.trim().replace("\ufeff", "");
 			if(hasText(trimmedLine)){
 				elasticUtil.indexWord(typeName, trimmedLine);
 			}
 		}
-		return br;
+		br.close();
 	}
 
 	private void process94Category(int categoryNumber, String categoryName, int categoryNumberFromJson, JsonNode json) {
