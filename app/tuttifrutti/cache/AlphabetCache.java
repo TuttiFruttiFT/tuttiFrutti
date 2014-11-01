@@ -38,6 +38,10 @@ public class AlphabetCache {
 		}
 		return new ArrayList<>();
 	}
+	
+	public void cleanCache(String categoryId){
+		Cache.set(getKey(categoryId), null);
+	}
 
 	private ArrayList<String> unavailableLettersList(String unavailableLetters) {
 		return new ArrayList<String>(asList(unavailableLetters.split(SEPARATOR)));
