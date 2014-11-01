@@ -6,6 +6,7 @@ import static tuttifrutti.models.Suggestion.BATCH_SIZE;
 import static tuttifrutti.models.Suggestion.VOTES_TO_ACCEPT;
 import static tuttifrutti.models.Suggestion.VOTES_TO_REJECT;
 import static tuttifrutti.models.enums.SuggestionState.ACCEPTED;
+import static tuttifrutti.models.enums.SuggestionState.CONSOLIDATED;
 import static tuttifrutti.models.enums.SuggestionState.REJECTED;
 import static tuttifrutti.models.enums.SuggestionState.SUGGESTED;
 
@@ -80,6 +81,10 @@ public class SuggestionService {
 		Query<Suggestion> query = mongoDatastore.find(Suggestion.class, "state =", SUGGESTED.toString());
 		query.and(query.criteria("player_ids").not().contains(playerId));
 		return query.batchSize(BATCH_SIZE).asList();
+	}
+	
+	public List<Suggestion> consolidatedSuggestions(){
+		return getSuggestionsWithState(CONSOLIDATED);
 	}
 	
 	public List<Suggestion> acceptedSuggestions(){

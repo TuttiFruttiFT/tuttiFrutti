@@ -17,6 +17,7 @@ import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 import tuttifrutti.elastic.ElasticUtil;
+import tuttifrutti.services.SuggestionService;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,6 +29,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class CategoryLoader extends Controller {
 	
 	@Autowired
+	private SuggestionService suggestionService;
+	
+	@Autowired
 	private ElasticUtil elasticUtil;
 	
 	@SneakyThrows
@@ -35,8 +39,15 @@ public class CategoryLoader extends Controller {
 		InputStream inJson = CategoryLoader.class.getResourceAsStream("/categorias/ninetyfour_seconds_es.json");
 		InputStream verbsFile = CategoryLoader.class.getResourceAsStream("/categorias/verbs.txt");
 		InputStream bandsFile = CategoryLoader.class.getResourceAsStream("/categorias/bandas_def.txt");
+		InputStream animalsFile = CategoryLoader.class.getResourceAsStream("/categorias/animales.txt");
+		InputStream colorsFile = CategoryLoader.class.getResourceAsStream("/categorias/colors.txt");
+		InputStream countriesFile = CategoryLoader.class.getResourceAsStream("/categorias/countries.txt");
+		InputStream drinksFile = CategoryLoader.class.getResourceAsStream("/categorias/drinks.txt");
+		InputStream jobsFile = CategoryLoader.class.getResourceAsStream("/categorias/jobs.txt");
+		InputStream musicalInstrumentsFile = CategoryLoader.class.getResourceAsStream("/categorias/musical_instruments.txt");
+		InputStream musicalStylesFile = CategoryLoader.class.getResourceAsStream("/categorias/musical_styles.txt");
+		InputStream sportsFile = CategoryLoader.class.getResourceAsStream("/categorias/sports.txt");
 		BufferedReader br = null;
-		String line;
 		try {
 			JsonNode jsonArray = new ObjectMapper().readTree(inJson);
 			
@@ -50,28 +61,30 @@ public class CategoryLoader extends Controller {
 				process94Category(184,"fruits",categoryNumber,json);
 				process94Category(339,"drinks",categoryNumber,json);
 				process94Category(168,"musical_instruments",categoryNumber,json);
-				process94Category(171,"animals",categoryNumber,json);
-				process94Category(174,"animals",categoryNumber,json);
+//				process94Category(171,"animals",categoryNumber,json);
+//				process94Category(174,"animals",categoryNumber,json);
 				process94Category(173,"countries",categoryNumber,json);
 				process94Category(170,"jobs",categoryNumber,json);
 //				process94Category(183,"verbs",categoryNumber,json);
 			}
 			
-			br = new BufferedReader(new InputStreamReader(verbsFile, Charset.forName("UTF-8")));
-			while ((line = br.readLine()) != null) {
-				String trimmedLine = line.trim();
-				if(hasText(trimmedLine)){
-					elasticUtil.indexWord("verbs", trimmedLine);
-				}
-			}
+			br = processWordFile(verbsFile, "verbs");
+			br = processWordFile(bandsFile, "bands");
+			br = processWordFile(animalsFile, "animals");
+			br = processWordFile(colorsFile, "colors");
+			br = processWordFile(countriesFile, "countries");
+			br = processWordFile(drinksFile, "drinks");
+			br = processWordFile(jobsFile, "jobs");
+			br = processWordFile(musicalInstrumentsFile, "musical_instruments");
+			br = processWordFile(musicalStylesFile, "musical_styles");
+			br = processWordFile(sportsFile, "sports");
 			
-			br = new BufferedReader(new InputStreamReader(bandsFile, Charset.forName("UTF-8")));
-			while ((line = br.readLine()) != null) {
-				String trimmedLine = line.trim();
+			suggestionService.consolidatedSuggestions().forEach(suggestion -> {
+				String trimmedLine = suggestion.getWrittenWord().trim();
 				if(hasText(trimmedLine)){
-					elasticUtil.indexWord("bands", trimmedLine);
+					elasticUtil.indexWord(suggestion.getCategory().getId(), trimmedLine);
 				}
-			}
+			});
 			
 			return ok();
 		} catch (IOException e) {
@@ -82,8 +95,21 @@ public class CategoryLoader extends Controller {
 			verbsFile.close();
 		}
 		
-		System.out.println("ANTES DE INTERNAL");
 		return internalServerError();
+	}
+
+	private BufferedReader processWordFile(InputStream verbsFile, String typeName)
+			throws IOException {
+		BufferedReader br;
+		String line;
+		br = new BufferedReader(new InputStreamReader(verbsFile, Charset.forName("UTF-8")));
+		while ((line = br.readLine()) != null) {
+			String trimmedLine = line.trim();
+			if(hasText(trimmedLine)){
+				elasticUtil.indexWord(typeName, trimmedLine);
+			}
+		}
+		return br;
 	}
 
 	private void process94Category(int categoryNumber, String categoryName, int categoryNumberFromJson, JsonNode json) {
