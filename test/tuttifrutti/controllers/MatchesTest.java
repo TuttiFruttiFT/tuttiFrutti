@@ -28,6 +28,7 @@ import static tuttifrutti.models.enums.PowerUpType.buy_time;
 import static tuttifrutti.models.enums.PowerUpType.opponent_word;
 import static tuttifrutti.models.enums.PowerUpType.suggest;
 import static tuttifrutti.utils.JsonUtil.parseListToJson;
+import static tuttifrutti.utils.TestUtils.cleanAlphabetCache;
 import static tuttifrutti.utils.TestUtils.createMatch;
 import static tuttifrutti.utils.TestUtils.createMatchConfig;
 import static tuttifrutti.utils.TestUtils.createRound;
@@ -119,6 +120,8 @@ public class MatchesTest extends ElasticSearchAwareTest {
 	@Test
 	public void searchPublicMatchReturnsANewOneBecauseTheyAreAllStarted() {
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
+			cleanAlphabetCache();
+			
 			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
 			
 			String language = "ES";
@@ -169,10 +172,13 @@ public class MatchesTest extends ElasticSearchAwareTest {
 	@Test
 	public void searchPublicMatchReturnsCreatedMatch() {
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
+			cleanAlphabetCache();
+			
 			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
 			Player player = savePlayer(dataStore, "sarasas@sarasa.com");
 			String language = "ES";
 
+			populateElastic(getJsonFilesFotCategories());
 			saveCategories(dataStore, language);
 			
 			MatchConfig matchConfig = createMatchConfig(language, N, PUBLIC, 2, false, 25);
@@ -180,7 +186,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			WSResponse r = WS.url("http://localhost:9000/match/public").setContentType("application/json")
 							 .post("{\"player_id\" : \"" + player.getId().toString() + "\", \"config\":" 
 								   + Json.toJson(matchConfig).toString()+ "}")
-							 .get(5000L);
+							 .get(500000000L);
 			assertThat(r).isNotNull();
 			assertThat(r.getStatus()).isEqualTo(OK);
 
@@ -502,6 +508,8 @@ public class MatchesTest extends ElasticSearchAwareTest {
 	@Test
 	public void finishedGameResult() {
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
+			cleanAlphabetCache();
+			
 			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
 			Round roundService = SpringApplicationContext.getBeanNamed("round", Round.class);
 			populateElastic(getJsonFilesFotCategories());
@@ -542,7 +550,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 						   + "\", \"time\": 41" 
 						   + ", \"duplas\":" + JsonUtil.parseListToJson(duplas)
 						   + "}")
-					 .get(5000000L);
+					 .get(500000000L);
 			
 			assertThat(turnResult).isNotNull();
 			assertThat(turnResult.getStatus()).isEqualTo(OK);

@@ -11,6 +11,7 @@ import java.util.List;
 import org.mongodb.morphia.Datastore;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import play.Logger;
 import play.libs.Json;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
@@ -57,17 +58,22 @@ public class Matches extends Controller {
 		JsonNode jsonConfig = json.get("config");
 
 		MatchConfig config = Json.fromJson(jsonConfig, MatchConfig.class);
-
-		Match match = matchService.findPublicMatch(playerId, config);
-		if(match == null){
-			match = matchService.createPublic(config);
+		Match match = null;
+		
+		try{
+			match = matchService.findPublicMatch(playerId, config);
+			if(match == null){
+				match = matchService.createPublic(config);
+			}
+			matchService.addPlayer(match, playerId);
+			powerUpService.generate(match, playerId);
+			if(match.readyToStart()){
+				match.setState(MatchState.PLAYER_TURN);
+			}
+			mongoDatastore.save(match);
+		}catch(Exception e){
+			Logger.error("Public Match Service",e);
 		}
-		matchService.addPlayer(match, playerId);
-		powerUpService.generate(match, playerId);
-		if(match.readyToStart()){
-			match.setState(MatchState.PLAYER_TURN);
-		}
-		mongoDatastore.save(match);
         return ok(Json.toJson(match));
     }
 	

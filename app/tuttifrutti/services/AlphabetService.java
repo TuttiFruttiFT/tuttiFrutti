@@ -55,7 +55,7 @@ public class AlphabetService {
 	
 	protected Alphabet alphabetForLanguage(String language){
 		List<Letter> bannedLetters = BANNED_LETTERS.get(language);
-		List<Letter> letters = VALUES.stream().filter(letter -> !bannedLetters.stream().anyMatch(bannedLetter -> bannedLetter.equals(letter.getLetter()))).collect(toList());
+		List<Letter> letters = VALUES.stream().filter(letter -> !bannedLetters.stream().anyMatch(bannedLetter -> bannedLetter.getLetter().equals(letter.getLetter()))).collect(toList());
 		return new Alphabet(language,letters);
 	}
 }

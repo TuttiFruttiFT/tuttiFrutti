@@ -35,6 +35,7 @@ public class ElasticSearchAwareTest {
 		jsonList.add(Pair.of("mealMango.json", "meals"));
 		jsonList.add(Pair.of("mealRisotto.json", "meals"));
 		jsonList.add(Pair.of("mealSandia.json", "meals"));
+		jsonList.add(Pair.of("mealSaviaDeAbedul.json", "meals"));
 		jsonList.add(Pair.of("countryColombia.json", "countries"));
 		jsonList.add(Pair.of("countryRumania.json", "countries"));
 		jsonList.add(Pair.of("countryMarruecos.json", "countries"));
@@ -46,7 +47,6 @@ public class ElasticSearchAwareTest {
 		jsonList.add(Pair.of("verbServir.json", "verbs"));
 		jsonList.add(Pair.of("sportSurf.json", "sports"));
 		jsonList.add(Pair.of("sportSoftbol.json", "sports"));
-		jsonList.add(Pair.of("mealSaviaDeAbedul.json", "meals"));
 		jsonList.add(Pair.of("colorSiena.json", "colors"));
 		jsonList.add(Pair.of("colorSalmon.json", "colors"));
 		return jsonList.toArray((Pair<String, String>[])new Pair[jsonList.size()]);

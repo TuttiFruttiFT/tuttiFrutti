@@ -41,7 +41,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
  */
 public class PlayersTest {
 	
-	@Test
+//	@Test
 	public void activeMatchesFromPlayer(){
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
 			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
@@ -82,7 +82,7 @@ public class PlayersTest {
 		});
 	}
 	
-	@Test
+//	@Test
 	public void findExistingPlayer(){
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
 			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
@@ -113,7 +113,7 @@ public class PlayersTest {
 			JsonNode jsonNode = r.asJson();
 			
 			assertThat(jsonNode.get("mail").asText()).isEqualTo("sarasas@sarasa.com");
-			assertThat(jsonNode.get("password").asText()).isEqualTo("SARASA");
+			assertThat(jsonNode.get("password")).isNull();
 			assertThat(jsonNode.get("nickname").asText()).isEqualTo("sarasas");
 		});
 	}

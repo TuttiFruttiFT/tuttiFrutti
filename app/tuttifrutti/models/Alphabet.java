@@ -23,7 +23,7 @@ public class Alphabet {
 	
 	private String language;
 	
-	private int size;
+	private Integer size;
 	
 	public Alphabet(String language,List<Letter> letters){
 		this.language = language;

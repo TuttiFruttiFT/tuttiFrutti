@@ -5,6 +5,20 @@ import static java.util.stream.Collectors.toList;
 import static org.joda.time.DateTime.now;
 import static tuttifrutti.models.enums.LanguageType.ES;
 import static tuttifrutti.models.enums.MatchState.TO_BE_APPROVED;
+import static tuttifrutti.utils.CategoryType.animals;
+import static tuttifrutti.utils.CategoryType.bands;
+import static tuttifrutti.utils.CategoryType.cities;
+import static tuttifrutti.utils.CategoryType.clothes;
+import static tuttifrutti.utils.CategoryType.colors;
+import static tuttifrutti.utils.CategoryType.countries;
+import static tuttifrutti.utils.CategoryType.jobs;
+import static tuttifrutti.utils.CategoryType.meals;
+import static tuttifrutti.utils.CategoryType.musical_instruments;
+import static tuttifrutti.utils.CategoryType.musical_styles;
+import static tuttifrutti.utils.CategoryType.names;
+import static tuttifrutti.utils.CategoryType.sports;
+import static tuttifrutti.utils.CategoryType.things;
+import static tuttifrutti.utils.CategoryType.verbs;
 
 import java.util.List;
 
@@ -12,6 +26,8 @@ import org.bson.types.ObjectId;
 import org.mongodb.morphia.Datastore;
 
 import play.Logger;
+import play.cache.Cache;
+import tuttifrutti.cache.AlphabetCache;
 import tuttifrutti.models.Alphabet;
 import tuttifrutti.models.Category;
 import tuttifrutti.models.Dupla;
@@ -119,20 +135,20 @@ public class TestUtils {
 	}
 	
 	public static void saveCategories(Datastore datastore, String language) {
-		saveCategory(datastore, language,"names","nombres_img","Nombres");
-		saveCategory(datastore, language,"colors","colores_img","Colores");
-		saveCategory(datastore, language,"things","cosas_img","Cosas / Objectos");
-		saveCategory(datastore, language,"meals","comidas_img","Comidas y Bebidas");
-		saveCategory(datastore, language,"countries","countries_img","Países");
-		saveCategory(datastore, language,"animals","animales_img","Animales");
-		saveCategory(datastore, language,"sports","deportes_img","Deportes");
-		saveCategory(datastore, language,"cities","ciudades_img","Ciudades");
-		saveCategory(datastore, language,"clothes","ropa_img","Ropa");
-		saveCategory(datastore, language,"musical_styles","musical_styles_img","Estilos Musicales");
-		saveCategory(datastore, language,"musical_instruments","musical_instruments_img","Instrumentos Musicales");
-		saveCategory(datastore, language,"verbs","verbos_img","Verbos");
-		saveCategory(datastore, language,"jobs","trabajos_img","Trabajos");
-		saveCategory(datastore, language,"bands","bands_img","Bandas de Música");
+		saveCategory(datastore, language,names.toString(),"nombres_img","Nombres");
+		saveCategory(datastore, language,colors.toString(),"colores_img","Colores");
+		saveCategory(datastore, language,things.toString(),"cosas_img","Cosas / Objectos");
+		saveCategory(datastore, language,meals.toString(),"comidas_img","Comidas y Bebidas");
+		saveCategory(datastore, language,countries.toString(),"countries_img","Países");
+		saveCategory(datastore, language,animals.toString(),"animales_img","Animales");
+		saveCategory(datastore, language,sports.toString(),"deportes_img","Deportes");
+		saveCategory(datastore, language,cities.toString(),"ciudades_img","Ciudades");
+		saveCategory(datastore, language,clothes.toString(),"ropa_img","Ropa");
+		saveCategory(datastore, language,musical_styles.toString(),"musical_styles_img","Estilos Musicales");
+		saveCategory(datastore, language,musical_instruments.toString(),"musical_instruments_img","Instrumentos Musicales");
+		saveCategory(datastore, language,verbs.toString(),"verbos_img","Verbos");
+		saveCategory(datastore, language,jobs.toString(),"trabajos_img","Trabajos");
+		saveCategory(datastore, language,bands.toString(),"bands_img","Bandas de Música");
 	}
 
 	public static Round createRound(Turn turn, int roundNumber, Letter letter) {
@@ -159,6 +175,12 @@ public class TestUtils {
 			Thread.sleep(timeInMillis);
 		} catch (Exception e) {
 			Logger.error("In Sleep",e);
+		}
+	}
+	
+	public static void cleanAlphabetCache() {
+		for(CategoryType category : CategoryType.values()){
+			Cache.set(AlphabetCache.PREFIX + category.toString(), null);
 		}
 	}
 }

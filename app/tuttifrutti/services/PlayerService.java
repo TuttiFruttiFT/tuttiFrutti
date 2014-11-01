@@ -141,7 +141,7 @@ public class PlayerService {
 	private Player updateLoserStatistics(PlayerResult loserResult) {
 		Player loser = this.player(loserResult.getPlayer().getId());
 		loser.setLost(loser.getLost() + 1);
-		loser.setBest(max(loser.getBest() != null ? loser.getBest() : 0, loserResult.getScore()));
+		loser.setBest(max(loser.getBest(), loserResult.getScore()));
 		loser.setBalance(loser.getBalance() + AMOUNT_OF_RUS_FOR_LOSING);
 		return loser;
 	}
@@ -149,7 +149,7 @@ public class PlayerService {
 	private Player updateWinnerStatistics(PlayerResult winnerResult) {
 		Player winner = this.player(winnerResult.getPlayer().getId());
 		winner.setWon(winner.getWon() + 1);
-		winner.setBest(max(winner.getBest() != null ? winner.getBest() : 0, winnerResult.getScore()));
+		winner.setBest(max(winner.getBest(), winnerResult.getScore()));
 		winner.setBalance(winner.getBalance() + AMOUNT_OF_RUS_FOR_WINNING);
 		return winner;
 	}

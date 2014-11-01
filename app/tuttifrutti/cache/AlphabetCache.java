@@ -15,18 +15,19 @@ import play.cache.Cache;
 @Component
 public class AlphabetCache {
 	private static final String SEPARATOR = "-";
-	private static final String PREFIX = "ALPHABET_";
+	public static final String PREFIX = "ALPHABET_";
 	
 	public void addUnavailableLetter(String categoryId, String letter) {
 		String unavailableLetters = (String)Cache.get(getKey(categoryId));
 		if(unavailableLetters == null){
 			unavailableLetters = letter;
 		}else{
-			if(!unavailableLettersList(unavailableLetters).contains(letter)){				
-				unavailableLetters = unavailableLetters + SEPARATOR + letter;
-				Cache.set(getKey(categoryId), unavailableLetters);
+			if(unavailableLettersList(unavailableLetters).contains(letter)){				
+				return;
 			}
+			unavailableLetters = unavailableLetters + SEPARATOR + letter;
 		}
+		Cache.set(getKey(categoryId), unavailableLetters);
 		return;
 	}
 

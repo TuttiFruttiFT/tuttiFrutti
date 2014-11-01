@@ -47,17 +47,17 @@ public class Player {
 	@Property("twitter_id")
 	@JsonProperty("twitter_id")
 	private String twitterId;
-	
-	private Integer balance;
-	
+		
 	@JsonIgnore
 	private String password;
 	
-	private Integer won;
+	private int balance;
 	
-	private Integer lost;
+	private int won;
 	
-	private Integer best;
+	private int lost;
+	
+	private int best;
 	
 	private String image;
 
