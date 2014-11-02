@@ -237,6 +237,12 @@ public class Match {
 		return this.getPlayerResults().stream().map(result -> result.getPlayer())
 				.filter(player -> !player.getId().toString().equals(playerId)).collect(toList());
 	}
+	
+	public List<Player> playersThatHaveNotPlayedExcept(String playerid){
+		return this.playersExcept(playerid).stream()
+		.filter(player -> !this.lastRound.getTurns().stream().anyMatch(turn -> turn.getPlayer().getId().toString().equals(player.getId().toString())))
+		.collect(toList());
+	}
 
 	public boolean playerHasAlreadyPlayed(String playerId) {
 		List<Turn> turns = this.lastRound.getTurns();
@@ -245,10 +251,31 @@ public class Match {
 		}
 		return turns.stream().anyMatch(turn -> turn.getPlayer().getId().toString().equals(playerId));
 	}
-
+	
 	public boolean playerHasAccepted(String playerId) {
 		return this.getPlayerResults().stream().filter(playerResult -> playerResult.getPlayer().getId().toString().equals(playerId))
 											   .findFirst().get().isAccepted();
+	}
+
+	public boolean bestBpmbpt(Turn playerTurn) {
+		List<Turn> turns = this.getLastRound().getTurns();
+		if(turns.size() == 1){
+			return true;
+		}
+		List<Turn> othersTurn = turns.stream()
+								.filter(turn -> turn.isBpmbpt() && !turn.getPlayer().getId().toString().equals(playerTurn.getPlayer().getId().toString()))
+								.collect(toList());
+		if(isEmpty(othersTurn)){
+			return true;
+		}
+		
+		for(Turn otherTurn : othersTurn){
+			if(otherTurn.getEndTime() < playerTurn.getEndTime()){
+				return false;
+			}
+		}
+		
+		return true;
 	}
 }
 

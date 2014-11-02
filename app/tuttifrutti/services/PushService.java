@@ -119,7 +119,7 @@ public class PushService {
 		promise(() -> {
 			ObjectNode json = newObject().put("type", BPMBPT.toString()).put("match_id", match.getId().toString())
 					  .put("round_number", roundNumber).put("bpmbpt_time", bpmbptTime).put("bpmbpt_name", player.getNickname());
-			for(Player otherPlayer : match.playersExcept(player.getId().toString())){
+			for(Player otherPlayer : match.playersThatHaveNotPlayedExcept(player.getId().toString())){
 				sendGCMMessage(json.put("player_id", otherPlayer.getId().toString()),player.getDevices());
 			}
 			return null;

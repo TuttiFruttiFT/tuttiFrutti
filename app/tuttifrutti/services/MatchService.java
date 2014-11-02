@@ -177,7 +177,7 @@ public class MatchService {
 				return null;
 			});
 		}else{
-			if(turn.isBpmbpt()){
+			if(turn.isBpmbpt() && match.bestBpmbpt(turn)){
 				pushService.bpmbpt(match, turn.getEndTime(), turn.getPlayer(), match.getLastRound().getNumber());
 			}
 		}
