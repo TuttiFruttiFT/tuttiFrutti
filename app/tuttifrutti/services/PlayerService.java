@@ -25,8 +25,9 @@ import com.fasterxml.jackson.databind.JsonNode;
  */
 @Component
 public class PlayerService {
-	private static final Integer AMOUNT_OF_RUS_FOR_WINNING = 20;
-	private static final Integer AMOUNT_OF_RUS_FOR_LOSING = 0;
+	private static final Integer AMOUNT_OF_RUS_FOR_WINNING = 5;
+	private static final Integer AMOUNT_OF_RUS_FOR_LOSING = 1;
+	private static final Integer STARTING_RUS = 10;
 	
 	@Autowired
 	private Datastore mongoDatastore;
@@ -55,13 +56,18 @@ public class PlayerService {
 
 	public Player registerMail(String mail, String clave) {
 		Player player = new Player();
-		String[] splittedMail = mail.split("@");
-		player.setNickname((splittedMail.length > 0) ? splittedMail[0] : mail);
-		player.setMail(mail);
+		player.setNickname(nicknameFromMail(mail));
+		player.setMail(mail.trim().toLowerCase());
 		player.setPassword(clave);
+		player.setBalance(STARTING_RUS);
 		mongoDatastore.save(player);
 		
 		return player;
+	}
+
+	public String nicknameFromMail(String mail) {
+		String[] splittedMail = mail.split("@");
+		return (splittedMail.length > 0) ? splittedMail[0].trim() : mail.trim();
 	}
 
 	public Player registerFacebook(String facebookId) {
@@ -93,17 +99,17 @@ public class PlayerService {
 		
 	}
 
-	public List<Player> searchPlayers(String palabraABuscar) {
+	public List<Player> searchPlayers(String word) {
 		return mongoDatastore.find(Player.class).asList();
 	}
 
-	public List<Player> searchOthersPlayers(String idJugador) {
+	public List<Player> searchOthersPlayers(String playerId) {
 		// TODO implementar
 		return null;
 	}
 
 	public Player search(String mail) {
-		Query<Player> query = mongoDatastore.find(Player.class, "mail =", mail);
+		Query<Player> query = mongoDatastore.find(Player.class, "mail =", mail.trim().toLowerCase());
 		return query.get();
 	}
 
@@ -152,5 +158,13 @@ public class PlayerService {
 		winner.setBest(max(winner.getBest(), winnerResult.getScore()));
 		winner.setBalance(winner.getBalance() + AMOUNT_OF_RUS_FOR_WINNING);
 		return winner;
+	}
+
+	public boolean isValid(String mail) {
+		String nickname = this.nicknameFromMail(mail);
+		if(nickname.length() < 3){
+			return false;
+		}
+		return true;
 	}
 }

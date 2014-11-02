@@ -29,6 +29,10 @@ import com.fasterxml.jackson.databind.JsonNode;
  */
 @org.springframework.stereotype.Controller
 public class Players extends Controller {
+	private static final String SHORT_NICKNAME = "SHORT_NICKNAME";
+
+	private static final String MALFORMED_REQUEST = "MALFORMED_REQUEST";
+
 	@Autowired
 	private PlayerService playerService;
 	
@@ -41,6 +45,8 @@ public class Players extends Controller {
 	@Transient
 	@Autowired
 	private PushService pushUtil;
+	
+	
 	
 	@BodyParser.Of(BodyParser.Json.class)
 	public Result register() {
@@ -57,8 +63,12 @@ public class Players extends Controller {
 			
 			if(isNotEmpty(mail) && isNotEmpty(password)){
 				player = playerService.search(mail);
-				if(player == null){					
-					player = playerService.registerMail(mail,password);
+				if(player == null){
+					if(playerService.isValid(mail)){						
+						player = playerService.registerMail(mail,password);
+					}else{						
+						return badRequest(Json.newObject().put("status_code", SHORT_NICKNAME));
+					}
 				}else{
 					if(!playerService.validatePassword(player.getPassword(), password)){
 						return unauthorized();
@@ -74,7 +84,7 @@ public class Players extends Controller {
 				return ok(Json.toJson(player));
 			}
 
-			return badRequest();
+			return badRequest(Json.newObject().put("status_code", MALFORMED_REQUEST));
 		}
     }
 	

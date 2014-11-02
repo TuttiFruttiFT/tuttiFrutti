@@ -74,4 +74,12 @@ public class Player {
 		this.id = id;
 		this.nickname = nickname;
 	}
+
+	public Player reducedPlayer() {
+		Player reducedPlayer = new Player();
+		reducedPlayer.setId(this.getId());
+		reducedPlayer.setNickname(this.getNickname());
+		reducedPlayer.setImage(this.getImage());
+		return reducedPlayer;
+	}
 }

@@ -21,16 +21,12 @@ public class Searches extends Controller {
 	@Autowired
 	private PlayerService playerService;
 	
-	public Result searchPlayers(String playerId,String palabraABuscar) {
+	public Result searchPlayers(String playerId,String word) {
 		List<Player> players = new ArrayList<>();
 		
-		for(Player player : playerService.searchPlayers(palabraABuscar)){
-			if(!player.getId().toString().equals(playerId)){				
-				Player reducedPlayer = new Player();
-				reducedPlayer.setId(player.getId());
-				reducedPlayer.setNickname(player.getNickname());
-				reducedPlayer.setImage(player.getImage());
-				players.add(reducedPlayer);
+		for(Player player : playerService.searchPlayers(word)){
+			if(!player.getId().toString().equals(playerId)){	
+				players.add(player.reducedPlayer());
 			}
 		}
 		
