@@ -46,8 +46,6 @@ public class Players extends Controller {
 	@Autowired
 	private PushService pushUtil;
 	
-	
-	
 	@BodyParser.Of(BodyParser.Json.class)
 	public Result register() {
 		JsonNode json = request().body().asJson();
@@ -66,7 +64,7 @@ public class Players extends Controller {
 				if(player == null){
 					if(playerService.isValid(mail)){						
 						player = playerService.registerMail(mail,password);
-					}else{						
+					}else{
 						return badRequest(Json.newObject().put("status_code", SHORT_NICKNAME));
 					}
 				}else{
@@ -134,9 +132,9 @@ public class Players extends Controller {
 		String playerId = json.get("player_id").asText();
 		String friendId = json.get("friend_id").asText();
 		
-		playerService.addFriend(playerId,friendId);
+		Player friend = playerService.addFriend(playerId,friendId);
 		
-		return ok();
+		return ok(Json.toJson(friend));
 	}
 	
 	public Result powerUp(String idJugador,String idPowerUp){

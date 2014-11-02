@@ -85,12 +85,15 @@ public class PlayerService {
 		return false;
 	}
 
-	public void addFriend(String idJugador, String idAmigo) {
-		// TODO implementar
-		
+	public Player addFriend(String playerId, String friendId) {
+		Player player = mongoDatastore.get(Player.class,new ObjectId(playerId));
+		Player friend = mongoDatastore.get(Player.class,new ObjectId(friendId));
+		player.addFriend(friend.reducedPlayer());
+		mongoDatastore.save(player);
+		return friend.reducedPlayer();
 	}
 	
-	public void powerUp(String idJugador, String idPowerUp) {
+	public void powerUp(String playerId, String powerUpId) {
 		//TODO implementar
 	}
 

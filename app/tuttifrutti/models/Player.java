@@ -1,5 +1,8 @@
 package tuttifrutti.models;
 
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
+
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -61,7 +64,7 @@ public class Player {
 	
 	private String image;
 
-	private List<String> friends;
+	private List<Player> friends;
 	
 	@JsonIgnore
 	private List<Device> devices;
@@ -81,5 +84,12 @@ public class Player {
 		reducedPlayer.setNickname(this.getNickname());
 		reducedPlayer.setImage(this.getImage());
 		return reducedPlayer;
+	}
+
+	public void addFriend(Player friend) {
+		if(isEmpty(this.friends)){
+			this.friends = new ArrayList<>();
+		}
+		this.friends.add(friend);
 	}
 }

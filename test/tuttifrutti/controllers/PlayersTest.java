@@ -20,6 +20,7 @@ import java.util.Arrays;
 import org.junit.Test;
 import org.mongodb.morphia.Datastore;
 
+import play.libs.Json;
 import play.libs.ws.WS;
 import play.libs.ws.WSResponse;
 import tuttifrutti.models.Letter;
@@ -115,6 +116,30 @@ public class PlayersTest {
 			assertThat(jsonNode.get("mail").asText()).isEqualTo("sarasas@sarasa.com");
 			assertThat(jsonNode.get("password")).isNull();
 			assertThat(jsonNode.get("nickname").asText()).isEqualTo("sarasas");
+		});
+	}
+	
+	@Test
+	public void addFriend(){
+		running(testServer(9000, fakeApplication()), (Runnable) () -> {
+			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
+			
+			Player player = savePlayer(dataStore, "sarasas@sarasa.com", "SARASA");
+			Player friend = savePlayer(dataStore, "sarasas2@sarasa.com", "SARASA2");
+			
+			WSResponse r = WS.url("http://localhost:9000/player/friend").setContentType("application/json")
+					   .post(Json.newObject().put("player_id", player.getId().toString())
+							   				 .put("friend_id", friend.getId().toString()))
+					   .get(5000000L);
+			
+			assertThat(r).isNotNull();
+			assertThat(r.getStatus()).isEqualTo(OK);
+			
+			Player playerResponse = Json.fromJson(r.asJson(), Player.class);
+			
+			assertThat(playerResponse.getId()).isEqualTo(friend.getId());
+			assertThat(playerResponse.getNickname()).isEqualTo(friend.getNickname());
+			assertThat(playerResponse.getImage()).isEqualTo(friend.getImage());
 		});
 	}
 }
