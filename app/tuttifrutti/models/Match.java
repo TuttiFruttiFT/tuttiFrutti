@@ -84,6 +84,10 @@ public class Match {
 	@Embedded
 	private Alphabet alphabet;
 	
+	@Property("played_letters")
+	@JsonProperty(value = "played_letters")
+	private List<Letter> playedLetters;
+	
 	public void changeMatchDependingOnPlayer(String playerId){
 		this.changeMatchNameDependingOnPlayer(playerId);
 		this.changeMatchStateDependingOnPlayersGame(playerId);
@@ -276,6 +280,13 @@ public class Match {
 		}
 		
 		return true;
+	}
+
+	public void addPlayedLetter(Letter letter) {
+		if(isEmpty(this.playedLetters)){
+			this.playedLetters = new ArrayList<>();
+		}
+		this.playedLetters.add(letter);
 	}
 }
 

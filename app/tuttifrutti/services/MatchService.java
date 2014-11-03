@@ -170,6 +170,7 @@ public class MatchService {
 					pushService.matchResult(match);
 				}else{				
 					match.setState(PLAYER_TURN);
+					match.addPlayedLetter(round.getLetter().getLetter());
 					roundService.create(match);
 					pushService.roundResult(match,round.getNumber());
 				}

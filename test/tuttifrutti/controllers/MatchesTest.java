@@ -311,6 +311,8 @@ public class MatchesTest extends ElasticSearchAwareTest {
 			assertThat(newRound.getLetter()).isNotEqualTo(modifiedRound.getLetter());
 			assertThat(newRound.getLetter().getPreviousLetters()).contains(R.toString());
 			
+			assertThat(modifiedMatch.getPlayedLetters().size()).isEqualTo(1);
+			assertThat(modifiedMatch.getPlayedLetters().get(0)).isEqualTo(R);
 			assertPlayerScores(modifiedMatch, player, player2, 85, 70);
 			
 			assertThat(modifiedRound.getEndTime()).isEqualTo((int)MINUTES.toSeconds(TURN_DURATION_IN_MINUTES));
