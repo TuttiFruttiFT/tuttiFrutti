@@ -187,4 +187,15 @@ public class Matches extends Controller {
 		
 		return notFound();
 	}
+	
+	@BodyParser.Of(BodyParser.Json.class)
+	public Result hideMatch(){
+		JsonNode json = request().body().asJson();
+		String playerId = json.get("player_id").asText();
+		String matchId = json.get("match_id").asText();
+		
+		matchService.hideMatch(matchId,playerId);
+		
+		return ok();
+	}
 }

@@ -34,6 +34,8 @@ GET		/match/:matchId/round/:roundNumber/result/:playerId	@tuttifrutti.controller
 
 GET		/match/result/:matchId						@tuttifrutti.controllers.Matches.matchResult(matchId)
 
+PUT		/match/hide									@tuttifrutti.controllers.Matches.hideMatch()	
+
 POST	/rus/purchase								@tuttifrutti.controllers.Rus.buy()
 
 GET		/rus/packs									@tuttifrutti.controllers.Rus.packs()

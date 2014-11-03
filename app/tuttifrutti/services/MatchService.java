@@ -74,18 +74,20 @@ public class MatchService {
 		List<ActiveMatch> activeMatches = new ArrayList<>();
 		Query<Match> query = mongoDatastore.find(Match.class, "playerResults.player.id =", new ObjectId(playerId));
 		for(Match match : query.asList()){
-			ActiveMatch activeMatch = new ActiveMatch();
-			Round round = new Round();
-			round.setNumber(match.getLastRound().getNumber());
-			round.setLetter(match.getLastRound().getLetter());
-			activeMatch.setCurrentRound(round);
-			activeMatch.setId(match.getId().toString());
-			match.changeMatchDependingOnPlayer(playerId);
-			activeMatch.setMatchName(match.getMatchName());
-			activeMatch.setState(match.getState().toString());
-			activeMatch.setWinner(match.getWinner());
-			activeMatch.setConfig(match.getConfig());
-			activeMatches.add(activeMatch);
+			if(match.mustBeShownFor(playerId)){				
+				ActiveMatch activeMatch = new ActiveMatch();
+				Round round = new Round();
+				round.setNumber(match.getLastRound().getNumber());
+				round.setLetter(match.getLastRound().getLetter());
+				activeMatch.setCurrentRound(round);
+				activeMatch.setId(match.getId().toString());
+				match.changeMatchDependingOnPlayer(playerId);
+				activeMatch.setMatchName(match.getMatchName());
+				activeMatch.setState(match.getState().toString());
+				activeMatch.setWinner(match.getWinner());
+				activeMatch.setConfig(match.getConfig());
+				activeMatches.add(activeMatch);
+			}
 		}
 		return activeMatches;
 	}
@@ -129,7 +131,7 @@ public class MatchService {
 		if(player == null){
 			throw new RuntimeException("Player " + playerId + " does not exist");
 		}
-		match.getPlayerResults().add(new PlayerResult(player,0,0,true));
+		match.getPlayerResults().add(new PlayerResult(player,0,0,true,true));
 		match.getMatchName().incrementPlayers();
 	}
 
@@ -294,5 +296,9 @@ public class MatchService {
 	
 	public void privateMatchReady(Match match, List<Player> players) {
 		pushService.privateMatchReady(match, players);
+	}
+
+	public void hideMatch(String matchId, String playerId) {
+		
 	}
 }
