@@ -95,6 +95,7 @@ public class TestUtils {
 		playerResult.setPlayer(player);
 		playerResult.setScore(score);
 		playerResult.setAccepted(true);
+		playerResult.setShow(true);
 		datastore.save(playerResult);
 		return playerResult;
 	}

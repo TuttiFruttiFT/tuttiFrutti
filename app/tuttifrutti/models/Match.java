@@ -292,7 +292,7 @@ public class Match {
 	public boolean mustBeShownFor(String playerId) {
 		PlayerResult playerResult = this.playerResults.stream()
 										.filter(aPlayerResult -> aPlayerResult.getPlayer().getId().toString().equals(playerId)).findFirst().get();
-		return playerResult.isShow();
+		return playerResult.getShow();
 	}
 }
 

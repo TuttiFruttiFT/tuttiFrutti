@@ -24,5 +24,9 @@ public class PlayerResult {
 	private int score;
 	private int playedTime;
 	private boolean accepted;
-	private boolean show;
+	private Boolean show;
+	
+	public boolean getShow(){
+		return show == null || show;
+	}
 }

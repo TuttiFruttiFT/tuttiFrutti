@@ -299,6 +299,11 @@ public class MatchService {
 	}
 
 	public void hideMatch(String matchId, String playerId) {
-		
+		Match match = this.match(matchId, null);
+		PlayerResult playerResult = match.getPlayerResults().stream()
+									.filter(aPlayerResult -> aPlayerResult.getPlayer().getId().toString().equals(playerId))
+									.findFirst().get();
+		playerResult.setShow(false);
+		mongoDatastore.save(match);
 	}
 }
