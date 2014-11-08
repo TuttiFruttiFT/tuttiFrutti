@@ -9,6 +9,7 @@ import static play.libs.F.Promise.promise;
 import static tuttifrutti.models.Turn.TURN_DURATION_IN_MINUTES;
 import static tuttifrutti.models.enums.DuplaScore.ZERO_SCORE;
 import static tuttifrutti.models.enums.DuplaState.WRONG;
+import static tuttifrutti.models.enums.MatchState.CLEAN;
 import static tuttifrutti.models.enums.MatchState.FINISHED;
 import static tuttifrutti.models.enums.MatchState.PLAYER_TURN;
 import static tuttifrutti.models.enums.MatchState.REJECTED;
@@ -73,6 +74,7 @@ public class MatchService {
 	public List<ActiveMatch> activeMatches(String playerId) {
 		List<ActiveMatch> activeMatches = new ArrayList<>();
 		Query<Match> query = mongoDatastore.find(Match.class, "playerResults.player.id =", new ObjectId(playerId));
+		query.and(query.criteria("state").notEqual(CLEAN));
 		for(Match match : query.asList()){
 			if(match.mustBeShownFor(playerId)){				
 				ActiveMatch activeMatch = new ActiveMatch();

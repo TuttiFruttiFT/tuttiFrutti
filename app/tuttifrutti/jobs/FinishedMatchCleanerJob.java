@@ -7,7 +7,6 @@ import static tuttifrutti.models.enums.MatchState.FINISHED;
 
 import java.util.List;
 
-import org.joda.time.DateTime;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,5 +1,6 @@
 package tuttifrutti.controllers;
 
+import static java.util.Arrays.asList;
 import static org.fest.assertions.Assertions.assertThat;
 import static play.mvc.Http.Status.OK;
 import static play.test.Helpers.fakeApplication;
@@ -15,7 +16,7 @@ import static tuttifrutti.utils.TestUtils.saveCategories;
 import static tuttifrutti.utils.TestUtils.savePlayer;
 import static tuttifrutti.utils.TestUtils.savePlayerResult;
 
-import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Test;
 import org.mongodb.morphia.Datastore;
@@ -62,13 +63,16 @@ public class PlayersTest {
 
 			MatchConfig matchConfig = createMatchConfig(language, N, PUBLIC, 2, true, 25);
 			
-			createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig, new MatchName(2));
-			createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig, new MatchName(2));
-			createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig, new MatchName(2));
-			Match match4 = createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig, new MatchName(2));
+			List<PlayerResult> playersResultList = asList(playerResult1,playerResult2);
+			MatchName matchName = new MatchName(2);
+			
+			createMatch(dataStore, language, lastRound,playersResultList, matchConfig, matchName);
+			createMatch(dataStore, language, lastRound,playersResultList, matchConfig, matchName);
+			createMatch(dataStore, language, lastRound,playersResultList, matchConfig, matchName);
+			Match match4 = createMatch(dataStore, language, lastRound,playersResultList, matchConfig, matchName);
 			match4.setState(FINISHED);
 			dataStore.save(match4);
-			Match match5 = createMatch(dataStore, language, lastRound,Arrays.asList(playerResult1,playerResult2), matchConfig, new MatchName(2));
+			Match match5 = createMatch(dataStore, language, lastRound,playersResultList, matchConfig, matchName);
 			match5.setState(REJECTED);
 			dataStore.save(match5);
 			

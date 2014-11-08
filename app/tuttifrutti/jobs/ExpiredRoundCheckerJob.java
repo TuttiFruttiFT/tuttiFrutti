@@ -1,5 +1,6 @@
 package tuttifrutti.jobs;
 
+import static tuttifrutti.models.enums.MatchState.CLEAN;
 import static tuttifrutti.models.enums.MatchState.EXPIRED;
 import static tuttifrutti.models.enums.MatchState.FINISHED;
 import static tuttifrutti.models.enums.MatchState.REJECTED;
@@ -38,8 +39,8 @@ public class ExpiredRoundCheckerJob implements Runnable {
 	public void run() {
 		Logger.info("Starting ExpiredRoundCheckerJob");
 		Query<Match> query = mongoDatastore.find(Match.class, "config.mode =", this.mode.toString());
-		query.and(query.criteria("state").not().equal(FINISHED),query.criteria("state").not().equal(EXPIRED),
-				  query.criteria("state").not().equal(REJECTED),
+		query.and(query.criteria("state").notEqual(FINISHED),query.criteria("state").notEqual(EXPIRED),
+				  query.criteria("state").notEqual(REJECTED),query.criteria("state").notEqual(CLEAN),
 				  query.criteria("startDate").greaterThanOrEq(DateTime.now()));
 		
 		List<Match> matches = query.asList();

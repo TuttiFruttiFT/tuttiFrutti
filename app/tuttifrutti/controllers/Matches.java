@@ -64,6 +64,7 @@ public class Matches extends Controller {
 			match = matchService.findPublicMatch(playerId, config);
 			if(match == null){
 				match = matchService.createPublic(config);
+				match.getMatchName().decrementPlayers();
 			}
 			matchService.addPlayer(match, playerId);
 			powerUpService.generate(match, playerId);
