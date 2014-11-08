@@ -133,37 +133,41 @@ public class PushService {
 	}
 	
 	private void sendGCMMessage(JsonNode jsonData,List<Device> devices){
-		Map<String,JsonNode> attributes = new HashMap<>();
-		ArrayNode registrationIds = newObject().arrayNode();
-		for(Device device : devices){
-			registrationIds.add(device.getRegistrationId());
-		}
-		attributes.put("registration_ids", registrationIds);
-		attributes.put("data", jsonData);
-		JsonNode request = Json.newObject().setAll(attributes);
-		Logger.info(request.toString());
-		System.out.println(request.toString());
-		for(int i = 0;i < RETRIES_NUMBER;i++){
-			WSResponse r = null;
-			try{				
-				r = WS.url("https://android.googleapis.com/gcm/send").setContentType("application/json").setHeader("Authorization", "key=" + API_KEY)
-						.post(request)
-						.get(5000L);
-			}catch(Exception e){
-				Logger.error("sending gcm push",e);
-				return;
+		try{
+			Map<String,JsonNode> attributes = new HashMap<>();
+			ArrayNode registrationIds = newObject().arrayNode();
+			for(Device device : devices){
+				registrationIds.add(device.getRegistrationId());
+			}
+			attributes.put("registration_ids", registrationIds);
+			attributes.put("data", jsonData);
+			JsonNode request = Json.newObject().setAll(attributes);
+			Logger.info(request.toString());
+			System.out.println(request.toString());
+			for(int i = 0;i < RETRIES_NUMBER;i++){
+				WSResponse r = null;
+				try{				
+					r = WS.url("https://android.googleapis.com/gcm/send").setContentType("application/json").setHeader("Authorization", "key=" + API_KEY)
+							.post(request)
+							.get(5000L);
+				}catch(Exception e){
+					Logger.error("sending gcm push",e);
+					return;
+				}
+				
+				if(r.getStatus() == Status.OK){
+					JsonNode response = r.asJson();
+					Logger.info(response.toString());
+					return;
+				}else{
+					Logger.warn("Sending message " + jsonData.toString() + " fail with status " + r.getStatus() + ". Retry: " + i);
+				}
 			}
 			
-			if(r.getStatus() == Status.OK){
-				JsonNode response = r.asJson();
-				Logger.info(response.toString());
-				return;
-			}else{
-				Logger.warn("Sending message " + jsonData.toString() + " fail with status " + r.getStatus() + ". Retry: " + i);
-			}
+			Logger.error("Could not send message " + jsonData.toString() + " with request " + request.toString());
+		}catch(Exception e){
+			Logger.error("sending gcm message with this data: " + jsonData.asText(),e);
 		}
-		
-		Logger.error("Could not send message " + jsonData.toString() + " with request " + request.toString());
 	}
 
 	private void sendMessageTo(List<Player> players, Match match,PushType pushType) {
