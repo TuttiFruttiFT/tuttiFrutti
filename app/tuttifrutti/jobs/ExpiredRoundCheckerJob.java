@@ -1,5 +1,6 @@
 package tuttifrutti.jobs;
 
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static tuttifrutti.models.enums.MatchState.CLEAN;
 import static tuttifrutti.models.enums.MatchState.EXPIRED;
 import static tuttifrutti.models.enums.MatchState.FINISHED;
@@ -45,9 +46,11 @@ public class ExpiredRoundCheckerJob implements Runnable {
 		
 		List<Match> matches = query.asList();
 		
-		matches.forEach(match -> {
-			
-		});
+		if(isNotEmpty(matches)){			
+			matches.forEach(match -> {
+				
+			});
+		}
 		
 		Logger.info("Finishing ExpiredRoundCheckerJob");		
 	}
