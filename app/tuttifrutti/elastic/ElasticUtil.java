@@ -12,6 +12,8 @@ import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders.randomFunction;
 import static tuttifrutti.models.enums.LanguageType.ES;
 import static tuttifrutti.utils.ConfigurationAccessor.i;
+import static tuttifrutti.utils.WordUtil.getLetter;
+import static tuttifrutti.utils.WordUtil.processWord;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -169,14 +171,6 @@ public class ElasticUtil {
 		matchQueryBuilder.maxExpansions(1);
 		matchQueryBuilder.minimumShouldMatch("100%");
 		return matchQueryBuilder;
-	}
-
-	private String getLetter(String word) {
-		return word.substring(0, 1);
-	}
-	
-	private String processWord(String unprocessedWord) {
-		return unprocessedWord.toLowerCase();
 	}
 
 	public Map<String, Boolean> availableLettersForCategory(String categoryName) {

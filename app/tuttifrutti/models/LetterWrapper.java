@@ -12,6 +12,8 @@ import lombok.Setter;
 import org.mongodb.morphia.annotations.Embedded;
 import org.mongodb.morphia.annotations.Property;
 
+import tuttifrutti.utils.WordUtil;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -63,5 +65,10 @@ public class LetterWrapper {
 
 	private List<Letter> getAvailableLetters(Alphabet alphabet) {
 		return alphabet.getLetters().stream().filter(letter -> !this.previousLetters.stream().anyMatch(usedLetter -> usedLetter.equals(letter.getLetter()))).collect(toList());
+	}
+
+	public boolean wordStartWithThisLetter(String writtenWord) {
+		String wordLetter = WordUtil.getLetter(writtenWord).toUpperCase();
+		return this.letter.getLetter().equals(wordLetter);
 	}
 }

@@ -3,6 +3,7 @@ package tuttifrutti.services;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.joda.time.DateTime.now;
 import static org.springframework.util.StringUtils.isEmpty;
 import static play.libs.F.Promise.promise;
@@ -32,6 +33,7 @@ import org.springframework.stereotype.Component;
 import tuttifrutti.elastic.ElasticUtil;
 import tuttifrutti.models.Category;
 import tuttifrutti.models.Dupla;
+import tuttifrutti.models.LetterWrapper;
 import tuttifrutti.models.Match;
 import tuttifrutti.models.MatchConfig;
 import tuttifrutti.models.MatchName;
@@ -145,14 +147,14 @@ public class MatchService {
 	}
 
 	public List<Dupla> play(Match match, String playerId, List<Dupla> duplas, int time) {		
-		Round round = match.getLastRound();
+		LetterWrapper letter = match.getLastRound().getLetter();
 		
-		elasticUtil.validate(duplas,round.getLetter());
+		elasticUtil.validate(duplas,letter);
 		Turn turn = match.createTurn(match,playerId, duplas, time);
 		match.updateDates(playerId);
 		mongoDatastore.save(match);
 		calculateResult(match, turn);
-		return getWrongDuplas(duplas);
+		return getWrongDuplas(duplas, letter);
 	}
 	
 	private void calculateResult(Match match, Turn turn) {
@@ -258,8 +260,9 @@ public class MatchService {
 		return create(config, type, new MatchName(1), new ArrayList<PlayerResult>(), categoryService.getPublicMatchCategories(config.getLanguage()));
 	}
 	
-	private List<Dupla> getWrongDuplas(List<Dupla> duplas) {
-		return duplas.stream().filter(dupla -> dupla.getState().equals(WRONG)).collect(toList());
+	private List<Dupla> getWrongDuplas(List<Dupla> duplas, LetterWrapper letter) {
+		return duplas.stream().filter(dupla -> dupla.getState().equals(WRONG) && !isBlank(dupla.getWrittenWord())
+									  && letter.wordStartWithThisLetter(dupla.getWrittenWord())).collect(toList());
 	}
 	
 	public boolean playerReject(String playerId, Match match) {
