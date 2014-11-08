@@ -2,6 +2,7 @@ package tuttifrutti.models;
 
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
+import static org.joda.time.DateTime.now;
 import static tuttifrutti.models.enums.DuplaScore.ALONE_SCORE;
 import static tuttifrutti.models.enums.DuplaScore.DUPLICATE_SCORE;
 import static tuttifrutti.models.enums.DuplaScore.UNIQUE_SCORE;
@@ -70,6 +71,12 @@ public class Match {
 	@JsonDeserialize(using = DateDeserializer.class)
 	private Date startDate;
 	
+	@Property("modified_date")
+	@JsonProperty(value = "modified_date")
+	@JsonSerialize(using = DateSerializer.class)
+	@JsonDeserialize(using = DateDeserializer.class)
+	private Date modifiedDate;
+	
 	@Embedded
 	private List<Category> categories;
 	
@@ -111,8 +118,7 @@ public class Match {
 	
 	private void changeMatchStateDependingOnPlayersGame(String playerId) {
 		boolean playerHasAlreadyPlayed = playerHasAlreadyPlayed(playerId);
-		PlayerResult player = this.getPlayerResults().stream().filter(playerResult -> playerResult.getPlayer().getId().toString().equals(playerId))
-																	 .findFirst().get();
+		PlayerResult player = playerResult(playerId);
 		MatchState matchState = this.getState();
 		if(matchState.equals(TO_BE_APPROVED)){
 			if(player.isAccepted() && !playerHasAlreadyPlayed){
@@ -257,8 +263,7 @@ public class Match {
 	}
 	
 	public boolean playerHasAccepted(String playerId) {
-		return this.getPlayerResults().stream().filter(playerResult -> playerResult.getPlayer().getId().toString().equals(playerId))
-											   .findFirst().get().isAccepted();
+		return playerResult(playerId).isAccepted();
 	}
 
 	public boolean bestBpmbpt(Turn playerTurn) {
@@ -290,9 +295,18 @@ public class Match {
 	}
 
 	public boolean mustBeShownFor(String playerId) {
-		PlayerResult playerResult = this.playerResults.stream()
-										.filter(aPlayerResult -> aPlayerResult.getPlayer().getId().toString().equals(playerId)).findFirst().get();
-		return playerResult.getShow();
+		return playerResult(playerId).getShow();
+	}
+
+	public void updateDates(String playerId) {
+		Date today = now().toDate();
+		this.setModifiedDate(today);
+		playerResult(playerId).setModifiedDate(today);
+	}
+
+	private PlayerResult playerResult(String playerId) {
+		return this.getPlayerResults().stream()
+			.filter(aPlayerResult -> aPlayerResult.getPlayer().getId().toString().equals(playerId)).findFirst().get();
 	}
 }
 

@@ -1,3 +1,4 @@
+import static play.libs.Akka.system;
 import static scala.concurrent.duration.Duration.Zero;
 import static tuttifrutti.utils.FiniteDurationUtils.ONE_DAY;
 import static tuttifrutti.utils.FiniteDurationUtils.ONE_HOUR;
@@ -10,9 +11,9 @@ import lombok.val;
 import play.Application;
 import play.GlobalSettings;
 import play.Logger;
-import play.libs.Akka;
 import tuttifrutti.elastic.ElasticSearchEmbeddedServer;
 import tuttifrutti.jobs.AlphabetLoaderJob;
+import tuttifrutti.jobs.FinishedMatchCleanerJob;
 import tuttifrutti.jobs.PowerUpWordLoader;
 import tuttifrutti.jobs.SuggestionIndexerJob;
 import tuttifrutti.mongo.MongoEmbeddedServer;
@@ -26,6 +27,8 @@ public class Global extends GlobalSettings {
 	
 	private AlphabetLoaderJob alphabetLoaderJob;
 	
+	private FinishedMatchCleanerJob finishedMatchCleanerJob;
+	
 	private List<Cancellable> jobs = new ArrayList<Cancellable>();
 	
 	@Override
@@ -38,10 +41,12 @@ public class Global extends GlobalSettings {
 			powerUpWordLoaderJob = SpringApplicationContext.getBean(PowerUpWordLoader.class);
 			suggestionIndexerJob = SpringApplicationContext.getBean(SuggestionIndexerJob.class);
 			alphabetLoaderJob = SpringApplicationContext.getBean(AlphabetLoaderJob.class);
-			Akka.system().scheduler().scheduleOnce(Zero(), alphabetLoaderJob, Akka.system().dispatcher());
-			Akka.system().scheduler().scheduleOnce(Zero(), powerUpWordLoaderJob, Akka.system().dispatcher());
-			jobs.add(Akka.system().scheduler().schedule(nextExecutionInSeconds(00, 00), ONE_DAY, powerUpWordLoaderJob, Akka.system().dispatcher()));
-			jobs.add(Akka.system().scheduler().schedule(Zero(),ONE_HOUR,suggestionIndexerJob, Akka.system().dispatcher()));
+			finishedMatchCleanerJob = SpringApplicationContext.getBean(FinishedMatchCleanerJob.class);
+			system().scheduler().scheduleOnce(Zero(), alphabetLoaderJob, system().dispatcher());
+			system().scheduler().scheduleOnce(Zero(), powerUpWordLoaderJob, system().dispatcher());
+			jobs.add(system().scheduler().schedule(nextExecutionInSeconds(00, 00), ONE_DAY, powerUpWordLoaderJob, system().dispatcher()));
+			jobs.add(system().scheduler().schedule(Zero(),ONE_HOUR,suggestionIndexerJob, system().dispatcher()));
+			jobs.add(system().scheduler().schedule(Zero(),ONE_HOUR,finishedMatchCleanerJob, system().dispatcher()));
 		}
 	}
 	

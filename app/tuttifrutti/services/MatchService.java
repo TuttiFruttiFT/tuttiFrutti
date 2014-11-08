@@ -131,7 +131,7 @@ public class MatchService {
 		if(player == null){
 			throw new RuntimeException("Player " + playerId + " does not exist");
 		}
-		match.getPlayerResults().add(new PlayerResult(player,0,0,true,true));
+		match.getPlayerResults().add(new PlayerResult(player,0,0,true,true,now().toDate(),0));
 		match.getMatchName().incrementPlayers();
 	}
 
@@ -147,6 +147,7 @@ public class MatchService {
 		
 		elasticUtil.validate(duplas,round.getLetter());
 		Turn turn = match.createTurn(match,playerId, duplas, time);
+		match.updateDates(playerId);
 		mongoDatastore.save(match);
 		calculateResult(match, turn);
 		return getWrongDuplas(duplas);

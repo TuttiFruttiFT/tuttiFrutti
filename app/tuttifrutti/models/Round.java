@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import org.bson.types.ObjectId;
@@ -35,6 +36,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
  */
 @Entity
 @Getter @Setter
+@NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Component
@@ -69,6 +71,11 @@ public class Round {
 	@Autowired
 	private Datastore mongoDatastore;
 
+	public Round (Integer number,LetterWrapper letter){
+		this.number = number;
+		this.letter = letter;
+	}
+	
 	public void create(Match match) {
 		Round round = new Round();
 		round.setNumber(getRoundNumber(match));

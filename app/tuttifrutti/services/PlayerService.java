@@ -2,6 +2,7 @@ package tuttifrutti.services;
 
 import static java.lang.Math.max;
 import static java.util.stream.Collectors.toList;
+import static org.joda.time.DateTime.now;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -118,7 +119,7 @@ public class PlayerService {
 
 	public List<PlayerResult> playerResultsFromIds(List<String> playerIds) {
 		List<PlayerResult> playerResults = new ArrayList<>();
-		this.playersFromIds(playerIds).stream().forEach(player -> playerResults.add(new PlayerResult(player,0,0,false,true)));
+		this.playersFromIds(playerIds).stream().forEach(player -> playerResults.add(new PlayerResult(player,0,0,false,true,now().toDate(),0)));
 		return playerResults;
 	}
 	

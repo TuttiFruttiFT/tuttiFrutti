@@ -184,4 +184,8 @@ public class TestUtils {
 			Cache.set(AlphabetCache.PREFIX + category.toString(), null);
 		}
 	}
+	
+	public static PlayerResult testPlayerResult(Datastore datastore){
+		return savePlayerResult(datastore, savePlayer(datastore, "sarasas@sarasa.com"), 0);
+	}
 }
