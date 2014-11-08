@@ -135,8 +135,8 @@ public class MatchService {
 		if(player == null){
 			throw new RuntimeException("Player " + playerId + " does not exist");
 		}
-		match.getPlayerResults().add(new PlayerResult(player,0,0,true,true,now().toDate(),0));
-		match.getMatchName().incrementPlayers();
+		match.getPlayerResults().add(new PlayerResult(player,0,0,true,true,now().toDate(),0));		
+		match.incrementPlayers();
 	}
 
 	public Match createPrivate(String playerId, String name, MatchConfig config, List<String> playerIds, List<String> categoryIds) {
@@ -153,42 +153,46 @@ public class MatchService {
 		Turn turn = match.createTurn(match,playerId, duplas, time);
 		match.updateDates(playerId);
 		mongoDatastore.save(match);
-		calculateResult(match, turn);
+		verifyResult(match, turn);
 		return getWrongDuplas(duplas, letter);
 	}
 	
-	private void calculateResult(Match match, Turn turn) {
+	private void verifyResult(Match match, Turn turn) {
 		if(match.isRoundOver()){
-			promise(() -> {				
-				Round round = match.getLastRound();
-				List<Turn> turns = round.getTurns();
-				Integer minTime = getMinimumTime(turns);
-				List<Dupla> allDuplas = flatDuplasFromTurns(turns);
-				List<Dupla> validDuplas = processInvalidDuplas(minTime,allDuplas);
-				
-				match.processValidDuplas(validDuplas);
-				calculateTurnScores(turns, match);
-				saveOldRound(match, round, minTime);
-				
-				if(match.isFinished(round)){
-					match.calculateWinner();
-					playerService.updateStatistics(match);
-					match.setState(FINISHED);
-					pushService.matchResult(match);
-				}else{				
-					match.setState(PLAYER_TURN);
-					match.addPlayedLetter(round.getLetter().getLetter());
-					roundService.create(match);
-					pushService.roundResult(match,round.getNumber());
-				}
-				mongoDatastore.save(match);
-				return null;
-			});
+			calculateResult(match);
 		}else{
 			if(turn.isBpmbpt() && match.bestBpmbpt(turn)){
 				pushService.bpmbpt(match, turn.getEndTime(), turn.getPlayer(), match.getLastRound().getNumber());
 			}
 		}
+	}
+
+	public void calculateResult(Match match) {
+		promise(() -> {
+			Round round = match.getLastRound();
+			List<Turn> turns = round.getTurns();
+			Integer minTime = getMinimumTime(turns);
+			List<Dupla> allDuplas = flatDuplasFromTurns(turns);
+			List<Dupla> validDuplas = processInvalidDuplas(minTime,allDuplas);
+			
+			match.processValidDuplas(validDuplas);
+			calculateTurnScores(turns, match);
+			saveOldRound(match, round, minTime);
+			
+			if(match.isFinished(round)){
+				match.calculateWinner();
+				playerService.updateStatistics(match);
+				match.setState(FINISHED);
+				pushService.matchResult(match);
+			}else{				
+				match.setState(PLAYER_TURN);
+				match.addPlayedLetter(round.getLetter().getLetter());
+				roundService.create(match);
+				pushService.roundResult(match,round.getNumber());
+			}
+			mongoDatastore.save(match);
+			return null;
+		});
 	}
 	
 	private void calculateTurnScores(List<Turn> turns, Match match) {
@@ -244,6 +248,7 @@ public class MatchService {
 		Match match = new Match();
 		config.setType(type);
 		config.setCurrentTotalNumberOfPlayers(config.getNumberOfPlayers());
+		config.setIncorporatedNumberOfPlayers(0);
 		match.setConfig(config);
 		match.setMatchName(matchName);
 		match.setName(matchName.getValue());
@@ -286,11 +291,10 @@ public class MatchService {
 				match.setState(REJECTED);
 				pushService.rejected(players,match);
 			}else{
-				match.getConfig().setCurrentTotalNumberOfPlayers(match.getConfig().getCurrentTotalNumberOfPlayers() - 1);
-				match.getMatchName().decrementPlayers();
+				match.decrementPlayers();
 				List<Turn> turns = match.getLastRound().getTurns();
 				if(isNotEmpty(turns) && (turns.size() == match.getConfig().getCurrentTotalNumberOfPlayers())){
-					this.calculateResult(match, null);
+					this.verifyResult(match, null);
 				}
 				pushService.rejectedByPlayer(rejectorPlayer,match);
 			}

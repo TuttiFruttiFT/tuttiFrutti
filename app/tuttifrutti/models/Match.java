@@ -308,6 +308,23 @@ public class Match {
 		return this.getPlayerResults().stream()
 			.filter(aPlayerResult -> aPlayerResult.getPlayer().getId().toString().equals(playerId)).findFirst().get();
 	}
+
+	public void decrementPlayers() {
+		this.getConfig().decrementCurrentPlayers();
+		this.getConfig().decrementIncorporatedPlayers();
+		this.getMatchName().decrementPlayers();
+	}
+
+	public void incrementPlayers() {
+		this.getMatchName().incrementPlayers();
+		this.getConfig().incrementIncorporatedPlayers();
+	}
+
+	public void playerAcceptMatch(String playerId) {
+		this.getPlayerResults().stream().filter(playerResult -> playerResult.getPlayer().getId().toString().equals(playerId))
+		    .forEach(playerResult -> playerResult.setAccepted(true));
+		this.getConfig().incrementIncorporatedPlayers();
+	}
 }
 
 class PlayerResultScoreComparator implements Comparator<PlayerResult>{

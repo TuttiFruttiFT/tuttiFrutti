@@ -117,8 +117,7 @@ public class Matches extends Controller {
 		
 		Match match = matchService.match(matchId, null);
 		
-		match.getPlayerResults().stream().filter(playerResult -> playerResult.getPlayer().getId().toString().equals(playerId))
-										 .forEach(playerResult -> playerResult.setAccepted(true));
+		match.playerAcceptMatch(playerId);
 		
 		mongoDatastore.save(match);
 		

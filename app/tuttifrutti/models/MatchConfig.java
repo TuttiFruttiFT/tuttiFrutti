@@ -39,5 +39,25 @@ public class MatchConfig {
 	@JsonProperty(value = "current_total_number_of_players")
 	private int currentTotalNumberOfPlayers;
 	
+	@Property("incorporated_number_of_players")
+	@JsonProperty(value = "incorporated_number_of_players")
+	private int incorporatedNumberOfPlayers;
+	
 	private String language;
+
+	public void incrementIncorporatedPlayers() {
+		this.incorporatedNumberOfPlayers = this.incorporatedNumberOfPlayers + 1;
+	}
+
+	public void decrementCurrentPlayers() {
+		this.currentTotalNumberOfPlayers = this.currentTotalNumberOfPlayers - 1;
+	}
+
+	public void decrementIncorporatedPlayers() {
+		this.incorporatedNumberOfPlayers = this.incorporatedNumberOfPlayers - 1;
+	}
+
+	public void decrementMatchPlayers() {
+		this.numberOfPlayers = this.numberOfPlayers - 1;
+	}
 }
