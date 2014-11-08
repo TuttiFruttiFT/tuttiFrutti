@@ -1,5 +1,6 @@
 package tuttifrutti.controllers;
 
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import tuttifrutti.models.Device;
 import tuttifrutti.models.Player;
+import tuttifrutti.models.PlayerConfig;
 import tuttifrutti.models.views.ActiveMatch;
 import tuttifrutti.services.MatchService;
 import tuttifrutti.services.PlayerService;
@@ -62,7 +64,7 @@ public class Players extends Controller {
 			if(isNotEmpty(mail) && isNotEmpty(password)){
 				player = playerService.search(mail);
 				if(player == null){
-					if(playerService.isValid(mail)){						
+					if(playerService.isValidMail(mail)){						
 						player = playerService.registerMail(mail,password);
 					}else{
 						return badRequest(Json.newObject().put("status_code", SHORT_NICKNAME));
@@ -89,8 +91,28 @@ public class Players extends Controller {
 	@BodyParser.Of(BodyParser.Json.class)
 	public Result editProfile() {
 		JsonNode json = request().body().asJson();
+		String player_id = json.get("player_id") != null ? json.get("player_id").asText() : null;
+		String mail = json.get("mail") != null ? json.get("mail").asText() : null;
+		String nickname = json.get("nickname") != null ? json.get("nickname").asText() : null;
+		String password = json.get("password") != null ? json.get("password").asText() : null;
+		String newPassword = json.get("new_password") != null ? json.get("new_password").asText() : null;
 		
-		if(playerService.editProfile(json)){
+		String result = playerService.editProfile(player_id, mail, nickname, password, newPassword);
+		if(isEmpty(result)){
+			return ok();
+		}
+		
+		return badRequest(result);
+	}
+	
+	@BodyParser.Of(BodyParser.Json.class)
+	public Result editSettings() {
+		JsonNode json = request().body().asJson();
+		String playerId = json.get("player_id") != null ? json.get("player_id").asText() : null;
+		JsonNode jsonConfig = json.get("config");
+		PlayerConfig config = Json.fromJson(jsonConfig, PlayerConfig.class);
+		
+		if(playerService.editSettings(playerId, config)){
 			return ok();
 		}
 		

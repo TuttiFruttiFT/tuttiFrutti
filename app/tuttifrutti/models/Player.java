@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import org.bson.types.ObjectId;
+import org.mongodb.morphia.annotations.Embedded;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Property;
@@ -72,6 +73,9 @@ public class Player {
 	@JsonSerialize(using = DateSerializer.class)
 	@JsonDeserialize(using = DateDeserializer.class)
 	private Date last;
+	
+	@Embedded
+	private PlayerConfig config;
 	
 	public Player(ObjectId id,String nickname){
 		this.id = id;

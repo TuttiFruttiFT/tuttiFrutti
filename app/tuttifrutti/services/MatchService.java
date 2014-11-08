@@ -316,4 +316,8 @@ public class MatchService {
 		playerResult.setShow(false);
 		mongoDatastore.save(match);
 	}
+
+	public void changePlayerOnMatches(Player player) {
+		//TODO implementar
+	}
 }

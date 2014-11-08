@@ -3,12 +3,14 @@ package tuttifrutti.services;
 import static java.lang.Math.max;
 import static java.util.Collections.shuffle;
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
+import static java.util.regex.Pattern.compile;
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.joda.time.DateTime.now;
+import static play.libs.F.Promise.promise;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
@@ -17,18 +19,24 @@ import org.mongodb.morphia.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import play.libs.F.Promise;
+import scala.Function;
 import tuttifrutti.models.Match;
 import tuttifrutti.models.Pack;
 import tuttifrutti.models.Player;
+import tuttifrutti.models.PlayerConfig;
 import tuttifrutti.models.PlayerResult;
-
-import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * @author rfanego
  */
 @Component
 public class PlayerService {
+	private static final String NO_PLAYER_FOUND = "NO_PLAYER_FOUND";
+	private static final String INVALID_NICKNAME = "INVALID_NICKNAME";
+	private static final String WRONG_PASSWORD = "WRONG_PASSWORD";
+	private static final String INVALID_NEW_PASSWORD = "INVALID_NEW_PASSWORD";
+	
 	private static final Integer AMOUNT_OF_RUS_FOR_WINNING = 5;
 	private static final Integer AMOUNT_OF_RUS_FOR_LOSING = 1;
 	private static final Integer AMOUNT_OF_RUS_FOR_WINNING_ROUND = 1;
@@ -37,6 +45,9 @@ public class PlayerService {
 	
 	@Autowired
 	private Datastore mongoDatastore;
+	
+	@Autowired
+	private MatchService matchService;
 
 	public Player player(String playerId){
 		return mongoDatastore.get(Player.class,new ObjectId(playerId));
@@ -86,9 +97,43 @@ public class PlayerService {
 		return null;
 	}
 
-	public boolean editProfile(JsonNode json) {
-		// TODO implementar
+	public String editProfile(String playerId, String mail, String nickname, String password, String newPassword) {
+		Player player = mongoDatastore.get(Player.class,new ObjectId(playerId));
+		if(player != null){
+			if(isNotEmpty(password) && isNotEmpty(newPassword)){				
+				if(validatePassword(player.getPassword(),password)){
+					if(isValidPassword(newPassword)){						
+						player.setPassword(newPassword);
+					}else{
+						return INVALID_NEW_PASSWORD;
+					}
+				}else{
+					return WRONG_PASSWORD;
+				}
+			}
+			
+			player.setMail(mail);
+			if(isValidNickname(nickname)){				
+				player.setNickname(nickname);
+			}else{
+				return INVALID_NICKNAME;
+			}
+			promise(() -> {
+				matchService.changePlayerOnMatches(player);
+				return null;
+			});
+			mongoDatastore.save(player);
+		}
+		return NO_PLAYER_FOUND;
+	}
+	
+	public boolean editSettings(String playerId, PlayerConfig config) {
+		Player player = mongoDatastore.get(Player.class,new ObjectId(playerId));
 		return false;
+	}
+
+	private boolean isValidPassword(String newPassword) {
+		return newPassword.length() >= 6;
 	}
 
 	public void addFriend(String playerId, String friendId) {
@@ -116,8 +161,8 @@ public class PlayerService {
 
 	public List<Player> searchPlayers(String word, String playerId) {
 		Query<Player> query = mongoDatastore.find(Player.class);
-		query.or(query.criteria("nickname").equal(Pattern.compile(word, CASE_INSENSITIVE)),
-				query.criteria("mail").equal(Pattern.compile(word, CASE_INSENSITIVE)));
+		query.or(query.criteria("nickname").equal(compile(word, CASE_INSENSITIVE)),
+				query.criteria("mail").equal(compile(word, CASE_INSENSITIVE)));
 		query.and(query.criteria("id").notEqual(new ObjectId(playerId)));
 		return query.asList();
 	}
@@ -180,8 +225,12 @@ public class PlayerService {
 		return winner;
 	}
 
-	public boolean isValid(String mail) {
+	public boolean isValidMail(String mail) {
 		String nickname = this.nicknameFromMail(mail);
+		return isValidNickname(nickname);
+	}
+
+	private boolean isValidNickname(String nickname) {
 		if(nickname.length() < 3){
 			return false;
 		}

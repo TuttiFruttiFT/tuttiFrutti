@@ -4,7 +4,9 @@
 
 POST	/player									    @tuttifrutti.controllers.Players.register()
                                                     
-PUT		/player									    @tuttifrutti.controllers.Players.editProfile()
+PUT		/player										@tuttifrutti.controllers.Players.editProfile()
+
+PUT		/player/settings							@tuttifrutti.controllers.Players.editSettings()
                                                     
 GET		/player/:playerId						    @tuttifrutti.controllers.Players.player(playerId)
                                                     
