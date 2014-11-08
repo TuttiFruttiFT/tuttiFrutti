@@ -138,12 +138,6 @@ public class PlayersTest {
 			
 			assertThat(r).isNotNull();
 			assertThat(r.getStatus()).isEqualTo(OK);
-			
-			Player playerResponse = Json.fromJson(r.asJson(), Player.class);
-			
-			assertThat(playerResponse.getId()).isEqualTo(friend.getId());
-			assertThat(playerResponse.getNickname()).isEqualTo(friend.getNickname());
-			assertThat(playerResponse.getImage()).isEqualTo(friend.getImage());
 		});
 	}
 }

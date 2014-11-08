@@ -132,9 +132,20 @@ public class Players extends Controller {
 		String playerId = json.get("player_id").asText();
 		String friendId = json.get("friend_id").asText();
 		
-		Player friend = playerService.addFriend(playerId,friendId);
+		playerService.addFriend(playerId,friendId);
 		
-		return ok(Json.toJson(friend));
+		return ok();
+	}
+	
+	@BodyParser.Of(BodyParser.Json.class)
+	public Result removeFriend(){
+		JsonNode json = request().body().asJson();
+		String playerId = json.get("player_id").asText();
+		String friendId = json.get("friend_id").asText();
+		
+		playerService.removeFriend(playerId,friendId);
+		
+		return ok();
 	}
 	
 	public Result powerUp(String idJugador,String idPowerUp){

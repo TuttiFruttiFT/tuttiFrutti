@@ -1,11 +1,14 @@
 package tuttifrutti.services;
 
 import static java.lang.Math.max;
+import static java.util.Collections.shuffle;
+import static java.util.regex.Pattern.CASE_INSENSITIVE;
 import static java.util.stream.Collectors.toList;
 import static org.joda.time.DateTime.now;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
@@ -28,7 +31,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class PlayerService {
 	private static final Integer AMOUNT_OF_RUS_FOR_WINNING = 5;
 	private static final Integer AMOUNT_OF_RUS_FOR_LOSING = 1;
-	private static final Integer STARTING_RUS = 10;
+	private static final Integer AMOUNT_OF_RUS_FOR_WINNING_ROUND = 1;
+	private static final Integer STARTING_RUS = 25;
+	private static final int AMOUNT_OF_OTHER_PLAYERS = 20;
 	
 	@Autowired
 	private Datastore mongoDatastore;
@@ -86,12 +91,18 @@ public class PlayerService {
 		return false;
 	}
 
-	public Player addFriend(String playerId, String friendId) {
+	public void addFriend(String playerId, String friendId) {
 		Player player = mongoDatastore.get(Player.class,new ObjectId(playerId));
 		Player friend = mongoDatastore.get(Player.class,new ObjectId(friendId));
 		player.addFriend(friend.reducedPlayer());
 		mongoDatastore.save(player);
-		return friend.reducedPlayer();
+	}
+	
+	public void removeFriend(String playerId, String friendId) {
+		Player player = mongoDatastore.get(Player.class,new ObjectId(playerId));
+		
+		player.getFriends().removeIf(friend -> friend.getId().toString().equals(friendId));
+		mongoDatastore.save(player);
 	}
 	
 	public void powerUp(String playerId, String powerUpId) {
@@ -103,13 +114,18 @@ public class PlayerService {
 		
 	}
 
-	public List<Player> searchPlayers(String word) {
-		return mongoDatastore.find(Player.class).asList();
+	public List<Player> searchPlayers(String word, String playerId) {
+		Query<Player> query = mongoDatastore.find(Player.class);
+		query.or(query.criteria("nickname").equal(Pattern.compile(word, CASE_INSENSITIVE)),
+				query.criteria("mail").equal(Pattern.compile(word, CASE_INSENSITIVE)));
+		query.and(query.criteria("id").notEqual(new ObjectId(playerId)));
+		return query.asList();
 	}
 
 	public List<Player> searchOthersPlayers(String playerId) {
-		// TODO implementar
-		return null;
+		List<Player> players = mongoDatastore.find(Player.class).asList();
+		shuffle(players);
+		return players.subList(0, AMOUNT_OF_OTHER_PLAYERS < players.size() ? players.size() : AMOUNT_OF_OTHER_PLAYERS);
 	}
 
 	public Player search(String mail) {

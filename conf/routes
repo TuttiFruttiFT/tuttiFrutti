@@ -13,6 +13,8 @@ GET		/player/matches/:playerId				    @tuttifrutti.controllers.Players.activeMat
 POST	/player/invitation						    @tuttifrutti.controllers.Players.invitePlayers()
                                                     
 POST	/player/friend							    @tuttifrutti.controllers.Players.addFriend()
+
+DELETE	/player/friend							    @tuttifrutti.controllers.Players.removeFriend()
                                                     
 POST	/player/:playerId/powerup/:idPowerUp	    @tuttifrutti.controllers.Players.powerUp(playerId,idPowerUp)
 

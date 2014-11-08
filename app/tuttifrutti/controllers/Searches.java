@@ -24,10 +24,8 @@ public class Searches extends Controller {
 	public Result searchPlayers(String playerId,String word) {
 		List<Player> players = new ArrayList<>();
 		
-		for(Player player : playerService.searchPlayers(word)){
-			if(!player.getId().toString().equals(playerId)){	
-				players.add(player.reducedPlayer());
-			}
+		for(Player player : playerService.searchPlayers(word, playerId)){
+			players.add(player.reducedPlayer());
 		}
 		
         return ok(parse(parseListToJson(players)));
