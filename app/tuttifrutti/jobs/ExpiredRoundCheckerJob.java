@@ -30,8 +30,8 @@ public class ExpiredRoundCheckerJob implements Runnable {
 	@Autowired
 	private Datastore mongoDatastore;
 	
-	private long normalModeTimeMillis = TimeUnit.DAYS.toMillis(ConfigurationAccessor.i("match.mode.normal"));
-	private long quickModeTimeMillis = TimeUnit.MINUTES.toMillis(ConfigurationAccessor.i("match.mode.quick"));
+//	private long normalModeTimeMillis = TimeUnit.DAYS.toMillis(ConfigurationAccessor.i("match.mode.normal"));
+//	private long quickModeTimeMillis = TimeUnit.MINUTES.toMillis(ConfigurationAccessor.i("match.mode.quick"));
 	
 //	public ExpiredRoundCheckerJob(MatchMode mode) {
 //		this.mode = mode;
