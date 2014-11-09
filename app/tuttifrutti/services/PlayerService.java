@@ -19,8 +19,6 @@ import org.mongodb.morphia.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import play.libs.F.Promise;
-import scala.Function;
 import tuttifrutti.models.Match;
 import tuttifrutti.models.Pack;
 import tuttifrutti.models.Player;
@@ -35,7 +33,9 @@ public class PlayerService {
 	private static final String NO_PLAYER_FOUND = "NO_PLAYER_FOUND";
 	private static final String INVALID_NICKNAME = "INVALID_NICKNAME";
 	private static final String WRONG_PASSWORD = "WRONG_PASSWORD";
-	private static final String INVALID_NEW_PASSWORD = "INVALID_NEW_PASSWORD";
+	public static final String INVALID_NEW_PASSWORD = "INVALID_NEW_PASSWORD";
+	public static final String SHORT_NICKNAME = "SHORT_NICKNAME";
+	public static final String MALFORMED_REQUEST = "MALFORMED_REQUEST";
 	
 	private static final Integer AMOUNT_OF_RUS_FOR_WINNING = 5;
 	private static final Integer AMOUNT_OF_RUS_FOR_LOSING = 1;
@@ -123,16 +123,18 @@ public class PlayerService {
 				return null;
 			});
 			mongoDatastore.save(player);
+			return null;
 		}
 		return NO_PLAYER_FOUND;
 	}
 	
-	public boolean editSettings(String playerId, PlayerConfig config) {
+	public void editSettings(String playerId, PlayerConfig config) {
 		Player player = mongoDatastore.get(Player.class,new ObjectId(playerId));
-		return false;
+		player.setConfig(config);
+		mongoDatastore.save(player);
 	}
 
-	private boolean isValidPassword(String newPassword) {
+	public boolean isValidPassword(String newPassword) {
 		return newPassword.length() >= 6;
 	}
 

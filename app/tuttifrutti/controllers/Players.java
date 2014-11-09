@@ -2,6 +2,9 @@ package tuttifrutti.controllers;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static tuttifrutti.services.PlayerService.INVALID_NEW_PASSWORD;
+import static tuttifrutti.services.PlayerService.MALFORMED_REQUEST;
+import static tuttifrutti.services.PlayerService.SHORT_NICKNAME;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,10 +34,6 @@ import com.fasterxml.jackson.databind.JsonNode;
  */
 @org.springframework.stereotype.Controller
 public class Players extends Controller {
-	private static final String SHORT_NICKNAME = "SHORT_NICKNAME";
-
-	private static final String MALFORMED_REQUEST = "MALFORMED_REQUEST";
-
 	@Autowired
 	private PlayerService playerService;
 	
@@ -64,8 +63,12 @@ public class Players extends Controller {
 			if(isNotEmpty(mail) && isNotEmpty(password)){
 				player = playerService.search(mail);
 				if(player == null){
-					if(playerService.isValidMail(mail)){						
-						player = playerService.registerMail(mail,password);
+					if(playerService.isValidMail(mail)){
+						if(playerService.isValidPassword(password)){							
+							player = playerService.registerMail(mail,password);
+						}else{
+							return badRequest(Json.newObject().put("status_code", INVALID_NEW_PASSWORD));
+						}
 					}else{
 						return badRequest(Json.newObject().put("status_code", SHORT_NICKNAME));
 					}
@@ -91,13 +94,13 @@ public class Players extends Controller {
 	@BodyParser.Of(BodyParser.Json.class)
 	public Result editProfile() {
 		JsonNode json = request().body().asJson();
-		String player_id = json.get("player_id") != null ? json.get("player_id").asText() : null;
+		String playerId = json.get("player_id") != null ? json.get("player_id").asText() : null;
 		String mail = json.get("mail") != null ? json.get("mail").asText() : null;
 		String nickname = json.get("nickname") != null ? json.get("nickname").asText() : null;
 		String password = json.get("password") != null ? json.get("password").asText() : null;
 		String newPassword = json.get("new_password") != null ? json.get("new_password").asText() : null;
 		
-		String result = playerService.editProfile(player_id, mail, nickname, password, newPassword);
+		String result = playerService.editProfile(playerId, mail, nickname, password, newPassword);
 		if(isEmpty(result)){
 			return ok();
 		}
@@ -112,11 +115,9 @@ public class Players extends Controller {
 		JsonNode jsonConfig = json.get("config");
 		PlayerConfig config = Json.fromJson(jsonConfig, PlayerConfig.class);
 		
-		if(playerService.editSettings(playerId, config)){
-			return ok();
-		}
+		playerService.editSettings(playerId, config);
 		
-		return badRequest();
+		return ok();
 	}
 	
 	public Result player(String playerId) {
