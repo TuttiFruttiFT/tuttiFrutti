@@ -170,9 +170,11 @@ public class PlayerService {
 	}
 
 	public List<Player> searchOthersPlayers(String playerId) {
-		List<Player> players = mongoDatastore.find(Player.class).asList();
+		Query<Player> query = mongoDatastore.find(Player.class);
+		query.and(query.criteria("id").notEqual(new ObjectId(playerId)));
+		List<Player> players = query.asList();
 		shuffle(players);
-		return players.subList(0, AMOUNT_OF_OTHER_PLAYERS < players.size() ? players.size() : AMOUNT_OF_OTHER_PLAYERS);
+		return players.subList(0, AMOUNT_OF_OTHER_PLAYERS < players.size() ? AMOUNT_OF_OTHER_PLAYERS : players.size());
 	}
 
 	public Player search(String mail) {
