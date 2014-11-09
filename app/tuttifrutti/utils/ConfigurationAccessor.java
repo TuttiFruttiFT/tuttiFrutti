@@ -25,7 +25,6 @@ import com.typesafe.config.ConfigFactory;
  * {@link ConfigFactory#load()} as the former includes properties overridden by tests while the
  * latter only loads stuff from application*.conf files.
  * 
- * @author Jonathan Chiocchio
  */
 @Slf4j
 @NoArgsConstructor(access = PRIVATE)

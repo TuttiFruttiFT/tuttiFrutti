@@ -96,4 +96,8 @@ public class Player {
 		}
 		this.friends.add(friend);
 	}
+
+	public void decrementBalance(int rus) {
+		this.balance = this.balance - rus;
+	}
 }

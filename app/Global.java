@@ -15,6 +15,7 @@ import tuttifrutti.elastic.ElasticSearchEmbeddedServer;
 import tuttifrutti.jobs.AlphabetLoaderJob;
 import tuttifrutti.jobs.FinishedMatchCleanerJob;
 import tuttifrutti.jobs.PowerUpWordLoader;
+import tuttifrutti.jobs.RusLoaderJob;
 import tuttifrutti.jobs.SuggestionIndexerJob;
 import tuttifrutti.mongo.MongoEmbeddedServer;
 import tuttifrutti.utils.SpringApplicationContext;
@@ -29,6 +30,8 @@ public class Global extends GlobalSettings {
 	
 	private FinishedMatchCleanerJob finishedMatchCleanerJob;
 	
+	private RusLoaderJob rusLoaderJob;
+	
 	private List<Cancellable> jobs = new ArrayList<Cancellable>();
 	
 	@Override
@@ -42,8 +45,10 @@ public class Global extends GlobalSettings {
 			suggestionIndexerJob = SpringApplicationContext.getBean(SuggestionIndexerJob.class);
 			alphabetLoaderJob = SpringApplicationContext.getBean(AlphabetLoaderJob.class);
 			finishedMatchCleanerJob = SpringApplicationContext.getBean(FinishedMatchCleanerJob.class);
+			rusLoaderJob = SpringApplicationContext.getBean(RusLoaderJob.class);
 			system().scheduler().scheduleOnce(Zero(), alphabetLoaderJob, system().dispatcher());
 			system().scheduler().scheduleOnce(Zero(), powerUpWordLoaderJob, system().dispatcher());
+			system().scheduler().scheduleOnce(Zero(), rusLoaderJob, system().dispatcher());
 			jobs.add(system().scheduler().schedule(nextExecutionInSeconds(00, 00), ONE_DAY, powerUpWordLoaderJob, system().dispatcher()));
 			jobs.add(system().scheduler().schedule(Zero(),ONE_HOUR,suggestionIndexerJob, system().dispatcher()));
 			jobs.add(system().scheduler().schedule(Zero(),ONE_HOUR,finishedMatchCleanerJob, system().dispatcher()));

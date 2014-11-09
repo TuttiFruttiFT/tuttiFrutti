@@ -2,6 +2,7 @@ package tuttifrutti.controllers;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static tuttifrutti.models.enums.PowerUpType.valueOf;
 import static tuttifrutti.services.PlayerService.INVALID_NEW_PASSWORD;
 import static tuttifrutti.services.PlayerService.MALFORMED_REQUEST;
 import static tuttifrutti.services.PlayerService.SHORT_NICKNAME;
@@ -20,6 +21,7 @@ import play.mvc.Result;
 import tuttifrutti.models.Device;
 import tuttifrutti.models.Player;
 import tuttifrutti.models.PlayerConfig;
+import tuttifrutti.models.enums.PowerUpType;
 import tuttifrutti.models.views.ActiveMatch;
 import tuttifrutti.services.MatchService;
 import tuttifrutti.services.PlayerService;
@@ -171,9 +173,15 @@ public class Players extends Controller {
 		return ok();
 	}
 	
-	public Result powerUp(String idJugador,String idPowerUp){
-		playerService.powerUp(idJugador, idPowerUp);
-		return ok();
+	public Result powerUp(String playerId,String powerUpId){
+		PowerUpType powerUp = valueOf(powerUpId);
+		if(powerUp == null){
+			return badRequest();
+		}
+		if(playerService.powerUp(playerId, powerUp)){
+			return ok();
+		}
+		return forbidden();
 	}
 	
 	@BodyParser.Of(BodyParser.Json.class)

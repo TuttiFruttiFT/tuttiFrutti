@@ -19,11 +19,13 @@ import org.mongodb.morphia.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import tuttifrutti.cache.RusCache;
 import tuttifrutti.models.Match;
 import tuttifrutti.models.Pack;
 import tuttifrutti.models.Player;
 import tuttifrutti.models.PlayerConfig;
 import tuttifrutti.models.PlayerResult;
+import tuttifrutti.models.enums.PowerUpType;
 
 /**
  * @author rfanego
@@ -48,6 +50,9 @@ public class PlayerService {
 	
 	@Autowired
 	private MatchService matchService;
+	
+	@Autowired
+	RusCache rusCache;
 
 	public Player player(String playerId){
 		return mongoDatastore.get(Player.class,new ObjectId(playerId));
@@ -152,8 +157,15 @@ public class PlayerService {
 		mongoDatastore.save(player);
 	}
 	
-	public void powerUp(String playerId, String powerUpId) {
-		//TODO implementar
+	public boolean powerUp(String playerId, PowerUpType powerUp) {
+		Player player = mongoDatastore.get(Player.class,new ObjectId(playerId));
+		int rus = rusCache.rusFor(powerUp);
+		if(rus < player.getBalance()){
+			player.decrementBalance(rus);
+			mongoDatastore.save(player);
+			return true;
+		}
+		return false;
 	}
 
 	public void buy(String idJugador, Pack pack) {
