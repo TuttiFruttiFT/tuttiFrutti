@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import play.Logger;
 import tuttifrutti.models.Match;
 import tuttifrutti.models.enums.MatchMode;
+import tuttifrutti.utils.ConfigurationAccessor;
 
 /**
  * @author rfanego
@@ -29,8 +30,8 @@ public class ExpiredRoundCheckerJob implements Runnable {
 	@Autowired
 	private Datastore mongoDatastore;
 	
-	private long normalModeTimeMillis = TimeUnit.DAYS.toMillis(2);
-	private long quickModeTimeMillis = TimeUnit.MINUTES.toMillis(15);
+	private long normalModeTimeMillis = TimeUnit.DAYS.toMillis(ConfigurationAccessor.i("match.mode.normal"));
+	private long quickModeTimeMillis = TimeUnit.MINUTES.toMillis(ConfigurationAccessor.i("match.mode.quick"));
 	
 //	public ExpiredRoundCheckerJob(MatchMode mode) {
 //		this.mode = mode;

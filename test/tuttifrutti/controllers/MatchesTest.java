@@ -51,6 +51,7 @@ import play.libs.Json;
 import play.libs.ws.WS;
 import play.libs.ws.WSResponse;
 import tuttifrutti.cache.CategoryCache;
+import tuttifrutti.cache.RusCache;
 import tuttifrutti.elastic.ElasticSearchAwareTest;
 import tuttifrutti.models.Category;
 import tuttifrutti.models.Device;
@@ -67,6 +68,7 @@ import tuttifrutti.models.Turn;
 import tuttifrutti.models.enums.DuplaScore;
 import tuttifrutti.models.enums.MatchState;
 import tuttifrutti.models.enums.MatchType;
+import tuttifrutti.models.enums.PowerUpType;
 import tuttifrutti.utils.JsonUtil;
 import tuttifrutti.utils.SpringApplicationContext;
 
@@ -344,8 +346,10 @@ public class MatchesTest extends ElasticSearchAwareTest {
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
 			Datastore dataStore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
 			CategoryCache categoryCache = SpringApplicationContext.getBeanNamed("categoryCache", CategoryCache.class);
+			RusCache rusCache = SpringApplicationContext.getBeanNamed("rusCache", RusCache.class);
 			populateElastic(getJsonFilesFotCategories());
 			populateCategoryCache(categoryCache);
+			populateRusCache(rusCache);
 			
 			String language = "ES";
 			int roundNumber = 1;
@@ -450,6 +454,12 @@ public class MatchesTest extends ElasticSearchAwareTest {
 		});
 	}
 	
+	private void populateRusCache(RusCache cache) {
+		for(PowerUpType powerUp : PowerUpType.values()){
+			cache.loadRus(powerUp);
+		}
+	}
+
 	@Test
 	public void emptyDuplas() {
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {

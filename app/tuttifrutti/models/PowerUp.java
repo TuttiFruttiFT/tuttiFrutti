@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import tuttifrutti.cache.CategoryCache;
+import tuttifrutti.cache.RusCache;
 import tuttifrutti.models.enums.PowerUpType;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -40,18 +41,26 @@ public class PowerUp {
 	private PowerUpType name;
 	
 	private String value;
+	
+	private int cost;
     
     @JsonIgnore
     @Autowired
     private CategoryCache categoryCache;
+    
+    @JsonIgnore
+    @Autowired
+	private RusCache rusCache;
 
-    public PowerUp(PowerUpType name){
-    	this.name = name;
+    public PowerUp(PowerUpType powerUp,int cost){
+    	this.name = powerUp;
+    	this.cost = cost;
     }
     
-	public PowerUp(PowerUpType name, String value) {
-		this.name = name;
+	public PowerUp(PowerUpType powerUp, String value,int cost) {
+		this.name = powerUp;
 		this.value = value;
+		this.cost = cost;
 	}
     
 	public void generate(Match match, String playerId) {
@@ -65,7 +74,7 @@ public class PowerUp {
 
 	private void buyTime(Match match) {
 		match.getCategories().forEach(category -> {
-			PowerUp buyTimePowerUp = new PowerUp(buy_time, "3000");
+			PowerUp buyTimePowerUp = new PowerUp(buy_time, "3000",rusCache.rusFor(buy_time));
 			category.getPowerUps().add(buyTimePowerUp);
 		});
 	}
@@ -80,9 +89,9 @@ public class PowerUp {
 				List<Dupla> categoryDuplas = validDuplas.stream().filter(dupla -> dupla.getCategory().getId().equals(category.getId())).collect(toList());
 				if(!isEmpty(categoryDuplas)){
 					shuffle(categoryDuplas);
-					category.getPowerUps().add(new PowerUp(opponent_word,categoryDuplas.get(0).getWrittenWord()));
+					category.getPowerUps().add(new PowerUp(opponent_word,categoryDuplas.get(0).getWrittenWord(),rusCache.rusFor(opponent_word)));
 				}else{
-					category.getPowerUps().add(new PowerUp(opponent_word));
+					category.getPowerUps().add(new PowerUp(opponent_word,rusCache.rusFor(opponent_word)));
 				}
 			}
 		}
@@ -91,14 +100,14 @@ public class PowerUp {
 	private void suggestWords(Match match) {
 		match.getCategories().forEach(category -> {
 			Letter letter = match.getLastRound().getLetter().getLetter();
-			category.getPowerUps().add(new PowerUp(suggest,categoryCache.retrieveWord(category.getId(), letter)));
+			category.getPowerUps().add(new PowerUp(suggest,categoryCache.retrieveWord(category.getId(), letter),rusCache.rusFor(suggest)));
 		});
 	}
 
 	private void autoCompleteWords(Match match) {
 		match.getCategories().forEach(category -> {
 			Letter letter = match.getLastRound().getLetter().getLetter();
-			category.getPowerUps().add(new PowerUp(autocomplete,categoryCache.retrieveWord(category.getId(), letter)));
+			category.getPowerUps().add(new PowerUp(autocomplete,categoryCache.retrieveWord(category.getId(), letter),rusCache.rusFor(autocomplete)));
 		});
 	}
 }
