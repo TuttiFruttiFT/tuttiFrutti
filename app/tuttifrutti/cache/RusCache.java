@@ -17,8 +17,9 @@ public class RusCache {
 	
 	public void loadRus(PowerUpType powerUp) {
 		Logger.info("Loading Rus Cache " + PREFIX + powerUp.toString() + " value "
-				+ ConfigurationAccessor.i("rus.powerUp." + powerUp.toString()));
-		Cache.set(PREFIX + powerUp.toString(), ConfigurationAccessor.i("rus.powerUp." + powerUp.toString()));
+				+ ConfigurationAccessor.i("rus.powerup." + powerUp.toString()));
+		Logger.info(ConfigurationAccessor.s("rus.powerup." + powerUp.toString()));
+		Cache.set(PREFIX + powerUp.toString(), ConfigurationAccessor.i("rus.powerup." + powerUp.toString()));
 	}
 
 	public int rusFor(PowerUpType powerUp){
