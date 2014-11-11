@@ -1,5 +1,8 @@
 package tuttifrutti.cache;
 
+import static tuttifrutti.utils.ConfigurationAccessor.i;
+import static tuttifrutti.utils.ConfigurationAccessor.s;
+
 import org.springframework.stereotype.Component;
 
 import play.Logger;
@@ -17,8 +20,12 @@ public class RusCache {
 	
 	public void loadRus(PowerUpType powerUp) {
 		Logger.info("Loading Rus Cache " + PREFIX + powerUp.toString() + " value "
-				+ ConfigurationAccessor.i("rus.powerup." + powerUp.toString()));
-		Logger.info(ConfigurationAccessor.s("rus.powerup." + powerUp.toString()));
+				+ i("rus.powerup." + powerUp.toString()));
+		Logger.info(s("rus.powerup." + powerUp.toString()));
+		Logger.info(s("elasticsearch.host"));
+		Logger.info(i("powerup.loader.count") + "");
+		Logger.info(i("rus.powerup.autocomplete") + "");
+//		rus.powerup.autocomplete
 		Cache.set(PREFIX + powerUp.toString(), ConfigurationAccessor.i("rus.powerup." + powerUp.toString()));
 	}
 
