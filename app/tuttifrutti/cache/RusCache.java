@@ -1,5 +1,6 @@
 package tuttifrutti.cache;
 
+import static java.lang.Integer.valueOf;
 import static tuttifrutti.utils.ConfigurationAccessor.i;
 import static tuttifrutti.utils.ConfigurationAccessor.s;
 
@@ -8,7 +9,6 @@ import org.springframework.stereotype.Component;
 import play.Logger;
 import play.cache.Cache;
 import tuttifrutti.models.enums.PowerUpType;
-import tuttifrutti.utils.ConfigurationAccessor;
 
 /**
  * @author rfanego
@@ -26,7 +26,7 @@ public class RusCache {
 		Logger.info(i("powerup.loader.count") + "");
 		Logger.info(i("rus.powerup.autocomplete") + "");
 //		rus.powerup.autocomplete
-		Cache.set(PREFIX + powerUp.toString(), ConfigurationAccessor.i("rus.powerup." + powerUp.toString()));
+		Cache.set(PREFIX + powerUp.toString(), valueOf(s("rus.powerup." + powerUp.toString())));
 	}
 
 	public int rusFor(PowerUpType powerUp){
