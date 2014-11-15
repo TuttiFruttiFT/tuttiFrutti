@@ -10,9 +10,7 @@ import static tuttifrutti.models.enums.MatchState.REJECTED;
 
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-import org.joda.time.DateTime;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +19,7 @@ import org.springframework.stereotype.Component;
 import play.Logger;
 import tuttifrutti.models.Match;
 import tuttifrutti.models.Player;
+import tuttifrutti.models.PlayerResult;
 import tuttifrutti.models.enums.MatchMode;
 import tuttifrutti.services.MatchService;
 import tuttifrutti.services.PlayerService;
@@ -69,12 +68,18 @@ public class ExpiredRoundCheckerJob implements Runnable {
 		
 		if(isNotEmpty(matches)){			
 			matches.forEach(match -> {
-				List<Player> expiredPlayers = match.expiredPlayers(nowMinusModeTime);
+				List<PlayerResult> expiredPlayers = match.expiredPlayers(nowMinusModeTime);
 				if(match.getPlayerResults().size() - expiredPlayers.size() > 1){
-					
-				}else{
 					match.setState(EXPIRED);
-					
+					expiredPlayers.forEach(aPlayer -> {
+						Player player = playerService.updateLoserStatisticsInExpiredMatch(aPlayer);
+						pushService.expiredForPlayer(player, match);
+						match.addExpiredPlayer(aPlayer);
+						mongoDatastore.save(player);						
+					});
+					mongoDatastore.save(match);
+				}else{
+					expireMatch(match);
 				}
 			});
 		}
@@ -91,18 +96,22 @@ public class ExpiredRoundCheckerJob implements Runnable {
 		
 		if(isNotEmpty(matches)){			
 			matches.forEach(match -> {
-				if(match.getLastRound().getNumber() > 1){
-					matchService.calculateResult(match, true);
-				}else{					
-					match.setState(EXPIRED);
-					pushService.expired(match);
-					match.getPlayerResults().forEach(aPlayer -> {
-						Player player = playerService.updateLoserStatisticsInExpiredMatch(aPlayer);
-						mongoDatastore.save(player);
-					});
-					mongoDatastore.save(match);
-				}
+//				if(match.getLastRound().getNumber() > 1){
+//					matchService.calculateResult(match, true);
+//				}else{					
+					expireMatch(match);
+//				}
 			});
 		}
+	}
+
+	private void expireMatch(Match match) {
+		match.setState(EXPIRED);
+		pushService.expired(match);
+		match.getPlayerResults().forEach(aPlayer -> {
+			Player player = playerService.updateLoserStatisticsInExpiredMatch(aPlayer);
+			mongoDatastore.save(player);
+		});
+		mongoDatastore.save(match);
 	}
 }

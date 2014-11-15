@@ -21,6 +21,7 @@ import java.util.Optional;
 import lombok.Getter;
 import lombok.Setter;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Embedded;
 import org.mongodb.morphia.annotations.Entity;
@@ -83,6 +84,9 @@ public class Match {
 	@Embedded
 	@JsonProperty(value = "players")
 	private List<PlayerResult> playerResults;
+	
+	@JsonProperty(value = "expired_players")
+	private List<PlayerResult> expiredPlayers;
 	
 	@JsonProperty(value = "current_round")
 	private Round lastRound;
@@ -326,9 +330,18 @@ public class Match {
 		this.getConfig().incrementIncorporatedPlayers();
 	}
 
-	public List<Player> expiredPlayers(Date nowMinusModeTime) {
+	public List<PlayerResult> expiredPlayers(Date nowMinusModeTime) {
 		// TODO implementar
 		return null;
+	}
+
+	public void addExpiredPlayer(PlayerResult aPlayer) {
+		if(CollectionUtils.isEmpty(this.expiredPlayers)){			
+			this.expiredPlayers = new ArrayList<>();
+		}
+		this.expiredPlayers.add(aPlayer);
+		
+		this.playerResults.removeIf(playerResult -> playerResult.getPlayer().getId().toString().equals(aPlayer.getPlayer().getId().toString()));
 	}
 }
 
