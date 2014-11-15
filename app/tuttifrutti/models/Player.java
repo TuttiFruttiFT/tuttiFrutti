@@ -100,4 +100,8 @@ public class Player {
 	public void decrementBalance(int rus) {
 		this.balance = this.balance - rus;
 	}
+
+	public void incrementBalance(Integer currentAmount) {
+		this.balance = this.balance + currentAmount;
+	}
 }
