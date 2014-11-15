@@ -14,6 +14,7 @@ import tuttifrutti.serializers.ObjectIdSerializer;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
@@ -34,9 +35,11 @@ public class Pack {
 	private String desc;
 	
 	@Property("current_amount")
+	@JsonProperty("current_amount")
 	private Integer currentAmount;
 	
 	@Property("default_amount")
+	@JsonProperty("default_amount")
 	private Integer defaultAmount;
 	
 	private Double price;

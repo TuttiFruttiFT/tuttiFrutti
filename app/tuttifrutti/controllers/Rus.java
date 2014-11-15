@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 import tuttifrutti.models.Pack;
@@ -26,9 +27,7 @@ public class Rus extends Controller {
 	public Result buy(){
 		JsonNode json = request().body().asJson();
 		String playerId = json.get("player_id").asText();
-		String packId = json.get("pack_id").asText();
-		
-		Pack pack = Pack.pack(packId);
+		Pack pack = Json.fromJson(json.get("pack"), Pack.class);
 		
 		GoogleUtil.buy(playerId,pack);
 		
