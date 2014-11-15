@@ -325,6 +325,11 @@ public class Match {
 		    .forEach(playerResult -> playerResult.setAccepted(true));
 		this.getConfig().incrementIncorporatedPlayers();
 	}
+
+	public List<Player> expiredPlayers(Date nowMinusModeTime) {
+		// TODO implementar
+		return null;
+	}
 }
 
 class PlayerResultScoreComparator implements Comparator<PlayerResult>{

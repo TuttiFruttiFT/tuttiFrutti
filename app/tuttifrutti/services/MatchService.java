@@ -11,6 +11,7 @@ import static tuttifrutti.models.Turn.TURN_DURATION_IN_MINUTES;
 import static tuttifrutti.models.enums.DuplaScore.ZERO_SCORE;
 import static tuttifrutti.models.enums.DuplaState.WRONG;
 import static tuttifrutti.models.enums.MatchState.CLEAN;
+import static tuttifrutti.models.enums.MatchState.EXPIRED;
 import static tuttifrutti.models.enums.MatchState.FINISHED;
 import static tuttifrutti.models.enums.MatchState.PLAYER_TURN;
 import static tuttifrutti.models.enums.MatchState.REJECTED;
@@ -19,6 +20,7 @@ import static tuttifrutti.models.enums.MatchType.PRIVATE;
 import static tuttifrutti.models.enums.MatchType.PUBLIC;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.OptionalInt;
@@ -167,7 +169,7 @@ public class MatchService {
 		}
 	}
 
-	public void calculateResult(Match match) {
+	public void calculateResult(Match match,boolean isExpired) {
 		promise(() -> {
 			Round round = match.getLastRound();
 			List<Turn> turns = round.getTurns();
@@ -179,10 +181,10 @@ public class MatchService {
 			calculateTurnScores(turns, match);
 			saveOldRound(match, round, minTime);
 			
-			if(match.isFinished(round)){
+			if(match.isFinished(round) || isExpired){
 				match.calculateWinner();
 				playerService.updateStatistics(match);
-				match.setState(FINISHED);
+				match.setState(isExpired ? EXPIRED : FINISHED);
 				pushService.matchResult(match);
 			}else{				
 				match.setState(PLAYER_TURN);
@@ -193,6 +195,10 @@ public class MatchService {
 			mongoDatastore.save(match);
 			return null;
 		});
+	}
+	
+	public void calculateResult(Match match) {
+		calculateResult(match, false);
 	}
 	
 	private void calculateTurnScores(List<Turn> turns, Match match) {
@@ -245,7 +251,9 @@ public class MatchService {
 	}
 	
 	private Match create(MatchConfig config, MatchType type,MatchName matchName,List<PlayerResult> playerResults, List<Category> categories) {
+		Date now = now().toDate();
 		Match match = new Match();
+		
 		config.setType(type);
 		config.setCurrentTotalNumberOfPlayers(config.getNumberOfPlayers());
 		config.setIncorporatedNumberOfPlayers(0);
@@ -253,7 +261,8 @@ public class MatchService {
 		match.setMatchName(matchName);
 		match.setName(matchName.getValue());
 		match.setState(TO_BE_APPROVED);
-		match.setStartDate(now().toDate());
+		match.setStartDate(now);
+		match.setModifiedDate(now);
 		match.setCategories(categories);
 		match.setPlayerResults(playerResults);
 		match.setAlphabet(alphabetService.alphabetForCategoriesAndLanguage(config.getLanguage(), categories));

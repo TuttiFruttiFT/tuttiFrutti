@@ -4,6 +4,7 @@ import static play.libs.F.Promise.promise;
 import static play.libs.Json.newObject;
 import static tuttifrutti.utils.ConfigurationAccessor.s;
 import static tuttifrutti.utils.PushType.BPMBPT;
+import static tuttifrutti.utils.PushType.MATCH_EXPIRED;
 import static tuttifrutti.utils.PushType.MATCH_REJECTED;
 import static tuttifrutti.utils.PushType.MATCH_REJECTED_BY_PLAYER;
 import static tuttifrutti.utils.PushType.MATCH_RESULT;
@@ -54,6 +55,23 @@ public class PushService {
 		});
 	}
 
+	public void expired(Match match) {
+		promise(() -> {
+			sendMessageTo(match.players(), match,MATCH_EXPIRED);
+			return null;
+		}).recover(new Function<Throwable, Object>() {
+			@Override
+			public Object apply(Throwable arg0) throws Throwable {
+				Logger.error("recover rejected",arg0);
+				return null;
+			}
+		});
+	}
+	
+	public void expiredForPlayer(Player expiredPlayer, Match match) {
+		
+	}
+	
 	public void rejected(List<Player> players, Match match) {
 		promise(() -> {
 			sendMessageTo(players, match,MATCH_REJECTED);

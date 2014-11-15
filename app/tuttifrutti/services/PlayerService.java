@@ -232,6 +232,13 @@ public class PlayerService {
 		loser.setBalance(loser.getBalance() + AMOUNT_OF_RUS_FOR_LOSING);
 		return loser;
 	}
+	
+	public Player updateLoserStatisticsInExpiredMatch(PlayerResult loserResult) {
+		Player loser = this.player(loserResult.getPlayer().getId());
+		loser.setLost(loser.getLost() + 1);
+		loser.setBest(max(loser.getBest(), loserResult.getScore()));
+		return loser;
+	}
 
 	private Player updateWinnerStatistics(PlayerResult winnerResult) {
 		Player winner = this.player(winnerResult.getPlayer().getId());
