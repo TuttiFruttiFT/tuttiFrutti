@@ -41,7 +41,7 @@ public class PlayerService {
 	
 	private static final Integer AMOUNT_OF_RUS_FOR_WINNING = 5;
 	private static final Integer AMOUNT_OF_RUS_FOR_LOSING = 1;
-	private static final Integer AMOUNT_OF_RUS_FOR_WINNING_ROUND = 1;
+//	private static final Integer AMOUNT_OF_RUS_FOR_WINNING_ROUND = 1;
 	private static final Integer STARTING_RUS = 25;
 	private static final int AMOUNT_OF_OTHER_PLAYERS = 20;
 	
@@ -168,9 +168,10 @@ public class PlayerService {
 		return false;
 	}
 
-	public void buy(String idJugador, Pack pack) {
-		// TODO implementar
-		
+	public void buy(String playerId, Pack pack) {
+		Player player = mongoDatastore.get(Player.class,new ObjectId(playerId));
+		player.incrementBalance(pack.getCurrentAmount());
+		mongoDatastore.save(player);
 	}
 
 	public List<Player> searchPlayers(String word, String playerId) {
