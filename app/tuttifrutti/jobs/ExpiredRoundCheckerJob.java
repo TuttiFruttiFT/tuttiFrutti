@@ -1,6 +1,5 @@
 package tuttifrutti.jobs;
 
-import static java.util.concurrent.TimeUnit.DAYS;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.joda.time.DateTime.now;
 import static tuttifrutti.models.enums.MatchState.CLEAN;
@@ -14,7 +13,6 @@ import java.util.List;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import play.Logger;
 import tuttifrutti.models.Match;
@@ -24,12 +22,10 @@ import tuttifrutti.models.enums.MatchMode;
 import tuttifrutti.services.MatchService;
 import tuttifrutti.services.PlayerService;
 import tuttifrutti.services.PushService;
-import tuttifrutti.utils.ConfigurationAccessor;
 
 /**
  * @author rfanego
  */
-@Component
 public class ExpiredRoundCheckerJob implements Runnable {
 	private MatchMode mode;
 	
@@ -45,18 +41,24 @@ public class ExpiredRoundCheckerJob implements Runnable {
 	@Autowired
 	private MatchService matchService;
 	
-//	public ExpiredRoundCheckerJob(MatchMode mode) {
-//		this.mode = mode;
-//	}
+	public ExpiredRoundCheckerJob(MatchMode mode) {
+		this.mode = mode;
+	}
 	
 	@Override
 	public void run() {
 		Logger.info("Starting ExpiredRoundCheckerJob");
 		
-		int modeTime = (int)DAYS.toMillis(ConfigurationAccessor.i("match.mode." + this.mode.toString()));
+		int modeTime = this.mode.time();
 		
 		expiredMatches(modeTime);
 		
+		expiredPlayers(modeTime);
+		
+		Logger.info("Finishing ExpiredRoundCheckerJob");
+	}
+
+	private void expiredPlayers(int modeTime) {
 		Date nowMinusModeTime = now().minusMillis(modeTime).toDate();
 		
 		Query<Match> query = mongoDatastore.find(Match.class, "config.mode =", this.mode.toString());
@@ -66,24 +68,34 @@ public class ExpiredRoundCheckerJob implements Runnable {
 		
 		List<Match> matches = query.asList();
 		
-		if(isNotEmpty(matches)){			
+		if(isNotEmpty(matches)){	
 			matches.forEach(match -> {
 				List<PlayerResult> expiredPlayers = match.expiredPlayers(nowMinusModeTime);
+				match.setState(EXPIRED);
 				if(match.getPlayerResults().size() - expiredPlayers.size() > 1){
-					match.setState(EXPIRED);
 					expiredPlayers.forEach(aPlayer -> {
 						Player player = playerService.updateLoserStatisticsInExpiredMatch(aPlayer);
 						pushService.expiredForPlayer(player, match);
 						match.addExpiredPlayer(aPlayer);
-						mongoDatastore.save(player);						
+						mongoDatastore.save(player);
 					});
-					mongoDatastore.save(match);
+					
+					if(match.isRoundOver()){
+						matchService.calculateResult(match);
+					}
 				}else{
-					expireMatch(match);
+					expiredPlayers.forEach(aPlayer -> {
+						Player player = playerService.updateLoserStatisticsInExpiredMatch(aPlayer);
+						match.addExpiredPlayer(aPlayer);
+						mongoDatastore.save(player);
+					});
+					match.getPlayerResults().forEach(aPlayerResult -> {
+						pushService.expiredForPlayer(aPlayerResult.getPlayer(), match);
+					});
 				}
+				mongoDatastore.save(match);
 			});
 		}
-		Logger.info("Finishing ExpiredRoundCheckerJob");		
 	}
 
 	private void expiredMatches(int modeTime) {
@@ -96,11 +108,7 @@ public class ExpiredRoundCheckerJob implements Runnable {
 		
 		if(isNotEmpty(matches)){			
 			matches.forEach(match -> {
-//				if(match.getLastRound().getNumber() > 1){
-//					matchService.calculateResult(match, true);
-//				}else{					
-					expireMatch(match);
-//				}
+				expireMatch(match);
 			});
 		}
 	}

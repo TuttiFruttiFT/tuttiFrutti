@@ -3,6 +3,8 @@
 # ~~~~
 
 POST	/player									    @tuttifrutti.controllers.Players.register()
+
+PUT		/player/social								@tuttifrutti.controllers.Players.addSocialNetwork()
                                                     
 PUT		/player										@tuttifrutti.controllers.Players.editProfile()
 

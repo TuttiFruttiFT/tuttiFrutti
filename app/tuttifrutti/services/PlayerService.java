@@ -92,9 +92,13 @@ public class PlayerService {
 		return (splittedMail.length > 0) ? splittedMail[0].trim() : mail.trim();
 	}
 
-	public Player registerFacebook(String facebookId) {
-		// TODO implementar
-		return null;		
+	public Player registerFacebook(String facebookId, String nickname) {
+		Player player = new Player();
+		player.setNickname(nickname);
+		player.setFacebookId(facebookId);
+		player.setBalance(STARTING_RUS);
+		mongoDatastore.save(player);
+		return player;		
 	}
 
 	public Player registerTwitter(String twitterId) {
@@ -195,6 +199,14 @@ public class PlayerService {
 		return query.get();
 	}
 
+	public Player searchByFacebook(String facebookId) {
+		return null;
+	}
+	
+	public Player searchByTwitter(String twitterId) {
+		return null;
+	}
+	
 	public List<PlayerResult> playerResultsFromIds(List<String> playerIds) {
 		List<PlayerResult> playerResults = new ArrayList<>();
 		this.playersFromIds(playerIds).stream().forEach(player -> playerResults.add(new PlayerResult(player,0,0,false,true,now().toDate(),0)));

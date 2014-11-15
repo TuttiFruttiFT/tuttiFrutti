@@ -3,8 +3,10 @@ package tuttifrutti.utils;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static org.joda.time.DateTime.now;
+import static tuttifrutti.models.Letter.A;
 import static tuttifrutti.models.enums.LanguageType.ES;
 import static tuttifrutti.models.enums.MatchState.TO_BE_APPROVED;
+import static tuttifrutti.models.enums.MatchType.PUBLIC;
 import static tuttifrutti.utils.CategoryType.animals;
 import static tuttifrutti.utils.CategoryType.bands;
 import static tuttifrutti.utils.CategoryType.cities;
@@ -20,6 +22,7 @@ import static tuttifrutti.utils.CategoryType.sports;
 import static tuttifrutti.utils.CategoryType.things;
 import static tuttifrutti.utils.CategoryType.verbs;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bson.types.ObjectId;
@@ -91,11 +94,7 @@ public class TestUtils {
 	}
 	
 	public static PlayerResult savePlayerResult(Datastore datastore, Player player, int score) {
-		PlayerResult playerResult = new PlayerResult();
-		playerResult.setPlayer(player);
-		playerResult.setScore(score);
-		playerResult.setAccepted(true);
-		playerResult.setShow(true);
+		PlayerResult playerResult = new PlayerResult(player,score,0,true,true,now().toDate(),0);
 		datastore.save(playerResult);
 		return playerResult;
 	}
@@ -188,4 +187,19 @@ public class TestUtils {
 	public static PlayerResult testPlayerResult(Datastore datastore){
 		return savePlayerResult(datastore, savePlayer(datastore, "sarasas@sarasa.com"), 0);
 	}
+	
+	public static Match createMatch(Datastore datastore, MatchMode matchMode, Integer numberOfPlayers){
+		String language = "ES";
+		saveCategories(datastore, language);
+		
+		MatchConfig matchConfig = createMatchConfig(language, matchMode, PUBLIC, numberOfPlayers, false, 25);
+		Round round = new Round(1,new LetterWrapper(A));
+		List<PlayerResult> playerResultList = new ArrayList<PlayerResult>();
+		for(int i = 0;i < numberOfPlayers;i++){
+			playerResultList.add(testPlayerResult(datastore));
+		}
+		Match match = createMatch(datastore, language, round,playerResultList, matchConfig, new MatchName(numberOfPlayers));
+		return match;
+	}
+	
 }

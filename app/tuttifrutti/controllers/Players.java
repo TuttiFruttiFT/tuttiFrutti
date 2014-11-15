@@ -58,6 +58,7 @@ public class Players extends Controller {
 			String mail = json.get("mail") != null ? json.get("mail").asText() : null;
 			String password = json.get("password") != null ? json.get("password").asText(): null;
 			String facebookId = json.get("facebook_id") != null ? json.get("facebook_id").asText() : null;
+			String nickname = json.get("nickname") != null ? json.get("nickname").asText() : null;
 			String twitterId = json.get("twitter_id") != null ? json.get("twitter_id").asText() : null;
 
 			Player player = null;
@@ -79,8 +80,9 @@ public class Players extends Controller {
 						return unauthorized();
 					}
 				}
-			}else if(isNotEmpty(facebookId)){
-				player = playerService.registerFacebook(facebookId);
+			}else if(isNotEmpty(facebookId) && isNotEmpty(nickname)){
+				player = playerService.searchByFacebook(facebookId);
+				player = playerService.registerFacebook(facebookId, nickname);
 			}else if(isNotEmpty(twitterId)){
 				player = playerService.registerTwitter(twitterId);
 			}
@@ -92,6 +94,12 @@ public class Players extends Controller {
 			return badRequest(Json.newObject().put("status_code", MALFORMED_REQUEST));
 		}
     }
+	
+	@BodyParser.Of(BodyParser.Json.class)
+	public Result addSocialNetwork(){
+		
+		return ok();
+	}
 	
 	@BodyParser.Of(BodyParser.Json.class)
 	public Result editProfile() {

@@ -6,6 +6,7 @@ import static org.joda.time.DateTime.now;
 import static tuttifrutti.models.enums.DuplaScore.ALONE_SCORE;
 import static tuttifrutti.models.enums.DuplaScore.DUPLICATE_SCORE;
 import static tuttifrutti.models.enums.DuplaScore.UNIQUE_SCORE;
+import static tuttifrutti.models.enums.MatchState.EXPIRED;
 import static tuttifrutti.models.enums.MatchState.OPPONENT_TURN;
 import static tuttifrutti.models.enums.MatchState.PLAYER_TURN;
 import static tuttifrutti.models.enums.MatchState.TO_BE_APPROVED;
@@ -85,6 +86,7 @@ public class Match {
 	@JsonProperty(value = "players")
 	private List<PlayerResult> playerResults;
 	
+	@JsonIgnore
 	@JsonProperty(value = "expired_players")
 	private List<PlayerResult> expiredPlayers;
 	
@@ -124,6 +126,11 @@ public class Match {
 		boolean playerHasAlreadyPlayed = playerHasAlreadyPlayed(playerId);
 		PlayerResult player = playerResult(playerId);
 		MatchState matchState = this.getState();
+		
+		if(player == null){
+			this.setState(EXPIRED);
+		}
+		
 		if(matchState.equals(TO_BE_APPROVED)){
 			if(player.isAccepted() && !playerHasAlreadyPlayed){
 				this.setState(PLAYER_TURN);
@@ -309,8 +316,12 @@ public class Match {
 	}
 
 	private PlayerResult playerResult(String playerId) {
-		return this.getPlayerResults().stream()
-			.filter(aPlayerResult -> aPlayerResult.getPlayer().getId().toString().equals(playerId)).findFirst().get();
+		Optional<PlayerResult> optionalPlayerResult = this.getPlayerResults().stream()
+			.filter(aPlayerResult -> aPlayerResult.getPlayer().getId().toString().equals(playerId)).findFirst();
+		if(optionalPlayerResult.isPresent()){					
+			return optionalPlayerResult.get();
+		}
+		return null;
 	}
 
 	public void decrementPlayers() {
@@ -331,8 +342,7 @@ public class Match {
 	}
 
 	public List<PlayerResult> expiredPlayers(Date nowMinusModeTime) {
-		// TODO implementar
-		return null;
+		return this.playerResults.stream().filter(aPlayer -> aPlayer.getModifiedDate().before(nowMinusModeTime)).collect(toList());
 	}
 
 	public void addExpiredPlayer(PlayerResult aPlayer) {
@@ -342,6 +352,7 @@ public class Match {
 		this.expiredPlayers.add(aPlayer);
 		
 		this.playerResults.removeIf(playerResult -> playerResult.getPlayer().getId().toString().equals(aPlayer.getPlayer().getId().toString()));
+		this.decrementPlayers();
 	}
 }
 

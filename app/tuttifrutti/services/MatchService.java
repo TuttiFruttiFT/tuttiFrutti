@@ -77,7 +77,9 @@ public class MatchService {
 	
 	public List<ActiveMatch> activeMatches(String playerId) {
 		List<ActiveMatch> activeMatches = new ArrayList<>();
-		Query<Match> query = mongoDatastore.find(Match.class, "playerResults.player.id =", new ObjectId(playerId));
+		Query<Match> query = mongoDatastore.find(Match.class);
+		query.or(query.criteria("expiredPlayers.player.id").equal(new ObjectId(playerId)),
+				query.criteria("playerResults.player.id").equal(new ObjectId(playerId)));
 		query.and(query.criteria("state").notEqual(CLEAN));
 		for(Match match : query.asList()){
 			if(match.mustBeShownFor(playerId)){				

@@ -149,6 +149,8 @@ public class Matches extends Controller {
 		
 		Match match = matchService.match(matchId, null);
 
+		//TODO agregar filtro por estado inválido
+		
 		if(match.playerHasAlreadyPlayed(playerId)){
 			return badRequest("Player " + playerId + " has already played.");
 		}

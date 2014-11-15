@@ -1,5 +1,10 @@
 package tuttifrutti.models.enums;
 
+import static java.util.concurrent.TimeUnit.DAYS;
+import static tuttifrutti.utils.ConfigurationAccessor.i;
+
+import java.util.concurrent.TimeUnit;
+
 import lombok.Getter;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -26,5 +31,13 @@ public enum MatchMode {
 	@JsonValue
 	public String toValue() {
 		return this.getName();
+	}
+
+	public int time() {
+		if(this.equals(Q)){
+			return (int)TimeUnit.MINUTES.toMillis(i("match.mode." + Q.toString()));
+		}else {
+			return (int)DAYS.toMillis(i("match.mode." + N.toString()));
+		}
 	}
 }
