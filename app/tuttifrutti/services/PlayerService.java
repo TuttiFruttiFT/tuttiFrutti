@@ -98,6 +98,7 @@ public class PlayerService {
 		player.setFacebookId(facebookId);
 		player.setBalance(STARTING_RUS);
 		mongoDatastore.save(player);
+		
 		return player;		
 	}
 
@@ -200,11 +201,13 @@ public class PlayerService {
 	}
 
 	public Player searchByFacebook(String facebookId) {
-		return null;
+		Query<Player> query = mongoDatastore.find(Player.class, "facebookId =", facebookId.trim().toLowerCase());
+		return query.get();
 	}
 	
 	public Player searchByTwitter(String twitterId) {
-		return null;
+		Query<Player> query = mongoDatastore.find(Player.class, "twitterId =", twitterId.trim().toLowerCase());
+		return query.get();
 	}
 	
 	public List<PlayerResult> playerResultsFromIds(List<String> playerIds) {

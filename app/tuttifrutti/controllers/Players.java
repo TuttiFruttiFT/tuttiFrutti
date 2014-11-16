@@ -82,9 +82,14 @@ public class Players extends Controller {
 				}
 			}else if(isNotEmpty(facebookId) && isNotEmpty(nickname)){
 				player = playerService.searchByFacebook(facebookId);
-				player = playerService.registerFacebook(facebookId, nickname);
+				if(player == null){					
+					player = playerService.registerFacebook(facebookId, nickname);
+				}
 			}else if(isNotEmpty(twitterId)){
-				player = playerService.registerTwitter(twitterId);
+				player = playerService.searchByTwitter(twitterId);
+				if(player == null){					
+					player = playerService.registerTwitter(twitterId);
+				}
 			}
 			
 			if(player != null){
