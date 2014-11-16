@@ -85,6 +85,7 @@ public class TestUtils {
 		match.setName(matchName.getValue());
 		match.setState(matchState);
 		match.setStartDate(now().toDate());
+		match.setModifiedDate(now().toDate());
 		match.setCategories(categories);
 		match.setPlayerResults(playerResults);
 		match.setLastRound(lastRound);
