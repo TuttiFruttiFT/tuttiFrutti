@@ -73,7 +73,7 @@ public class PushService {
 		promise(() -> {
 			ObjectNode json = newObject().put("type", MATCH_EXPIRED_FOR_PLAYER.toString()).put("match_id", match.getId().toString());
 			for(Player player : match.playersExcept(expiredPlayer.getId().toString())){
-				JsonNode jsonToSend = json.put("player_id", player.getId().toString()).set("expired_player", Json.toJson(expiredPlayer));
+				JsonNode jsonToSend = json.put("player_id", player.getId().toString()).set("expired_player", Json.toJson(expiredPlayer.reducedPlayer()));
 				sendGCMMessage(jsonToSend,player.getDevices());
 			}
 			return null;
