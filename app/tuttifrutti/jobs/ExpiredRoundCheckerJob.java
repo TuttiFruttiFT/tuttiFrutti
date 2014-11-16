@@ -47,7 +47,7 @@ public class ExpiredRoundCheckerJob implements Runnable {
 	
 	@Override
 	public void run() {
-		Logger.info("Starting ExpiredRoundCheckerJob");
+		Logger.info("Starting ExpiredRoundCheckerJob " + this.mode.toString());
 		
 		int modeTime = this.mode.time();
 		
@@ -55,7 +55,7 @@ public class ExpiredRoundCheckerJob implements Runnable {
 		
 		expiredPlayers(modeTime);
 		
-		Logger.info("Finishing ExpiredRoundCheckerJob");
+		Logger.info("Finishing ExpiredRoundCheckerJob "  + this.mode.toString());
 	}
 
 	private void expiredPlayers(int modeTime) {
@@ -71,7 +71,6 @@ public class ExpiredRoundCheckerJob implements Runnable {
 		if(isNotEmpty(matches)){	
 			matches.forEach(match -> {
 				List<PlayerResult> expiredPlayers = match.expiredPlayers(nowMinusModeTime);
-				match.setState(EXPIRED);
 				if(match.getPlayerResults().size() - expiredPlayers.size() > 1){
 					expiredPlayers.forEach(aPlayer -> {
 						Player player = playerService.updateLoserStatisticsInExpiredMatch(aPlayer);
@@ -84,6 +83,7 @@ public class ExpiredRoundCheckerJob implements Runnable {
 						matchService.calculateResult(match);
 					}
 				}else{
+					match.setState(EXPIRED);
 					expiredPlayers.forEach(aPlayer -> {
 						Player player = playerService.updateLoserStatisticsInExpiredMatch(aPlayer);
 						match.addExpiredPlayer(aPlayer);

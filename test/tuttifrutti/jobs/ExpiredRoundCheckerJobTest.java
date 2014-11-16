@@ -17,7 +17,6 @@ import org.mongodb.morphia.Datastore;
 import tuttifrutti.models.Match;
 import tuttifrutti.models.Player;
 import tuttifrutti.models.PlayerResult;
-import tuttifrutti.models.enums.MatchState;
 import tuttifrutti.utils.SpringApplicationContext;
 
 /**
@@ -26,7 +25,7 @@ import tuttifrutti.utils.SpringApplicationContext;
 public class ExpiredRoundCheckerJobTest {
 
 	@Test
-	public void test() {
+	public void whenExpiredQuickRoundCheckerJobRunWithExpiredMatchesThenCloseOnlyTheExpiredMatches() {
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
 			Datastore datastore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
 			ExpiredRoundCheckerJob job = SpringApplicationContext.getBeanNamed("expiredQuickRoundCheckerJob", ExpiredRoundCheckerJob.class);
@@ -67,7 +66,7 @@ public class ExpiredRoundCheckerJobTest {
 	}
 
 	@Test
-	public void test2() {
+	public void whenExpiredNormalRoundCheckerJobRunWithExpiredMatchesThenCloseOnlyTheExpiredMatches() {
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
 			Datastore datastore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
 			ExpiredRoundCheckerJob job = SpringApplicationContext.getBeanNamed("expiredNormalRoundCheckerJob", ExpiredRoundCheckerJob.class);
@@ -108,7 +107,7 @@ public class ExpiredRoundCheckerJobTest {
 	}
 	
 	@Test
-	public void test3() {
+	public void whenExpiredQuickRoundCheckerJobRunWithExpiredPlayersAndOnlyOnePlayerLeftThenExpireTheMatch() {
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
 			Datastore datastore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
 			ExpiredRoundCheckerJob job = SpringApplicationContext.getBeanNamed("expiredQuickRoundCheckerJob", ExpiredRoundCheckerJob.class);
@@ -135,7 +134,7 @@ public class ExpiredRoundCheckerJobTest {
 	}
 	
 	@Test
-	public void test4() {
+	public void whenExpiredQuickRoundCheckerJobRunWithExpiredPlayersAndMoreThanOnePlayerLeftThenExpireOnlyThatPlayer() {
 		running(testServer(9000, fakeApplication()), (Runnable) () -> {
 			Datastore datastore = SpringApplicationContext.getBeanNamed("mongoDatastore", Datastore.class);
 			ExpiredRoundCheckerJob job = SpringApplicationContext.getBeanNamed("expiredQuickRoundCheckerJob", ExpiredRoundCheckerJob.class);

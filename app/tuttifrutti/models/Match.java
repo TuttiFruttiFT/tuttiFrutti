@@ -2,6 +2,7 @@ package tuttifrutti.models;
 
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.joda.time.DateTime.now;
 import static tuttifrutti.models.enums.DuplaScore.ALONE_SCORE;
 import static tuttifrutti.models.enums.DuplaScore.DUPLICATE_SCORE;
@@ -150,7 +151,8 @@ public class Match {
 
 	@JsonIgnore
 	public boolean isRoundOver() {
-		return this.getLastRound().getTurns().size() == this.getConfig().getCurrentTotalNumberOfPlayers();
+		List<Turn> turns = this.getLastRound().getTurns();
+		return isNotEmpty(turns) && (turns.size() == this.getConfig().getCurrentTotalNumberOfPlayers());
 	}
 
 
