@@ -35,6 +35,9 @@ public class ActiveMatch {
 	
 	private MatchConfig config;
 	
+	@JsonProperty(value = "round_left_time")
+	private long roundLeftTime;
+	
 	public void setMatchName(MatchName matchName){
 		this.matchName = matchName;
 		this.name = matchName.getValue();

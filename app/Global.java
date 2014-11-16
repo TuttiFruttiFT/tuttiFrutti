@@ -1,5 +1,6 @@
 import static play.libs.Akka.system;
 import static scala.concurrent.duration.Duration.Zero;
+import static tuttifrutti.utils.FiniteDurationUtils.FIVE_MINUTES;
 import static tuttifrutti.utils.FiniteDurationUtils.ONE_DAY;
 import static tuttifrutti.utils.FiniteDurationUtils.ONE_HOUR;
 import static tuttifrutti.utils.FiniteDurationUtils.ONE_MINUTE;
@@ -54,12 +55,13 @@ public class Global extends GlobalSettings {
 			rusLoaderJob = SpringApplicationContext.getBean(RusLoaderJob.class);
 			expiredQuickRoundCheckerJob = SpringApplicationContext.getBeanNamed("expiredQuickRoundCheckerJob", ExpiredRoundCheckerJob.class);
 			expiredNormalRoundCheckerJob = SpringApplicationContext.getBeanNamed("expiredNormalRoundCheckerJob", ExpiredRoundCheckerJob.class);
+			
 			system().scheduler().scheduleOnce(Zero(), alphabetLoaderJob, system().dispatcher());
 			system().scheduler().scheduleOnce(Zero(), powerUpWordLoaderJob, system().dispatcher());
 			system().scheduler().scheduleOnce(Zero(), rusLoaderJob, system().dispatcher());
 			jobs.add(system().scheduler().schedule(nextExecutionInSeconds(00, 00), ONE_DAY, powerUpWordLoaderJob, system().dispatcher()));
 			jobs.add(system().scheduler().schedule(Zero(),ONE_MINUTE,expiredQuickRoundCheckerJob, system().dispatcher()));
-			jobs.add(system().scheduler().schedule(Zero(),ONE_HOUR,expiredNormalRoundCheckerJob, system().dispatcher()));
+			jobs.add(system().scheduler().schedule(Zero(),FIVE_MINUTES,expiredNormalRoundCheckerJob, system().dispatcher()));
 			jobs.add(system().scheduler().schedule(Zero(),ONE_HOUR,suggestionIndexerJob, system().dispatcher()));
 			jobs.add(system().scheduler().schedule(Zero(),ONE_HOUR,finishedMatchCleanerJob, system().dispatcher()));
 		}

@@ -316,6 +316,14 @@ public class Match {
 		this.setModifiedDate(today);
 		playerResult(playerId).setModifiedDate(today);
 	}
+	
+	public void updateAllDates() {
+		Date today = now().toDate();
+		this.playerResults.forEach(aPlayerResult -> {
+			aPlayerResult.setModifiedDate(today);
+		});
+		this.setModifiedDate(today);
+	}
 
 	private PlayerResult playerResult(String playerId) {
 		Optional<PlayerResult> optionalPlayerResult = this.getPlayerResults().stream()
@@ -339,7 +347,10 @@ public class Match {
 
 	public void playerAcceptMatch(String playerId) {
 		this.getPlayerResults().stream().filter(playerResult -> playerResult.getPlayer().getId().toString().equals(playerId))
-		    .forEach(playerResult -> playerResult.setAccepted(true));
+		    .forEach(playerResult -> {
+		    	playerResult.setAccepted(true);
+		    	playerResult.setModifiedDate(now().toDate());
+		    });
 		this.getConfig().incrementIncorporatedPlayers();
 	}
 

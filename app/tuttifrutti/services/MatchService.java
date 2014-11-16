@@ -94,6 +94,9 @@ public class MatchService {
 				activeMatch.setState(match.getState().toString());
 				activeMatch.setWinner(match.getWinner());
 				activeMatch.setConfig(match.getConfig());
+				if(!match.playerHasAlreadyPlayed(playerId)){					
+					activeMatch.setRoundLeftTime(now().minusMillis((int)match.getModifiedDate().getTime()).getMillis());
+				}
 				activeMatches.add(activeMatch);
 			}
 		}
@@ -191,6 +194,7 @@ public class MatchService {
 			}else{				
 				match.setState(PLAYER_TURN);
 				match.addPlayedLetter(round.getLetter().getLetter());
+				match.updateAllDates();
 				roundService.create(match);
 				pushService.roundResult(match,round.getNumber());
 			}
