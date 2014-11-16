@@ -94,8 +94,8 @@ public class MatchService {
 				activeMatch.setState(match.getState().toString());
 				activeMatch.setWinner(match.getWinner());
 				activeMatch.setConfig(match.getConfig());
-				if(!match.playerHasAlreadyPlayed(playerId)){					
-					activeMatch.setRoundLeftTime(now().minusMillis((int)match.getModifiedDate().getTime()).getMillis());
+				if(!match.getState().equals(EXPIRED) && !match.playerHasAlreadyPlayed(playerId)){
+					activeMatch.setRoundLeftTime(match.getConfig().getMode().time() - (now().getMillis() - match.getModifiedDate().getTime()));
 				}
 				activeMatches.add(activeMatch);
 			}
