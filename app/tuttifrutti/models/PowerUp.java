@@ -9,20 +9,26 @@ import static tuttifrutti.models.enums.PowerUpType.buy_time;
 import static tuttifrutti.models.enums.PowerUpType.opponent_word;
 import static tuttifrutti.models.enums.PowerUpType.suggest;
 
+
 import java.util.ArrayList;
 import java.util.List;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 
 import tuttifrutti.cache.CategoryCache;
 import tuttifrutti.cache.RusCache;
 import tuttifrutti.models.enums.PowerUpType;
+
+import tuttifrutti.utils.ConfigurationAccessor;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -74,7 +80,7 @@ public class PowerUp {
 
 	private void buyTime(Match match) {
 		match.getCategories().forEach(category -> {
-			PowerUp buyTimePowerUp = new PowerUp(buy_time, "3000",rusCache.rusFor(buy_time));
+			PowerUp buyTimePowerUp = new PowerUp(buy_time, ConfigurationAccessor.s("powerup.buy_time"),rusCache.rusFor(buy_time));
 			category.getPowerUps().add(buyTimePowerUp);
 		});
 	}

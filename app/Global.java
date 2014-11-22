@@ -62,7 +62,7 @@ public class Global extends GlobalSettings {
 			jobs.add(system().scheduler().schedule(nextExecutionInSeconds(00, 00), ONE_DAY, powerUpWordLoaderJob, system().dispatcher()));
 			jobs.add(system().scheduler().schedule(Zero(),ONE_MINUTE,expiredQuickRoundCheckerJob, system().dispatcher()));
 			jobs.add(system().scheduler().schedule(Zero(),FIVE_MINUTES,expiredNormalRoundCheckerJob, system().dispatcher()));
-			jobs.add(system().scheduler().schedule(Zero(),ONE_HOUR,suggestionIndexerJob, system().dispatcher()));
+			jobs.add(system().scheduler().schedule(Zero(),ONE_MINUTE,suggestionIndexerJob, system().dispatcher()));
 			jobs.add(system().scheduler().schedule(Zero(),ONE_HOUR,finishedMatchCleanerJob, system().dispatcher()));
 		}
 	}

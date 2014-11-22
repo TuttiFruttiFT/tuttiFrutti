@@ -14,8 +14,8 @@ GET		/player/:playerId						    @tuttifrutti.controllers.Players.player(playerId
                                                     
 GET		/player/matches/:playerId				    @tuttifrutti.controllers.Players.activeMatches(playerId)
                                                     
-POST	/player/invitation						    @tuttifrutti.controllers.Players.invitePlayers()
-                                                    
+GET		/player/friends/:playerId					@tuttifrutti.controllers.Players.friends(playerId)
+
 POST	/player/friend							    @tuttifrutti.controllers.Players.addFriend()
 
 DELETE	/player/friend							    @tuttifrutti.controllers.Players.removeFriend()

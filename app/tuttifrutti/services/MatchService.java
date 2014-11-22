@@ -45,6 +45,7 @@ import tuttifrutti.models.Round;
 import tuttifrutti.models.Turn;
 import tuttifrutti.models.enums.MatchType;
 import tuttifrutti.models.views.ActiveMatch;
+import tuttifrutti.utils.ConfigurationAccessor;
 
 /**
  * @author rfanego
@@ -73,7 +74,7 @@ public class MatchService {
 	@Autowired
 	private AlphabetService alphabetService;
 	
-	private static final int PUBLIC_NUMBER_OF_ROUND = 10;
+	private static final int PUBLIC_NUMBER_OF_ROUND = ConfigurationAccessor.i("match.public.number_of_round");
 	
 	public List<ActiveMatch> activeMatches(String playerId) {
 		List<ActiveMatch> activeMatches = new ArrayList<>();

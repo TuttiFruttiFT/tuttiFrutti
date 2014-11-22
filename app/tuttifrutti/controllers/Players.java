@@ -2,10 +2,12 @@ package tuttifrutti.controllers;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static play.libs.Json.parse;
 import static tuttifrutti.models.enums.PowerUpType.valueOf;
 import static tuttifrutti.services.PlayerService.INVALID_NEW_PASSWORD;
 import static tuttifrutti.services.PlayerService.MALFORMED_REQUEST;
 import static tuttifrutti.services.PlayerService.SHORT_NICKNAME;
+import static tuttifrutti.utils.JsonUtil.parseListToJson;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +28,6 @@ import tuttifrutti.models.views.ActiveMatch;
 import tuttifrutti.services.MatchService;
 import tuttifrutti.services.PlayerService;
 import tuttifrutti.services.PushService;
-import tuttifrutti.utils.FacebookUtil;
 import tuttifrutti.utils.JsonUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -162,19 +163,6 @@ public class Players extends Controller {
 	}
 	
 	@BodyParser.Of(BodyParser.Json.class)
-	public Result invitePlayers(){
-		JsonNode json = request().body().asJson();
-		String matchId = json.get("player_id").asText();
-		List<String> facebookIds = new ArrayList<String>();
-		for(JsonNode node : json.get("guests")){
-			facebookIds.add(node.asText());
-		}
-		
-		FacebookUtil.sendInvitations(matchId,facebookIds);
-		return ok();
-	}
-	
-	@BodyParser.Of(BodyParser.Json.class)
 	public Result addFriend(){
 		JsonNode json = request().body().asJson();
 		String playerId = json.get("player_id").asText();
@@ -194,6 +182,12 @@ public class Players extends Controller {
 		playerService.removeFriend(playerId,friendId);
 		
 		return ok();
+	}
+	
+	public Result friends(String playerId){
+		Player player = playerService.player(playerId);
+		
+		return ok(parse(parseListToJson(player.getFriends())));
 	}
 	
 	public Result powerUp(String playerId,String powerUpId){

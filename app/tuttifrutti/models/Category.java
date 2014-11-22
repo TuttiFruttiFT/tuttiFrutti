@@ -2,6 +2,7 @@ package tuttifrutti.models;
 
 import static java.util.Collections.shuffle;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static tuttifrutti.utils.ConfigurationAccessor.i;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,9 +34,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Component
 public class Category {
-	public static final int DEFAULT_CATEGORIES_NUMBER = 6;
-	public static final int MINIMUM_CATEGORIES_NUMBER = 4;
-	public static final int MAXIMUM_CATEGORIES_NUMBER = 12;
+	public static final int DEFAULT_CATEGORIES_NUMBER = i("categories.default_number");
+	public static final int MINIMUM_CATEGORIES_NUMBER = i("categories.minimum_number");
+	public static final int MAXIMUM_CATEGORIES_NUMBER = i("categories.maximum_number");
 	
 	@Id 
 	private String id;
