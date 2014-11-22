@@ -4,7 +4,6 @@ import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static tuttifrutti.models.Suggestion.BATCH_SIZE;
 import static tuttifrutti.models.Suggestion.VOTES_TO_ACCEPT;
-import static tuttifrutti.models.Suggestion.VOTES_TO_REJECT;
 import static tuttifrutti.models.enums.SuggestionState.ACCEPTED;
 import static tuttifrutti.models.enums.SuggestionState.CONSOLIDATED;
 import static tuttifrutti.models.enums.SuggestionState.REJECTED;
@@ -39,10 +38,9 @@ public class SuggestionService {
 		word = word.toLowerCase().trim();
 		Suggestion suggestion = search(category,word);
 		if(suggestion != null){
-			if(!suggestion.getPlayerIds().contains(playerId)){				
-				int positiveVotes = suggestion.getPositiveVotes() + 1;
-				suggestion.setPositiveVotes(positiveVotes);
-				suggestion.getPlayerIds().add(playerId);
+			if(!suggestion.getPlayerIds().contains(playerId)){
+				suggestion.addPositiveVote();
+				suggestion.addPlayer(playerId);
 			}
 		}else{
 			if(!elasticUtil.existWord(category.getId(), word)){		
@@ -61,19 +59,11 @@ public class SuggestionService {
 	public Suggestion judge(String suggestionId, boolean valid, String playerId) {
 		Suggestion suggestion = search(suggestionId);
 		if(valid){
-			int positiveVotes = suggestion.getPositiveVotes() + 1;
-			if(positiveVotes >= VOTES_TO_ACCEPT){
-				suggestion.setState(ACCEPTED);
-			}
-			suggestion.setPositiveVotes(positiveVotes);
+			suggestion.addPositiveVote();
 		}else{
-			int negativeVotes = suggestion.getNegativeVotes() + 1;
-			if(negativeVotes >= VOTES_TO_REJECT){
-				suggestion.setState(REJECTED);
-			}
-			suggestion.setNegativeVotes(negativeVotes);
+			suggestion.addNegativeVote();
 		}
-		suggestion.getPlayerIds().add(playerId);
+		suggestion.addPlayer(playerId);
 		return suggestion;
 	}
 

@@ -1,5 +1,10 @@
 package tuttifrutti.models;
 
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
+import static tuttifrutti.models.enums.SuggestionState.REJECTED;
+import static tuttifrutti.models.enums.SuggestionState.TO_BE_ACCEPTED;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Getter;
@@ -65,5 +70,29 @@ public class Suggestion {
 		this.negativeVotes = negativeVotes;
 		this.playerIds = playerIds;
 		this.state = state;
+	}
+
+	public void addPlayer(String playerId) {
+		if(isEmpty(playerIds)){
+			playerIds = new ArrayList<>();
+		}
+		playerIds.add(playerId);
+	}
+
+	public void addPositiveVote() {
+		int positiveVotes = this.getPositiveVotes() + 1;
+		if(positiveVotes >= VOTES_TO_ACCEPT){
+			this.setState(TO_BE_ACCEPTED);
+		}
+		this.setPositiveVotes(positiveVotes);
+	}
+
+	public void addNegativeVote() {
+		int negativeVotes = this.getNegativeVotes() + 1;
+		if(negativeVotes >= VOTES_TO_REJECT){
+			this.setState(REJECTED);
+		}
+		this.setNegativeVotes(negativeVotes);
+		
 	}
 }

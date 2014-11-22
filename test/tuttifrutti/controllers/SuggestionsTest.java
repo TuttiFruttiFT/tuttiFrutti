@@ -8,6 +8,7 @@ import static play.test.Helpers.running;
 import static play.test.Helpers.testServer;
 import static tuttifrutti.models.enums.SuggestionState.ACCEPTED;
 import static tuttifrutti.models.enums.SuggestionState.SUGGESTED;
+import static tuttifrutti.models.enums.SuggestionState.TO_BE_ACCEPTED;
 import static tuttifrutti.utils.SpringApplicationContext.getBeanNamed;
 import static tuttifrutti.utils.TestUtils.savePlayer;
 import static tuttifrutti.utils.TestUtils.sleep;
@@ -162,14 +163,14 @@ public class SuggestionsTest extends ElasticSearchAwareTest{
 				}
 			});
 			
-			Query<Suggestion> queryAccepted = dataStore.find(Suggestion.class, "state =", ACCEPTED.toString());
-			Suggestion suggestionsAccepted = queryAccepted.get();
+			Query<Suggestion> queryToBeAccepted = dataStore.find(Suggestion.class, "state =", TO_BE_ACCEPTED.toString());
+			Suggestion suggestionsAccepted = queryToBeAccepted.get();
 			
 			assertThat(suggestionsAccepted.getCategory().getId()).isEqualTo("animals");
 			assertThat(suggestionsAccepted.getWrittenWord()).isEqualTo("martín pescador");
 			assertThat(suggestionsAccepted.getPositiveVotes()).isEqualTo(5);
 			assertThat(suggestionsAccepted.getNegativeVotes()).isEqualTo(0);
-			assertThat(suggestionsAccepted.getState()).isEqualTo(ACCEPTED);
+			assertThat(suggestionsAccepted.getState()).isEqualTo(TO_BE_ACCEPTED);
 		});
 	}
 	
