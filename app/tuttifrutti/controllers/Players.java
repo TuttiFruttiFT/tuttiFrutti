@@ -80,15 +80,15 @@ public class Players extends Controller {
 						return unauthorized();
 					}
 				}
-			}else if(isNotEmpty(facebookId) && isNotEmpty(nickname)){
+			}else if(isNotEmpty(facebookId) && isNotEmpty(nickname) && isNotEmpty(mail)){
 				player = playerService.searchByFacebook(facebookId);
 				if(player == null){					
-					player = playerService.registerFacebook(facebookId, nickname);
+					player = playerService.registerFacebook(facebookId, nickname, mail);
 				}
-			}else if(isNotEmpty(twitterId) && isNotEmpty(nickname)){
+			}else if(isNotEmpty(twitterId) && isNotEmpty(nickname) && isNotEmpty(mail)){
 				player = playerService.searchByTwitter(twitterId);
 				if(player == null){					
-					player = playerService.registerTwitter(twitterId, nickname);
+					player = playerService.registerTwitter(twitterId, nickname, mail);
 				}
 			}
 			

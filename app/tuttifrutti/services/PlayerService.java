@@ -95,9 +95,10 @@ public class PlayerService {
 		return (splittedMail.length > 0) ? splittedMail[0].trim() : mail.trim();
 	}
 
-	public Player registerFacebook(String facebookId, String nickname) {
+	public Player registerFacebook(String facebookId, String nickname, String mail) {
 		Player player = new Player();
 		player.setNickname(nickname);
+		player.setMail(mail);
 		player.setFacebookId(facebookId);
 		player.setBalance(STARTING_RUS);
 		mongoDatastore.save(player);
@@ -105,9 +106,10 @@ public class PlayerService {
 		return player;
 	}
 
-	public Player registerTwitter(String twitterId, String nickname) {
+	public Player registerTwitter(String twitterId, String nickname, String mail) {
 		Player player = new Player();
 		player.setNickname(nickname);
+		player.setMail(mail);
 		player.setTwitterId(twitterId);
 		player.setBalance(STARTING_RUS);
 		mongoDatastore.save(player);
