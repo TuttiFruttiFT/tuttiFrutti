@@ -8,6 +8,9 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.joda.time.DateTime.now;
 import static play.libs.F.Promise.promise;
+import static tuttifrutti.models.enums.SocialNetworkType.facebook;
+import static tuttifrutti.models.enums.SocialNetworkType.twitter;
+import static tuttifrutti.models.enums.SocialNetworkType.valueOf;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -99,12 +102,17 @@ public class PlayerService {
 		player.setBalance(STARTING_RUS);
 		mongoDatastore.save(player);
 		
-		return player;		
+		return player;
 	}
 
-	public Player registerTwitter(String twitterId) {
-		// TODO implementar
-		return null;
+	public Player registerTwitter(String twitterId, String nickname) {
+		Player player = new Player();
+		player.setNickname(nickname);
+		player.setTwitterId(twitterId);
+		player.setBalance(STARTING_RUS);
+		mongoDatastore.save(player);
+		
+		return player;
 	}
 
 	public String editProfile(String playerId, String mail, String nickname, String password, String newPassword) {
@@ -274,5 +282,18 @@ public class PlayerService {
 			return false;
 		}
 		return true;
+	}
+
+	public void addSocialNetwork(String playerId, String type, String id) {
+		Player player = this.player(playerId);
+		if(facebook.equals(valueOf(type))){
+			player.setFacebookId(id);
+		}else if(twitter.equals(valueOf(type))){
+			player.setTwitterId(id);
+		}else{
+			throw new RuntimeException("Wrong social network type");
+		}
+		
+		mongoDatastore.save(player);
 	}
 }

@@ -85,10 +85,10 @@ public class Players extends Controller {
 				if(player == null){					
 					player = playerService.registerFacebook(facebookId, nickname);
 				}
-			}else if(isNotEmpty(twitterId)){
+			}else if(isNotEmpty(twitterId) && isNotEmpty(nickname)){
 				player = playerService.searchByTwitter(twitterId);
 				if(player == null){					
-					player = playerService.registerTwitter(twitterId);
+					player = playerService.registerTwitter(twitterId, nickname);
 				}
 			}
 			
@@ -102,6 +102,16 @@ public class Players extends Controller {
 	
 	@BodyParser.Of(BodyParser.Json.class)
 	public Result addSocialNetwork(){
+		JsonNode json = request().body().asJson();
+		String playerId = json.get("player_id") != null ? json.get("player_id").asText() : null;
+		String type = json.get("type") != null ? json.get("type").asText() : null;
+		String id = json.get("id") != null ? json.get("id").asText() : null;
+		
+		if(isEmpty(playerId) || isEmpty(type) || isEmpty(id)){
+			return badRequest("Missing parameters");
+		}
+		
+		playerService.addSocialNetwork(playerId,type,id);
 		
 		return ok();
 	}
