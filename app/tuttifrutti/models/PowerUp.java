@@ -94,6 +94,10 @@ public class PowerUp {
 					category.getPowerUps().add(new PowerUp(opponent_word,rusCache.rusFor(opponent_word)));
 				}
 			}
+		}else{
+			match.getCategories().forEach(category -> {
+				category.getPowerUps().add(new PowerUp(opponent_word,rusCache.rusFor(opponent_word)));
+			});
 		}
 	}
 
