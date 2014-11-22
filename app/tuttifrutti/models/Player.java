@@ -94,7 +94,9 @@ public class Player {
 		if(isEmpty(this.friends)){
 			this.friends = new ArrayList<>();
 		}
-		this.friends.add(friend);
+		if(!this.friends.stream().anyMatch(aFriend -> aFriend.getId().toString().equals(friend.getId().toString()))){
+			this.friends.add(friend);
+		}
 	}
 
 	public void decrementBalance(int rus) {

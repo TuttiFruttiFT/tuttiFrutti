@@ -1,5 +1,6 @@
 package tuttifrutti.controllers;
 
+import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static play.libs.Json.parse;
@@ -187,7 +188,11 @@ public class Players extends Controller {
 	public Result friends(String playerId){
 		Player player = playerService.player(playerId);
 		
-		return ok(parse(parseListToJson(player.getFriends())));
+		List<Player> friends = player.getFriends();
+		if(isNotEmpty(friends)){			
+			return ok(parse(parseListToJson(friends)));
+		}
+		return noContent();
 	}
 	
 	public Result powerUp(String playerId,String powerUpId){
