@@ -18,7 +18,7 @@ GET		/player/friends/:playerId					@tuttifrutti.controllers.Players.friends(play
 
 POST	/player/friend							    @tuttifrutti.controllers.Players.addFriend()
 
-DELETE	/player/friend							    @tuttifrutti.controllers.Players.removeFriend()
+PUT		/player/friend							    @tuttifrutti.controllers.Players.removeFriend()
                                                     
 POST	/player/:playerId/powerup/:idPowerUp	    @tuttifrutti.controllers.Players.powerUp(playerId,idPowerUp)
 
