@@ -191,14 +191,20 @@ public class PlayerService {
 
 	public List<Player> searchPlayers(String word, String playerId) {
 		Query<Player> query = mongoDatastore.find(Player.class);
-		query.or(query.criteria("nickname").equal(compile(word, CASE_INSENSITIVE)));
+		if(isNotEmpty(word)){
+			query.or(query.criteria("nickname").equal(compile(word, CASE_INSENSITIVE)));
+		}
 		query.and(query.criteria("id").notEqual(new ObjectId(playerId)));
 		return query.asList();
 	}
 
 	public List<Player> searchOthersPlayers(String playerId) {
+		Player player = this.player(playerId);
 		Query<Player> query = mongoDatastore.find(Player.class);
 		query.and(query.criteria("id").notEqual(new ObjectId(playerId)));
+		for(Player friend : player.getFriends()){
+			query.and(query.criteria("id").notEqual(friend.getId()));
+		}
 		List<Player> players = query.asList();
 		shuffle(players);
 		return players.subList(0, AMOUNT_OF_OTHER_PLAYERS < players.size() ? AMOUNT_OF_OTHER_PLAYERS : players.size());
