@@ -32,7 +32,7 @@ public class SuggestionIndexerJob implements Runnable {
 	@Override
 	public void run() {
 		Logger.info("Starting SuggestionIndexerJob");
-		try{			
+		try{
 			List<Suggestion> acceptedSuggestions = suggestionService.acceptedSuggestions();
 			acceptedSuggestions.forEach(suggestion -> {
 				elasticUtil.indexWord(suggestion.getCategory().getId(), suggestion.getWrittenWord());

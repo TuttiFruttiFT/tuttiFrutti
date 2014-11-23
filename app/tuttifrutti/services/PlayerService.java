@@ -139,7 +139,7 @@ public class PlayerService {
 			}
 			
 			player.setMail(mail);
-			if(isValidNickname(nickname)){				
+			if(isValidNickname(nickname) && !nicknameAlreadyExists(player,nickname)){
 				player.setNickname(nickname);
 			}else{
 				return INVALID_NICKNAME;
@@ -154,6 +154,15 @@ public class PlayerService {
 		return NO_PLAYER_FOUND;
 	}
 	
+	private boolean nicknameAlreadyExists(Player player, String nickname) {
+		if(!StringUtils.equals(player.getNickname(), nickname)){
+			if(this.searchByNickname(nickname) != null){
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public void editSettings(String playerId, PlayerConfig config) {
 		Player player = mongoDatastore.get(Player.class,new ObjectId(playerId));
 		player.setConfig(config);
@@ -238,6 +247,11 @@ public class PlayerService {
 		Query<Player> query = mongoDatastore.find(Player.class, "mail =", mail.trim().toLowerCase());
 		return query.get();
 	}
+	
+	public Player searchByNickname(String nickname) {
+		Query<Player> query = mongoDatastore.find(Player.class, "nickname =", nickname.trim().toLowerCase());
+		return query.get();
+	}
 
 	public Player searchByFacebook(String facebookId) {
 		Query<Player> query = mongoDatastore.find(Player.class, "facebookId =", facebookId.trim().toLowerCase());
@@ -309,7 +323,7 @@ public class PlayerService {
 	}
 
 	private boolean isValidNickname(String nickname) {
-		return true;
+		return isNotEmpty(nickname);
 	}
 
 	public void addSocialNetwork(String playerId, String type, String id) {
