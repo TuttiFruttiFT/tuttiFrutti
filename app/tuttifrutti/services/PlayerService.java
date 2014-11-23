@@ -159,11 +159,13 @@ public class PlayerService {
 		return newPassword.length() >= 6;
 	}
 
-	public void addFriend(String playerId, String friendId) {
+	public Player addFriend(String playerId, String friendId) {
 		Player player = mongoDatastore.get(Player.class,new ObjectId(playerId));
 		Player friend = mongoDatastore.get(Player.class,new ObjectId(friendId));
 		player.addFriend(friend.reducedPlayer());
 		mongoDatastore.save(player);
+		
+		return player;
 	}
 	
 	public void removeFriend(String playerId, String friendId) {

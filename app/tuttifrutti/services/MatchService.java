@@ -18,6 +18,7 @@ import static tuttifrutti.models.enums.MatchState.REJECTED;
 import static tuttifrutti.models.enums.MatchState.TO_BE_APPROVED;
 import static tuttifrutti.models.enums.MatchType.PRIVATE;
 import static tuttifrutti.models.enums.MatchType.PUBLIC;
+import static tuttifrutti.utils.ConfigurationAccessor.i;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -74,7 +75,7 @@ public class MatchService {
 	@Autowired
 	private AlphabetService alphabetService;
 	
-	private static final int PUBLIC_NUMBER_OF_ROUND = ConfigurationAccessor.i("match.public.number_of_round");
+	private static final int PUBLIC_NUMBER_OF_ROUND = i("match.public.number_of_round");
 	
 	public List<ActiveMatch> activeMatches(String playerId) {
 		List<ActiveMatch> activeMatches = new ArrayList<>();

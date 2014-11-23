@@ -3,6 +3,7 @@ package tuttifrutti.models;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static tuttifrutti.models.enums.SuggestionState.REJECTED;
 import static tuttifrutti.models.enums.SuggestionState.TO_BE_ACCEPTED;
+import static tuttifrutti.utils.ConfigurationAccessor.i;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,9 +35,9 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Suggestion {
-	public static final int VOTES_TO_ACCEPT = 5;
-	public static final int VOTES_TO_REJECT = 5;
-	public static final int BATCH_SIZE = 20;
+	public static final int VOTES_TO_ACCEPT = i("suggestion.votes.accept");
+	public static final int VOTES_TO_REJECT = i("suggestion.votes.reject");
+	public static final int BATCH_SIZE = i("suggestion.batch_size");
 	
 	@Id
 	@JsonSerialize(using = ObjectIdSerializer.class)

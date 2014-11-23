@@ -169,9 +169,9 @@ public class Players extends Controller {
 		String playerId = json.get("player_id").asText();
 		String friendId = json.get("friend_id").asText();
 		
-		playerService.addFriend(playerId,friendId);
+		Player player = playerService.addFriend(playerId,friendId);
 		
-		return ok();
+		return ok(Json.toJson(player));
 	}
 	
 	@BodyParser.Of(BodyParser.Json.class)
