@@ -62,6 +62,7 @@ public class Players extends Controller {
 			String facebookId = json.get("facebook_id") != null ? json.get("facebook_id").asText() : null;
 			String nickname = json.get("nickname") != null ? json.get("nickname").asText() : null;
 			String twitterId = json.get("twitter_id") != null ? json.get("twitter_id").asText() : null;
+			String image = json.get("image") != null ? json.get("image").asText() : null;
 
 			Player player = null;
 			
@@ -70,7 +71,7 @@ public class Players extends Controller {
 				if(player == null){
 					if(playerService.isValidMail(mail)){
 						if(playerService.isValidPassword(password)){							
-							player = playerService.registerMail(mail,password);
+							player = playerService.registerMail(mail,password, image);
 						}else{
 							return badRequest(Json.newObject().put("status_code", INVALID_NEW_PASSWORD));
 						}
@@ -85,16 +86,17 @@ public class Players extends Controller {
 			}else if(isNotEmpty(facebookId) && isNotEmpty(nickname) && isNotEmpty(mail)){
 				player = playerService.searchByFacebook(facebookId);
 				if(player == null){					
-					player = playerService.registerFacebook(facebookId, nickname, mail);
+					player = playerService.registerFacebook(facebookId, nickname, mail, image);
 				}
 			}else if(isNotEmpty(twitterId) && isNotEmpty(nickname) && isNotEmpty(mail)){
 				player = playerService.searchByTwitter(twitterId);
 				if(player == null){					
-					player = playerService.registerTwitter(twitterId, nickname, mail);
+					player = playerService.registerTwitter(twitterId, nickname, mail, null);
 				}
 			}
 			
 			if(player != null){
+				playerService.addImage(player,image);
 				return ok(Json.toJson(player));
 			}
 

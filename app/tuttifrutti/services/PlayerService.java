@@ -6,6 +6,7 @@ import static java.util.regex.Pattern.CASE_INSENSITIVE;
 import static java.util.regex.Pattern.compile;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.joda.time.DateTime.now;
 import static play.libs.F.Promise.promise;
@@ -81,12 +82,13 @@ public class PlayerService {
 		return null;
 	}
 
-	public Player registerMail(String mail, String clave) {
+	public Player registerMail(String mail, String password, String image) {
 		Player player = new Player();
 		player.setNickname(nicknameFromMail(mail));
 		player.setMail(mail.trim().toLowerCase());
-		player.setPassword(clave);
+		player.setPassword(password);
 		player.setBalance(STARTING_RUS);
+		player.setImage(image);
 		mongoDatastore.save(player);
 		
 		return player;
@@ -97,23 +99,25 @@ public class PlayerService {
 		return (splittedMail.length > 0) ? splittedMail[0].trim() : mail.trim();
 	}
 
-	public Player registerFacebook(String facebookId, String nickname, String mail) {
+	public Player registerFacebook(String facebookId, String nickname, String mail, String image) {
 		Player player = new Player();
 		player.setNickname(nickname);
 		player.setMail(mail);
 		player.setFacebookId(facebookId);
 		player.setBalance(STARTING_RUS);
+		player.setImage(image);
 		mongoDatastore.save(player);
 		
 		return player;
 	}
 
-	public Player registerTwitter(String twitterId, String nickname, String mail) {
+	public Player registerTwitter(String twitterId, String nickname, String mail, String image) {
 		Player player = new Player();
 		player.setNickname(nickname);
 		player.setMail(mail);
 		player.setTwitterId(twitterId);
 		player.setBalance(STARTING_RUS);
+		player.setImage(image);
 		mongoDatastore.save(player);
 		
 		return player;
@@ -305,9 +309,6 @@ public class PlayerService {
 	}
 
 	private boolean isValidNickname(String nickname) {
-		if(nickname.length() < 3){
-			return false;
-		}
 		return true;
 	}
 
@@ -322,5 +323,12 @@ public class PlayerService {
 		}
 		
 		mongoDatastore.save(player);
+	}
+
+	public void addImage(Player player, String image) {
+		if(isEmpty(player.getImage())){
+			player.setImage(image);
+			mongoDatastore.save(player);
+		}
 	}
 }

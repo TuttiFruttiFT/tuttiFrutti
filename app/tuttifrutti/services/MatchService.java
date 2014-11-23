@@ -46,7 +46,6 @@ import tuttifrutti.models.Round;
 import tuttifrutti.models.Turn;
 import tuttifrutti.models.enums.MatchType;
 import tuttifrutti.models.views.ActiveMatch;
-import tuttifrutti.utils.ConfigurationAccessor;
 
 /**
  * @author rfanego
@@ -264,7 +263,7 @@ public class MatchService {
 		
 		config.setType(type);
 		config.setCurrentTotalNumberOfPlayers(config.getNumberOfPlayers());
-		config.setIncorporatedNumberOfPlayers(0);
+		config.setIncorporatedNumberOfPlayers(1);
 		match.setConfig(config);
 		match.setMatchName(matchName);
 		match.setName(matchName.getValue());
@@ -309,6 +308,8 @@ public class MatchService {
 				pushService.rejected(players,match);
 			}else{
 				match.decrementPlayers();
+				match.getConfig().decrementCurrentPlayers();
+				match.getMatchName().decrementPlayers();
 				List<Turn> turns = match.getLastRound().getTurns();
 				if(isNotEmpty(turns) && (turns.size() == match.getConfig().getCurrentTotalNumberOfPlayers())){
 					this.verifyResult(match, null);
