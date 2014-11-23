@@ -191,8 +191,7 @@ public class PlayerService {
 
 	public List<Player> searchPlayers(String word, String playerId) {
 		Query<Player> query = mongoDatastore.find(Player.class);
-		query.or(query.criteria("nickname").equal(compile(word, CASE_INSENSITIVE)),
-				query.criteria("mail").equal(compile(word, CASE_INSENSITIVE)));
+		query.or(query.criteria("nickname").equal(compile(word, CASE_INSENSITIVE)));
 		query.and(query.criteria("id").notEqual(new ObjectId(playerId)));
 		return query.asList();
 	}
