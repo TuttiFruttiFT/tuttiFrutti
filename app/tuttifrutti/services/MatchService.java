@@ -96,7 +96,10 @@ public class MatchService {
 				activeMatch.setWinner(match.getWinner());
 				activeMatch.setConfig(match.getConfig());
 				if(!match.getState().equals(EXPIRED) && !match.playerHasAlreadyPlayed(playerId)){
-					activeMatch.setRoundLeftTime(match.getConfig().getMode().time() - (now().getMillis() - match.getModifiedDate().getTime()));
+					long playerTime = match.playerResult(playerId).getModifiedDate().getTime();
+					long matchTime = match.getModifiedDate().getTime();
+					long time = Math.min(matchTime, playerTime);
+					activeMatch.setRoundLeftTime(match.getConfig().getMode().time() - (now().getMillis() - time));
 				}
 				activeMatches.add(activeMatch);
 			}
@@ -145,6 +148,7 @@ public class MatchService {
 		}
 		match.getPlayerResults().add(new PlayerResult(player,0,0,true,true,now().toDate(),0));		
 		match.incrementPlayers();
+		match.setModifiedDate(now().toDate());
 	}
 
 	public Match createPrivate(String playerId, String name, MatchConfig config, List<String> playerIds, List<String> categoryIds) {
