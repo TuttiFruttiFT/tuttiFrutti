@@ -5,6 +5,7 @@ import static java.util.Collections.shuffle;
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
 import static java.util.regex.Pattern.compile;
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.joda.time.DateTime.now;
 import static play.libs.F.Promise.promise;
@@ -200,9 +201,12 @@ public class PlayerService {
 		}
 		List<CriteriaContainerImpl> criterias = new ArrayList<>();
 		criterias.add(query.criteria("id").notEqual(new ObjectId(playerId)));
-		for(Player friend : player.getFriends()){
-			CriteriaContainerImpl notEqual = query.criteria("id").notEqual(friend.getId());
-			criterias.add(notEqual);
+		List<Player> friends = player.getFriends();
+		if(isNotEmpty(friends)){			
+			for(Player friend : friends){
+				CriteriaContainerImpl notEqual = query.criteria("id").notEqual(friend.getId());
+				criterias.add(notEqual);
+			}
 		}
 		query.and(criterias.toArray(new CriteriaContainerImpl[criterias.size()]));
 		return query.asList();
@@ -213,9 +217,12 @@ public class PlayerService {
 		Query<Player> query = mongoDatastore.find(Player.class);
 		List<CriteriaContainerImpl> criterias = new ArrayList<>();
 		criterias.add(query.criteria("id").notEqual(new ObjectId(playerId)));
-		for(Player friend : player.getFriends()){
-			CriteriaContainerImpl notEqualCriteria = query.criteria("id").notEqual(friend.getId());
-			criterias.add(notEqualCriteria);
+		List<Player> friends = player.getFriends();
+		if(isNotEmpty(friends)){
+			for(Player friend : friends){
+				CriteriaContainerImpl notEqual = query.criteria("id").notEqual(friend.getId());
+				criterias.add(notEqual);
+			}
 		}
 		query.and(criterias.toArray(new CriteriaContainerImpl[criterias.size()]));
 		List<Player> players = query.asList();
