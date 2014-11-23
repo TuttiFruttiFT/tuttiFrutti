@@ -18,6 +18,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.Datastore;
+import org.mongodb.morphia.query.CriteriaContainerImpl;
 import org.mongodb.morphia.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -201,10 +202,15 @@ public class PlayerService {
 	public List<Player> searchOthersPlayers(String playerId) {
 		Player player = this.player(playerId);
 		Query<Player> query = mongoDatastore.find(Player.class);
-		query.and(query.criteria("id").notEqual(new ObjectId(playerId)));
+		List<CriteriaContainerImpl> criterias = new ArrayList<>();
+		criterias.add(query.criteria("id").notEqual(new ObjectId(playerId)));
+//		query.and(query.criteria("id").notEqual(new ObjectId(playerId)));
 		for(Player friend : player.getFriends()){
-			query.and(query.criteria("id").notEqual(friend.getId()));
+			CriteriaContainerImpl notEqual = query.criteria("id").notEqual(friend.getId());
+//			query.and(notEqual);
+			criterias.add(notEqual);
 		}
+		query.and(criterias.toArray(new CriteriaContainerImpl[criterias.size()]));
 		List<Player> players = query.asList();
 		shuffle(players);
 		return players.subList(0, AMOUNT_OF_OTHER_PLAYERS < players.size() ? AMOUNT_OF_OTHER_PLAYERS : players.size());
