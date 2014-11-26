@@ -2,6 +2,7 @@ package tuttifrutti.services;
 
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static tuttifrutti.models.Suggestion.BATCH_SIZE;
 import static tuttifrutti.models.Suggestion.VOTES_TO_ACCEPT;
 import static tuttifrutti.models.enums.SuggestionState.ACCEPTED;
@@ -67,9 +68,14 @@ public class SuggestionService {
 		return suggestion;
 	}
 
-	public List<Suggestion> getSuggestions(String playerId) {
+	public List<Suggestion> getSuggestions(String playerId, List<String> ommitedWordIds) {
 		Query<Suggestion> query = mongoDatastore.find(Suggestion.class, "state =", SUGGESTED.toString());
 		query.and(query.criteria("player_ids").not().contains(playerId));
+		if(isNotEmpty(ommitedWordIds)){
+			ommitedWordIds.forEach(wordId -> {
+				query.and(query.criteria("id").notEqual(new ObjectId(wordId)));
+			});
+		}
 		return query.batchSize(BATCH_SIZE).asList();
 	}
 	

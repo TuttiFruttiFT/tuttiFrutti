@@ -98,8 +98,17 @@ public class Suggestions extends Controller {
         return ok();
     }
 	
-	public Result getWords(String playerId){
-		List<Suggestion> suggestions = suggestionService.getSuggestions(playerId);
+	public Result getWords(){
+		JsonNode jsonRequest = request().body().asJson();
+		List<String> ommitedWordIds = new ArrayList<>();
+		String playerId = jsonRequest.get("player_id").asText();
+		JsonNode jsonOmmitedWords = jsonRequest.get("ommited_words");
+		if(jsonOmmitedWords != null && !jsonOmmitedWords.isNull()){			
+			for(JsonNode jsonOmmitedWord : jsonOmmitedWords){
+				ommitedWordIds.add(jsonOmmitedWord.asText());
+			}
+		}
+		List<Suggestion> suggestions = suggestionService.getSuggestions(playerId, ommitedWordIds);
 
 		if(isNotEmpty(suggestions)){			
 			return ok(parse(parseListToJson(suggestions)));

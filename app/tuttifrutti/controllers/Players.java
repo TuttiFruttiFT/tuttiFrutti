@@ -91,7 +91,7 @@ public class Players extends Controller {
 			}else if(isNotEmpty(twitterId) && isNotEmpty(nickname) && isNotEmpty(mail)){
 				player = playerService.searchByTwitter(twitterId);
 				if(player == null){					
-					player = playerService.registerTwitter(twitterId, nickname, mail, null);
+					player = playerService.registerTwitter(twitterId, nickname, mail, image);
 				}
 			}
 			

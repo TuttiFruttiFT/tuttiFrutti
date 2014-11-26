@@ -3,6 +3,7 @@ package tuttifrutti.jobs;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.joda.time.DateTime.now;
 import static tuttifrutti.models.enums.MatchState.CLEAN;
+import static tuttifrutti.models.enums.MatchState.EXPIRED;
 import static tuttifrutti.models.enums.MatchState.FINISHED;
 
 import java.util.List;
@@ -27,7 +28,8 @@ public class FinishedMatchCleanerJob implements Runnable {
 	@Override
 	public void run() {
 		Logger.info("Starting FinishedMatchCleanerJob");
-		Query<Match> query = mongoDatastore.find(Match.class, "state =", FINISHED.toString());
+		Query<Match> query = mongoDatastore.find(Match.class);
+		query.or(query.criteria("state").equal(FINISHED),query.criteria("state").equal(EXPIRED));
 		query.and(query.criteria("modifiedDate").lessThanOrEq(now().minusDays(1).toDate()));
 		
 		List<Match> matches = query.asList();

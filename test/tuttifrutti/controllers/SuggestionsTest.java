@@ -2,6 +2,7 @@ package tuttifrutti.controllers;
 
 import static java.util.Collections.singletonList;
 import static org.fest.assertions.Assertions.assertThat;
+import static play.libs.Json.newObject;
 import static play.mvc.Http.Status.OK;
 import static play.test.Helpers.fakeApplication;
 import static play.test.Helpers.running;
@@ -64,7 +65,7 @@ public class SuggestionsTest extends ElasticSearchAwareTest{
 			Query<Suggestion> query = dataStore.find(Suggestion.class, "state =", SUGGESTED.toString());
 			List<Suggestion> suggestions = query.asList();
 			
-			assertThat(suggestionService.getSuggestions(playerId)).isEmpty();
+			assertThat(suggestionService.getSuggestions(playerId, null)).isEmpty();
 			assertThat(suggestions.size()).isEqualTo(2);
 			
 			suggestions.forEach(suggestion -> {
@@ -144,7 +145,7 @@ public class SuggestionsTest extends ElasticSearchAwareTest{
 			Query<Suggestion> querySuggested = dataStore.find(Suggestion.class, "state =", SUGGESTED.toString());
 			List<Suggestion> suggestionsSuggestedResult = querySuggested.asList();
 			
-			assertThat(suggestionService.getSuggestions(playerId)).isEmpty();
+			assertThat(suggestionService.getSuggestions(playerId, null)).isEmpty();
 			assertThat(suggestionsSuggestedResult.size()).isEqualTo(2);
 			
 			suggestionsSuggestedResult.forEach(suggestion -> {
@@ -187,20 +188,27 @@ public class SuggestionsTest extends ElasticSearchAwareTest{
 			String playerId2 = player2.getId().toString();
 			
 			Suggestion bandSuggestion = suggestionService.suggest(new Category("bands"), "  David Bowie  ", playerId1);
+			Suggestion ommitedColorSuggestion = suggestionService.suggest(new Category("colors"), "  Marrón Asqueroso  ", playerId2);
 			Suggestion colorSuggestion = suggestionService.suggest(new Category("colors"), "  Marrón Sucio  ", playerId2);
 			
 			dataStore.save(bandSuggestion);
 			dataStore.save(colorSuggestion);
+			dataStore.save(ommitedColorSuggestion);
 			
 			createAcceptedSuggestion(dataStore,playerId2, new Category("animals"), "Ay");
 			
-			WSResponse r = WS.url("http://localhost:9000/word/" + playerId1).setContentType("application/json").get().get(5000000L);
+			JsonNode jsonBody = newObject().put("player_id", playerId1)
+								.set("ommited_words", newObject().arrayNode().add(ommitedColorSuggestion.getId().toString()));
+			
+			WSResponse r = WS.url("http://localhost:9000/word").setContentType("application/json").post(jsonBody).get(5000000L);
 			
 			assertThat(r).isNotNull();
 			assertThat(r.getStatus()).isEqualTo(OK);
 			
-			JsonNode suggestionJson = r.asJson().get(0);
+			JsonNode jsonSuggestions = r.asJson();
+			JsonNode suggestionJson = jsonSuggestions.get(0);
 			
+			assertThat(jsonSuggestions.size()).isEqualTo(1);
 			assertThat(suggestionJson.get("category").get("id").textValue()).isEqualTo(colorSuggestion.getCategory().getId());
 			assertThat(suggestionJson.get("written_word").textValue()).isEqualTo(colorSuggestion.getWrittenWord());
 			assertThat(suggestionJson.get("id").textValue()).isEqualTo(colorSuggestion.getId().toString());

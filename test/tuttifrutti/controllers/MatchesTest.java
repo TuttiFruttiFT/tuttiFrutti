@@ -433,7 +433,7 @@ public class MatchesTest extends ElasticSearchAwareTest {
 					}
 					
 					if(powerUp.getName().equals(buy_time)){
-						assertThat(powerUp.getValue()).isEqualTo("3000");
+						assertThat(powerUp.getValue()).isEqualTo("5000");
 					}
 				});
 			});

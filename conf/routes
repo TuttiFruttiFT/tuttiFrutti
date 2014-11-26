@@ -50,7 +50,7 @@ POST	/word/suggestion							@tuttifrutti.controllers.Suggestions.suggest()
 
 POST	/word/judgement								@tuttifrutti.controllers.Suggestions.judge()
 
-GET		/word/:playerId								@tuttifrutti.controllers.Suggestions.getWords(playerId)
+POST	/word										@tuttifrutti.controllers.Suggestions.getWords()
 
 GET		/search/:playerId							@tuttifrutti.controllers.Searches.searchPlayers(playerId,search_term ?= null)
 
