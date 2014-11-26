@@ -2,6 +2,8 @@ package tuttifrutti.services;
 
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
+import static tuttifrutti.models.Letter.K;
+import static tuttifrutti.models.Letter.Q;
 import static tuttifrutti.models.Letter.W;
 import static tuttifrutti.models.Letter.X;
 import static tuttifrutti.models.Letter.values;
@@ -40,6 +42,8 @@ public class AlphabetService {
 	public AlphabetService(){
 		BANNED_LETTERS = new HashMap<>();
 		List<Letter> spanishBannedLetters = new ArrayList<>();
+		spanishBannedLetters.add(K);
+		spanishBannedLetters.add(Q);
 		spanishBannedLetters.add(X);
 		spanishBannedLetters.add(W);
 		BANNED_LETTERS.put(ES.toString(), spanishBannedLetters);

@@ -1,10 +1,13 @@
 package tuttifrutti.models.views;
 
+import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
 import tuttifrutti.models.MatchConfig;
 import tuttifrutti.models.MatchName;
 import tuttifrutti.models.Player;
+import tuttifrutti.models.PlayerResult;
 import tuttifrutti.models.Round;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -37,6 +40,8 @@ public class ActiveMatch {
 	
 	@JsonProperty(value = "round_left_time")
 	private long roundLeftTime;
+	
+	private List<PlayerResult> players;
 	
 	public void setMatchName(MatchName matchName){
 		this.matchName = matchName;

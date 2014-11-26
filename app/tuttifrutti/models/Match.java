@@ -369,6 +369,14 @@ public class Match {
 		this.playerResults.removeIf(playerResult -> playerResult.getPlayer().getId().toString().equals(aPlayer.getPlayer().getId().toString()));
 		this.decrementPlayers();
 	}
+
+	public List<PlayerResult> reducedPlayers() {
+		this.getPlayerResults().forEach(aPlayerResult -> {
+			Player reducedPlayer = aPlayerResult.getPlayer();
+			aPlayerResult.setPlayer(reducedPlayer);
+		});
+		return this.getPlayerResults();
+	}
 }
 
 class PlayerResultScoreComparator implements Comparator<PlayerResult>{

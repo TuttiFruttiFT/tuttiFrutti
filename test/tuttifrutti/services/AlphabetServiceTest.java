@@ -26,8 +26,8 @@ public class AlphabetServiceTest {
 			
 			Alphabet alphabet = service.alphabetForLanguage(ES.toString());
 			
-			assertThat(alphabet.getLetters().size()).isEqualTo(24);
-			assertThat(alphabet.getSize()).isEqualTo(24);
+			assertThat(alphabet.getLetters().size()).isEqualTo(22);
+			assertThat(alphabet.getSize()).isEqualTo(22);
 			assertThat(alphabet.getLetters()).excludes("X","W");
 		});
 	}
@@ -46,8 +46,8 @@ public class AlphabetServiceTest {
 			
 			Alphabet alphabet = service.alphabetForCategoriesAndLanguage(ES.toString(),singletonList(new Category("bands")));
 			
-			assertThat(alphabet.getLetters().size()).isEqualTo(21);
-			assertThat(alphabet.getSize()).isEqualTo(21);
+			assertThat(alphabet.getLetters().size()).isEqualTo(19);
+			assertThat(alphabet.getSize()).isEqualTo(19);
 			assertThat(alphabet.getLetters()).excludes("A","P","N","X","W");
 		});
 	}

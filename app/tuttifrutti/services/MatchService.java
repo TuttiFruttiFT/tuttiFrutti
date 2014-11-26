@@ -101,6 +101,7 @@ public class MatchService {
 					long time = Math.min(matchTime, playerTime);
 					activeMatch.setRoundLeftTime(match.getConfig().getMode().time() - (now().getMillis() - time));
 				}
+				activeMatch.setPlayers(match.reducedPlayers());
 				activeMatches.add(activeMatch);
 			}
 		}
