@@ -311,7 +311,6 @@ public class MatchService {
 				match.setState(REJECTED);
 				pushService.rejected(players,match);
 			}else{
-				match.decrementPlayers();
 				match.getConfig().decrementCurrentPlayers();
 				match.getMatchName().decrementPlayers();
 				List<Turn> turns = match.getLastRound().getTurns();
