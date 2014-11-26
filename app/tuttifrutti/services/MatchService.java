@@ -95,7 +95,7 @@ public class MatchService {
 				activeMatch.setState(match.getState().toString());
 				activeMatch.setWinner(match.getWinner());
 				activeMatch.setConfig(match.getConfig());
-				if(!match.getState().equals(EXPIRED) && !match.playerHasAlreadyPlayed(playerId)){
+				if(!match.getState().equals(EXPIRED) /*&& !match.playerHasAlreadyPlayed(playerId)*/){
 					long playerTime = match.playerResult(playerId).getModifiedDate().getTime();
 					long matchTime = match.getModifiedDate().getTime();
 					long time = Math.min(matchTime, playerTime);
