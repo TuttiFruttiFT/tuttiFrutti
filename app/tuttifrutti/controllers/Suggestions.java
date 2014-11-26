@@ -4,6 +4,7 @@ import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static play.libs.Json.parse;
+import static tuttifrutti.models.enums.SuggestionState.SUGGESTED;
 import static tuttifrutti.utils.JsonUtil.parseListToJson;
 
 import java.util.ArrayList;
@@ -48,7 +49,7 @@ public class Suggestions extends Controller {
 				if(category != null || !isEmpty(word)){
 					Logger.info("Category: " + category.getId());
 					Suggestion suggestion = suggestionService.suggest(category,word, playerId);
-					if(suggestion != null){						
+					if(suggestion != null && suggestion.getState().equals(SUGGESTED)){						
 						suggestions.add(suggestion);
 					}
 				}

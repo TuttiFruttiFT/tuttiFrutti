@@ -39,9 +39,11 @@ public class SuggestionService {
 		word = word.toLowerCase().trim();
 		Suggestion suggestion = search(category,word);
 		if(suggestion != null){
-			if(!suggestion.getPlayerIds().contains(playerId)){
-				suggestion.addPositiveVote();
-				suggestion.addPlayer(playerId);
+			if(suggestion.getState().equals(SUGGESTED)){				
+				if(!suggestion.getPlayerIds().contains(playerId)){
+					suggestion.addPositiveVote();
+					suggestion.addPlayer(playerId);
+				}
 			}
 		}else{
 			if(!elasticUtil.existWord(category.getId(), word)){		
