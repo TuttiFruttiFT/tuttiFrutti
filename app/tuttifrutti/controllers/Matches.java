@@ -102,6 +102,8 @@ public class Matches extends Controller {
 		
 		Match match = matchService.createPrivate(playerId, matchName,config, playerIds, categoryIds);
 		
+		match.getConfig().incrementIncorporatedPlayers();
+		
 		mongoDatastore.save(match);
 		
 		matchService.privateMatchReady(match, match.playersExcept(playerId));

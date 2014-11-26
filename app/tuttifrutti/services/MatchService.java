@@ -268,7 +268,7 @@ public class MatchService {
 		
 		config.setType(type);
 		config.setCurrentTotalNumberOfPlayers(config.getNumberOfPlayers());
-		config.setIncorporatedNumberOfPlayers(1);
+		config.setIncorporatedNumberOfPlayers(0);
 		match.setConfig(config);
 		match.setMatchName(matchName);
 		match.setName(matchName.getValue());
