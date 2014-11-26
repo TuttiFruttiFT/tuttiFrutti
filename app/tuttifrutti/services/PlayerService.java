@@ -182,11 +182,13 @@ public class PlayerService {
 		return player;
 	}
 	
-	public void removeFriend(String playerId, String friendId) {
+	public Player removeFriend(String playerId, String friendId) {
 		Player player = mongoDatastore.get(Player.class,new ObjectId(playerId));
 		
 		player.getFriends().removeIf(friend -> friend.getId().toString().equals(friendId));
 		mongoDatastore.save(player);
+		
+		return player;
 	}
 	
 	public boolean powerUp(String playerId, PowerUpType powerUp) {

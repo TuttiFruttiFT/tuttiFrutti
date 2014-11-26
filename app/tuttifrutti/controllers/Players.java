@@ -182,9 +182,9 @@ public class Players extends Controller {
 		String playerId = json.get("player_id").asText();
 		String friendId = json.get("friend_id").asText();
 		
-		playerService.removeFriend(playerId,friendId);
+		Player player = playerService.removeFriend(playerId,friendId);
 		
-		return ok();
+		return ok(Json.toJson(player));
 	}
 	
 	public Result friends(String playerId){
